@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"code.google.com/p/gcfg"
 	"code.google.com/p/getopt"
 	"fmt"
 	"log"
@@ -126,39 +125,6 @@ sub positionDeci (deg, min, sign string) float64 {
   return ( ( $deg + ( $min + $sec / 100 ) / 60 ) * $sign );
 }
 */
-func GetConfig(configFile string) {
-
-	var split, header, format string
-	var hdr_format []string
-
-	err := gcfg.ReadFileInto(&cfg, configFile)
-	if err == nil {
-		split = cfg.Ctd.Split
-		header = cfg.Ctd.Header
-		format = cfg.Ctd.Format
-		//		cruisePrefix = cfg.Ctd.CruisePrefix
-		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
-	} else {
-		log.Fatal(err)
-	}
-	fields := strings.Split(split, ",")
-	for i := 0; i < len(fields); i += 2 {
-		if v, err := strconv.Atoi(fields[i+1]); err == nil {
-			map_var[fields[i]] = v - 1
-		}
-	}
-	// Loop over the map.
-	//hdr = make([]string, len(strings.Fields(header)))
-	hdr = strings.Fields(header)
-
-	hdr_format = strings.Fields(format)
-	for i := 0; i < len(hdr); i++ {
-		map_format[hdr[i]] = hdr_format[i]
-	}
-	if *optDebug {
-		fmt.Println(header)
-	}
-}
 
 func DecodeHeader(str string) {
 	// decode Systeme Upload Time
@@ -282,76 +248,7 @@ func (mp MyData) NewMyType(name string, width, height int) *MyData {
 	return &mp
 }
 
-func main() {
-
-	// to change the flags on the default logger
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	// parse option, move outside main
-	optDebug = getopt.Bool('d', "debug", "Display debug info")
-	optEcho = getopt.Bool('e', "debug", "Display processing in stdout")
-	optHelp := getopt.Bool('h', "help", "Help")
-	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
-	optCfgfile := getopt.StringLong("config", 'c', cfgname, "Name of the configuration file to use.")
-	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
-	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv")
-
-	// parse options line argument
-	getopt.Parse()
-
-	if *optHelp {
-		getopt.Usage()
-		os.Exit(0)
-	}
-	if *optVersion {
-		fmt.Println(PROGNAME + ": " + PROGVERSION)
-		os.Exit(0)
-	}
-	if *optCycleMesure != "" {
-		fmt.Println(*optCycleMesure)
-		nc.Attributes["cycle_mesure"] = *optCycleMesure
-	}
-
-	// read configuration file, by default, optCfgfile = cfgname
-	GetConfig(*optCfgfile)
-
-	if *optDebug {
-		fmt.Println(map_format)
-	}
-
-	// init the data 2D for test
-	data := make(MyData)
-
-	// initialize map from netcdf structure
-	nc.Dimensions = make(map[string]int)
-	nc.Variables_1D = make(map[string][]float64)
-	nc.Variables_2D = make(map[string][]float64)
-	nc.Attributes = make(map[string]string)
-	nc.Variables_1D["PROFILE"] = []float64{}
-
-	// get files list from argument line
-	// Args returns the non-option arguments.
-	// see https://code.google.com/p/getopt/source/browse/set.go#27
-	var files []string
-	if *optFiles == "" {
-		files = getopt.Args()
-	} else { 
-		files, _ = filepath.Glob(*optFiles)
-	}
-	if *optDebug {
-		fmt.Println(files)
-	}
-
-	// open output file for writing result
-	fout, err := os.Create(outputFilename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer fout.Close()
-
-	// use buffered mode for writing
-	w := bufio.NewWriter(fout)
-
+func firstPass(files []string) {
 	// loop over each files passed throw command line
 	for _, file := range files {
 		fid, err := os.Open(file)
@@ -396,5 +293,132 @@ func main() {
 	if *optDebug {
 		fmt.Println(nc.Variables_1D["PROFILE"])
 	}
-	//	CreateNetcdfFile(outputFilename+".nc", nc)
+}
+
+func secondPass() {
+	// loop over each files passed throw command line
+	for _, file := range files {
+		fid, err := os.Open(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer fid.Close()
+
+		fmt.Printf("Read %s\n", file)
+		profile := GetProfileNumber(file)
+		scanner := bufio.NewScanner(fid)
+		for scanner.Scan() {
+			str := scanner.Text()
+			match := regIsHeader.MatchString(str)
+			if match {
+				DecodeHeader(str)
+			} else {
+				DecodeData(str, profile)
+				for i := range hdr {
+					if *optEcho {
+						fmt.Printf(map_format[hdr[i]]+" ", data[hdr[i]])
+					}
+					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
+				}
+				// add new line
+				if *optEcho {
+					fmt.Printf("\n")
+				}
+				fmt.Fprintf(w, "\n")
+			}
+			match = regEndOfHeader.MatchString(str)
+			if match {
+				WriteHeader()
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			log.Fatal(err)
+		}
+		w.Flush()
+	}
+	if *optDebug {
+		fmt.Println(nc.Variables_1D["PROFILE"])
+	}
+}
+
+func main() {
+
+	// to change the flags on the default logger
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	// parse option, move outside main
+	optDebug = getopt.Bool('d', "debug", "Display debug info")
+	optEcho = getopt.Bool('e', "debug", "Display processing in stdout")
+	optHelp := getopt.Bool('h', "help", "Help")
+	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
+	optCfgfile := getopt.StringLong("config", 'c', cfgname, "Name of the configuration file to use.")
+	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
+	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv")
+
+	// parse options line argument
+	getopt.Parse()
+
+	// process bloc when option is set
+	if *optHelp {
+		getopt.Usage()
+		os.Exit(0)
+	}
+	if *optVersion {
+		fmt.Println(PROGNAME + ": v" + PROGVERSION)
+		os.Exit(0)
+	}
+	if *optCycleMesure != "" {
+		fmt.Println(*optCycleMesure)
+		nc.Attributes["cycle_mesure"] = *optCycleMesure
+	}
+
+	// read configuration file, by default, optCfgfile = cfgname
+	GetConfig(*optCfgfile)
+
+	if *optDebug {
+		fmt.Println(map_format)
+	}
+
+	// init the data 2D for test
+	data := make(MyData)
+
+	// initialize map from netcdf structure
+	nc.Dimensions = make(map[string]int)
+	nc.Variables_1D = make(map[string][]float64)
+	nc.Variables_2D = make(map[string][]float64)
+	nc.Attributes = make(map[string]string)
+	nc.Variables_1D["PROFILE"] = []float64{}
+
+	// get files list from argument line
+	// Args returns the non-option arguments.
+	// see https://code.google.com/p/getopt/source/browse/set.go#27
+	var files []string
+	if *optFiles == "" {
+		files = getopt.Args()
+	} else { 
+		files, _ = filepath.Glob(*optFiles)
+	}
+	// if no files supplied for arg list, test if files is empty
+	if len(files) == 0 {
+		getopt.Usage()
+		os.Exit(0)
+	}
+	if *optDebug {
+		fmt.Println(files)
+	}
+
+	// open output file for writing result
+	fout, err := os.Create(outputFilename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fout.Close()
+
+	// use buffered mode for writing
+	w := bufio.NewWriter(fout)
+
+	firstPass()
+
+//		CreateNetcdfFile(outputFilename+".nc", nc)
 }
