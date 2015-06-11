@@ -1,19 +1,16 @@
 package main
 
 import (
-	//	"fmt"
+	//"fmt"
 	"github.com/fhs/go-netcdf/netcdf"
 )
-
-// remove
-//var x int = 4
-var y int = 10
 
 // CreateExampleFile creates an example NetCDF file containing only one variable.
 func CreateNetcdfFile(filename string, nc Nc) error {
 
 	// get variables_1D size
-	len_1D := len(nc.Variables_1D["PROFILE"])
+	len_1D := nc.Dimensions["TIME"]
+	len_2D := nc.Dimensions["DEPTH"]
 
 	// Create a new NetCDF 3 file. The dataset is returned.
 	ds, err := netcdf.CreateFile(filename, netcdf.CLOBBER)
@@ -31,7 +28,7 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 	if err != nil {
 		return err
 	}
-	dim_2D[1], err = ds.AddDim("DEPTH", uint64(y))
+	dim_2D[1], err = ds.AddDim("DEPTH", uint64(len_2D))
 	if err != nil {
 		return err
 	}
@@ -54,6 +51,10 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 			return err
 		}
 		map_2D[key] = v
+
+		// define attribbute, modify it !!!!
+		a := v.Attr("_FillValue")
+		a.WriteFloat64s([]float64{1e36})
 	}
 	/*
 		// defined variable attributes
@@ -82,20 +83,24 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 		}
 	}
 
-	/*
-		temp := make([]int32, p * wd)
-
+	for key, value := range nc.Variables_2D {
+		//fmt.Println(value.data)
 		i := 0
-		for y := 1; y <= p; y++ {
-			for x := 1; x <= wd; x++ {
-				temp[i] = int32(x * y)
+		ht := len(value.data)
+		wd := len(value.data[0])
+		//fmt.Printf("ht: %d, wd: %d\n", ht, wd)
+		gopher := make([]float64, ht*wd)
+		for x := 0; x < ht; x++ {
+			for y := 0; y < wd; y++ {
+				gopher[i] = value.data[x][y]
 				i++
 			}
 		}
-		err = v.WriteFloat64s(temp)
+		err = map_2D[key].WriteFloat64s(gopher)
 		if err != nil {
 			return err
 		}
-	*/
+	}
+
 	return nil
 }

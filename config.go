@@ -41,4 +41,3 @@ func GetConfig(configFile string) {
 		fmt.Println(header)
 	}
 }
-

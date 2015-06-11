@@ -48,18 +48,19 @@ type Config struct {
 		Format string
 	}
 }
+
+type Data_2D struct {
+	data [][]float64
+}
+
+type AllData_2D map[string]Data_2D
+
 type Nc struct {
 	Dimensions   map[string]int
 	Variables_1D map[string][]float64
-	Variables_2D map[string][]float64
+	Variables_2D AllData_2D
 	Attributes   map[string]string
 }
-
-type MyType struct {
-	someslice [][]int
-}
-
-type MyData map[string]MyType
 
 // configuration file
 const cfgname string = "test.ini"
@@ -235,20 +236,27 @@ func DecodeData(str string, profile float64) {
 	data["PRFL"] = profile
 }
 
-func (mp MyData) NewMyType(name string, width, height int) *MyData {
-	mt := new(MyType)
-	mt.someslice = make([][]int, width)
-	for i := range mt.someslice {
-		mt.someslice[i] = make([]int, height)
-		//		for j := range mt.someslice[i] {
-		//			mt.someslice[i][j] = j
-		//		}
+func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
+	mt := new(Data_2D)
+	mt.data = make([][]float64, width)
+	for i := range mt.data {
+		mt.data[i] = make([]float64, height)
+		for j := range mt.data[i] {
+			mt.data[i][j] = 1e36
+		}
 	}
 	mp[name] = *mt
 	return &mp
 }
 
-func firstPass(files []string) {
+// read all cnv files and return dimensions
+func firstPass(files []string) (int, int) {
+
+	var line int = 0
+	var depth int = 0
+
+	fmt.Printf("First pass:\n")
+
 	// loop over each files passed throw command line
 	for _, file := range files {
 		fid, err := os.Open(file)
@@ -257,47 +265,48 @@ func firstPass(files []string) {
 		}
 		defer fid.Close()
 
-		fmt.Printf("Read %s\n", file)
-		profile := GetProfileNumber(file)
+		//	profile := GetProfileNumber(file)  // ?
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
-			if match {
-				DecodeHeader(str)
-			} else {
-				DecodeData(str, profile)
-				for i := range hdr {
-					if *optEcho {
-						fmt.Printf(map_format[hdr[i]]+" ", data[hdr[i]])
-					}
-					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
-				}
-				// add new line
-				if *optEcho {
-					fmt.Printf("\n")
-				}
-				fmt.Fprintf(w, "\n")
-			}
-			match = regEndOfHeader.MatchString(str)
-			if match {
-				WriteHeader()
+			if !match {
+				//	DecodeData(str, profile) // ?
+				line += 1
 			}
 		}
+		if *optDebug {
+			fmt.Printf("Read %s size: %d\n", file, line)
+		}
+		if line > depth {
+			depth = line
+		}
+		line = 0
 
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
-		w.Flush()
 	}
-	if *optDebug {
-		fmt.Println(nc.Variables_1D["PROFILE"])
-	}
+	return len(files), depth
 }
 
-func secondPass() {
+func secondPass(files []string) {
+
+	var nbProfile int = 0
+
+	// open output file for writing result
+	fout, err := os.Create(outputFilename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fout.Close()
+
+	// use buffered mode for writing
+	w := bufio.NewWriter(fout)
+
 	// loop over each files passed throw command line
 	for _, file := range files {
+		var line int = 0
 		fid, err := os.Open(file)
 		if err != nil {
 			log.Fatal(err)
@@ -318,24 +327,38 @@ func secondPass() {
 					if *optEcho {
 						fmt.Printf(map_format[hdr[i]]+" ", data[hdr[i]])
 					}
+					// write data to ascii file
 					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
+
+					// fill 2D slice for netcdf
+					if hdr[i] != "PRFL" {
+						if *optEcho {
+							//fmt.Printf("%1d %2d %s %6.3f\n", nbProfile, line, hdr[i], data[hdr[i]])
+						}
+						nc.Variables_2D[hdr[i]].data[nbProfile][line] = data[hdr[i]]
+					}
 				}
 				// add new line
 				if *optEcho {
 					fmt.Printf("\n")
 				}
 				fmt.Fprintf(w, "\n")
+				line++
 			}
 			match = regEndOfHeader.MatchString(str)
 			if match {
 				WriteHeader()
 			}
+			//	fmt.Println(line)
 		}
 
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
 		w.Flush()
+
+		// increment index in sclice
+		nbProfile += 1
 	}
 	if *optDebug {
 		fmt.Println(nc.Variables_1D["PROFILE"])
@@ -381,12 +404,11 @@ func main() {
 	}
 
 	// init the data 2D for test
-	data := make(MyData)
+	//data := make(MyData)
 
 	// initialize map from netcdf structure
 	nc.Dimensions = make(map[string]int)
 	nc.Variables_1D = make(map[string][]float64)
-	nc.Variables_2D = make(map[string][]float64)
 	nc.Attributes = make(map[string]string)
 	nc.Variables_1D["PROFILE"] = []float64{}
 
@@ -396,7 +418,7 @@ func main() {
 	var files []string
 	if *optFiles == "" {
 		files = getopt.Args()
-	} else { 
+	} else {
 		files, _ = filepath.Glob(*optFiles)
 	}
 	// if no files supplied for arg list, test if files is empty
@@ -408,17 +430,18 @@ func main() {
 		fmt.Println(files)
 	}
 
-	// open output file for writing result
-	fout, err := os.Create(outputFilename)
-	if err != nil {
-		log.Fatal(err)
+	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = firstPass(files)
+	//fmt.Printf("x: %d, y: %d\n", nc.Dimensions["TIME"], nc.Dimensions["DEPTH"])
+
+	nc.Variables_2D = make(AllData_2D)
+	for i, _ := range map_var {
+		nc.Variables_2D.NewData_2D(i, nc.Dimensions["TIME"], nc.Dimensions["DEPTH"])
 	}
-	defer fout.Close()
+	secondPass(files)
+	//	for i, v := range nc.Variables_2D {
+	//			fmt.Printf("%s:", i)
+	//			fmt.Println(v.data)*/
+	//	}
 
-	// use buffered mode for writing
-	w := bufio.NewWriter(fout)
-
-	firstPass()
-
-//		CreateNetcdfFile(outputFilename+".nc", nc)
+	CreateNetcdfFile(outputFilename+".nc", nc)
 }
