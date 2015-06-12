@@ -294,6 +294,8 @@ func secondPass(files []string) {
 
 	var nbProfile int = 0
 
+	fmt.Printf("Second pass:\n")
+
 	// open output file for writing result
 	fout, err := os.Create(outputFilename)
 	if err != nil {
@@ -313,7 +315,8 @@ func secondPass(files []string) {
 		}
 		defer fid.Close()
 
-		fmt.Printf("Read %s\n", file)
+		// fmt.Printf("Read %s\n", file)
+
 		profile := GetProfileNumber(file)
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {

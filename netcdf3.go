@@ -1,12 +1,15 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/fhs/go-netcdf/netcdf"
 )
 
 // CreateExampleFile creates an example NetCDF file containing only one variable.
 func CreateNetcdfFile(filename string, nc Nc) error {
+
+	// if *optEcho
+	fmt.Printf("wrinting netCDF: %s\n", filename)
 
 	// get variables_1D size
 	len_1D := nc.Dimensions["TIME"]
@@ -77,6 +80,10 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 
 	// Create the data with the above dimensions and write it to the file.
 	for key, value := range nc.Variables_1D {
+
+		// if *optEcho
+		fmt.Printf("wrinting %s: %d\n", key, len(value))
+
 		err = map_1D[key].WriteFloat64s([]float64(value))
 		if err != nil {
 			return err
@@ -84,11 +91,14 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 	}
 
 	for key, value := range nc.Variables_2D {
-		//fmt.Println(value.data)
+
 		i := 0
 		ht := len(value.data)
 		wd := len(value.data[0])
-		//fmt.Printf("ht: %d, wd: %d\n", ht, wd)
+
+		// if *optEcho
+		fmt.Printf("wrinting %s: %d x %d\n", key, ht, wd)
+
 		gopher := make([]float64, ht*wd)
 		for x := 0; x < ht; x++ {
 			for y := 0; y < wd; y++ {
@@ -101,6 +111,9 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 			return err
 		}
 	}
+
+	// if *optEcho
+	fmt.Printf("wrinting %s done ...", filename)
 
 	return nil
 }
