@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/getopt"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -98,37 +99,48 @@ var outputFilename string = "test_ctd"
 var nc Nc
 
 func Julian(date string) float64 {
-	day, _ := time.ParseInLocation("20060102150405", date, time.UTC)
-	const julian = 2453738.4195
-	// Easiest way to get the time.Time of the Unix time.
-	// (See comments for the UnixDate in package Time.)
-	unix := time.Unix(1136239445, 0)
-	const oneDay = float64(86400. * time.Second)
-	return julian + float64(day.Sub(unix))/oneDay
+	t, _ := time.ParseInLocation("20060102150405", date, time.UTC)
+	const UNIX_DATE_ORIGIN = -631152000 // 1950/1/1 00:00:00
+
+	a := float64(14-t.Month()) / 12
+	y := float64(t.Year()) + 4800.0 - a
+	m := float64(t.Month()) + 12*a - 3
+	julianDay := float64(t.Day()) + (153*m+2)/5 + 365*y + y/4
+	julianDay = julianDay - y/100 + y/400 - 32045.0 - 2433283.0 +
+		float64(t.Hour()) - 12/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
+	fmt.Println("jj:", julianDay)
+	return julianDay
 }
 
-/*
-sub positionDeci (deg, min, sign string) float64 {
+func positionDeci(pos string) float64 {
 
-  #controle du format des parametres
-  $hemi = uc $hemi;
-  if ( $hemi !~ /[NSEW]/ ) {
-    die "Mauvais parametre '$hemi' : format hemi [NSEW]\n";
-  }
+	var multiplier float64 = 1
+	var value float64
 
-  my $sign = 1;
-  if ( $hemi eq "S" || $hemi eq "W" ) {
-    $sign = -1;
-  }
-  my $tmp = $min;
-  $min = abs $tmp;
-  my $sec = ( $tmp - $min ) * 100;
-  return ( ( $deg + ( $min + $sec / 100 ) / 60 ) * $sign );
+	var regNmeaPos = regexp.MustCompile(`(\d+)\s+(\d+.\d+)\s+(\w)`)
+
+	if strings.Contains(pos, "S") || strings.Contains(pos, "W") {
+		multiplier = -1.0
+	}
+	match := regNmeaPos.MatchString(pos)
+	if match {
+		res := regNmeaPos.FindStringSubmatch(pos)
+		deg, _ := strconv.ParseFloat(res[1], 64)
+		min, _ := strconv.ParseFloat(res[2], 64)
+		tmp := math.Abs(min)
+		sec := (tmp - min) * 100.0
+		value = (deg + (min+sec/100.0)/60.0) * multiplier
+		if *optDebug {
+			fmt.Println("positionDeci:", pos, " -> ", value)
+		}
+	}
+	return value
 }
-*/
 
 func DecodeHeader(str string) {
 	// decode Systeme Upload Time
+	var v float64 = 1e36
+
 	match := regSystemTime.MatchString(str)
 	if match {
 		res := regSystemTime.FindStringSubmatch(str)
@@ -141,7 +153,9 @@ func DecodeHeader(str string) {
 		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
 			if *optDebug {
 				fmt.Println(t.Format("20060102150405"))
-				fmt.Printf("Julian: %f\n", Julian(t.Format("20060102150405")))
+				v = Julian(t.Format("20060102150405"))
+				fmt.Printf("Julian: %f\n", v)
+				nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
 			}
 		} else {
 			fmt.Println("Failed to decode time:", err)
@@ -149,17 +163,13 @@ func DecodeHeader(str string) {
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
-		//		res := regNmeaLatitude.FindStringSubmatch(str)
-		//		deg := res[1]; min:=res[2]; sign:=res[3]
-		//		fmt.Printf("%s %s %s", deg, min, sign)
+		v := positionDeci(str)
+		nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], v)
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
-		res := regNmeaLongitude.FindStringSubmatch(str)
-		value := res[1]
-		if *optDebug {
-			fmt.Println(value)
-		}
+		v := positionDeci(str)
+		nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
 	}
 	match = regCruise.MatchString(str)
 	if match {
@@ -222,6 +232,9 @@ func GetProfileNumber(path string) float64 {
 	reg := fmt.Sprintf("%s(\\d{%s})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
 	r := regexp.MustCompile(reg)
 	match := r.FindStringSubmatch(strings.ToLower(path))
+	if *optDebug {
+		fmt.Println("Get Profile number: ", path, "value:", match)
+	}
 	value, _ := strconv.ParseFloat(match[1], 64)
 	return value
 }
@@ -414,6 +427,9 @@ func main() {
 	nc.Variables_1D = make(map[string][]float64)
 	nc.Attributes = make(map[string]string)
 	nc.Variables_1D["PROFILE"] = []float64{}
+	//	nc.Variables_1D["TIME"] = []float64{}
+	//	nc.Variables_1D["LATITUDE"] = []float64{}
+	//	nc.Variables_1D["LONGITUDE"] = []float64{}
 
 	// get files list from argument line
 	// Args returns the non-option arguments.
@@ -433,18 +449,37 @@ func main() {
 		fmt.Println(files)
 	}
 
+	// first pass, return dimensions fron cnv files
 	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = firstPass(files)
 	//fmt.Printf("x: %d, y: %d\n", nc.Dimensions["TIME"], nc.Dimensions["DEPTH"])
 
+	// initialize 1D data, put it in function
+	nc.Variables_1D["TIME"] = make([]float64, nc.Dimensions["TIME"])
+	nc.Variables_1D["LATITUDE"] = make([]float64, nc.Dimensions["LATITUDE"])
+	nc.Variables_1D["LONGITUDE"] = make([]float64, nc.Dimensions["LONGITUDE"])
+	//	for i := 0; i < nc.Dimensions["TIME"]; i++ {
+	//		fmt.Println(nc.Variables_1D["TIME"])
+	//		fmt.Printf("i: %d\n", i)
+	//		v := nc.Variables_1D["TIME"]
+	//		v[i] = 1e36
+	//		nc.Variables_1D["TIME"] = v
+	//		//		nc.Variables_1D["LATITUDE"][i] = 1e36
+	//		//		nc.Variables_1D["LONGITUDE"][i] = 1e3*/6
+	//	}
+
+	// initialize 2D data
 	nc.Variables_2D = make(AllData_2D)
 	for i, _ := range map_var {
 		nc.Variables_2D.NewData_2D(i, nc.Dimensions["TIME"], nc.Dimensions["DEPTH"])
 	}
+
+	// second pass, read files again, extract data and fill slices
 	secondPass(files)
 	//	for i, v := range nc.Variables_2D {
 	//			fmt.Printf("%s:", i)
 	//			fmt.Println(v.data)*/
 	//	}
 
+	// write netcdf file
 	CreateNetcdfFile(outputFilename+".nc", nc)
 }
