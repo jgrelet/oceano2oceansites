@@ -40,7 +40,7 @@ $ go build
 
 Usage:
 ```
-> oceano2oceansites -h
+$ oceano2oceansites -h
 Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameters ...]
  -c, --config=value
                     Name of the configuration file to use.
