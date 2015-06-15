@@ -53,6 +53,29 @@ Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameter
  -v, --version      Show version, then exit.
 
 ```
+Edit config file:
+```
+[global]
+author         = your name
+
+[cruise]
+cycleMesure    = CRUISE_NAME
+plateforme     = SHIP
+callsign       = XXXX
+
+[ctd]
+cruisePrefix   = fr25
+stationPrefixLength  = 3
+header         = PRFL  PRES   DEPH   ETDD      TEMP    PSAL     DENS   SVEL    DOX2    FLU2    TUR3   NAVG
+format         = %05.0f  %4.0f    %6.1f %10.6f    %7.4f    %7.4f   %7.5f   %6.3f  %7.2f   %6.3f   %7.3f   %4.0f
+split          = ETDD,2,PRES,3,DEPH,4,TEMP,5,CNDC,7,FLU2,13,TUR3,14,DOX2,15,NAVG,17,PSAL,18,DENS,20,SVEL,22
+
+#header         = PRFL  PRES   DEPH   ETDD      TE01    TE02     PSA1    PSA2    CND1    CND2   DEN1   DEN2   SVEL    FLU2   TUR3   DO12   DO22    DOV1  DOV2     DVT1     DVT2   NAVG
+#split          = ETDD,2,PRES,3,DEPH,4,TE01,5,TE02,6,CND1,7,CND2,8,DOV1,9,DOV2,10,DVT1,11,DVT2,12,FLU2,13,TUR3,14,DO12,15,DO22,16,NAVG,17,PSA1,18,PSA2,19,DEN1,20,DEN2,21,SVEL,22
+#format         = %05.0f  %4.0f    %6.1f %10.6f    %7.4f   %7.4f     %7.4f   %7.4f   %7.5f   %7.5f  %6.3f  %6.3f  %7.2f   %6.3f  %6.2f  %7.3f  %7.3f   %6.4f %6.4f   %+7.5f   %+7.5f   %4.0f
+```
+header and format are used for output ASCII file. header give also the parameter list for Netcdf file
+split is used to extract parameter from seabird cnv files.
 
 Check data with ncdump:
 ```
