@@ -45,8 +45,8 @@ Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameter
  -c, --config=value
                     Name of the configuration file to use.
  -d                 debug
- -e                 debug
- -f, --files=value  files to process ex: data/fr25*.cnv
+ -e                 echo
+ -f, --files=value  files to process ex: data/dfr25*.cnv
  -h                 help
  -m, --cycle_mesure=value
                     Name of cycle_mesure
