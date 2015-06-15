@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"code.google.com/p/getopt"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -99,20 +100,22 @@ var outputFilename string = "test_ctd"
 var nc Nc
 
 func Julian(date string) float64 {
-	t, _ := time.ParseInLocation("20060102150405", date, time.UTC)
-	const UNIX_DATE_ORIGIN = -631152000 // 1950/1/1 00:00:00
+	const DIFF_ORIGIN = 2433283.0 // diff between UNIX DATE and 1950/1/1 00:00:00
 
-	a := float64(14-t.Month()) / 12
-	y := float64(t.Year()) + 4800.0 - a
-	m := float64(t.Month()) + 12*a - 3
-	julianDay := float64(t.Day()) + (153*m+2)/5 + 365*y + y/4
-	julianDay = julianDay - y/100 + y/400 - 32045.0 - 2433283.0 +
-		float64(t.Hour()) - 12/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
-	fmt.Println("jj:", julianDay)
-	return julianDay
+	t, _ := time.Parse("20060102150405", date)
+	a := int(14-t.Month()) / 12
+	y := t.Year() + 4800 - a
+	m := int(t.Month()) + 12*a - 3
+	julianDay := int(t.Day()) + (153*m+2)/5 + 365*y + y/4
+	julianDay = julianDay - y/100 + y/400 - 32045.0 - DIFF_ORIGIN //+
+	//float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
+	if *optDebug {
+		fmt.Println("Julian day:", date, " -> ", julianDay)
+	}
+	return float64(julianDay) + float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
 }
 
-func positionDeci(pos string) float64 {
+func positionDeci(pos string) (float64, error) {
 
 	var multiplier float64 = 1
 	var value float64
@@ -133,8 +136,10 @@ func positionDeci(pos string) float64 {
 		if *optDebug {
 			fmt.Println("positionDeci:", pos, " -> ", value)
 		}
+	} else {
+		return 1e36, errors.New("positionDeci: failed to decode position")
 	}
-	return value
+	return value, nil
 }
 
 func DecodeHeader(str string) {
@@ -146,30 +151,35 @@ func DecodeHeader(str string) {
 		res := regSystemTime.FindStringSubmatch(str)
 		value := res[1]
 		if *optDebug {
-			fmt.Println(value)
+			fmt.Printf("%s -> ", value)
 		}
 		// parse time with non standard format, see:
 		// http://golang.org/src/time/format.go
 		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
 			if *optDebug {
-				fmt.Println(t.Format("20060102150405"))
 				v = Julian(t.Format("20060102150405"))
-				fmt.Printf("Julian: %f\n", v)
 				nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
 			}
 		} else {
 			fmt.Println("Failed to decode time:", err)
+			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], 1e36)
 		}
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
-		v := positionDeci(str)
-		nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], v)
+		if v, err := positionDeci(str); err == nil {
+			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], v)
+		} else {
+			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
+		}
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
-		v := positionDeci(str)
-		nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
+		if v, err := positionDeci(str); err == nil {
+			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
+		} else {
+			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
+		}
 	}
 	match = regCruise.MatchString(str)
 	if match {
@@ -198,6 +208,8 @@ func DecodeHeader(str string) {
 				fmt.Println(v)
 			}
 			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], v)
+		} else {
+			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], 1e36)
 		}
 	}
 	match = regBottomDepth.MatchString(str)
@@ -209,6 +221,8 @@ func DecodeHeader(str string) {
 				fmt.Println(v)
 			}
 			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], v)
+		} else {
+			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], 1e36)
 		}
 	}
 	match = regOperator.MatchString(str)
@@ -225,7 +239,6 @@ func WriteHeader() {
 	if *optDebug {
 		fmt.Printf("%s\n", header.Time)
 	}
-	//	fmt.Fprintf(w, "%s\n", header.Time)
 }
 
 func GetProfileNumber(path string) float64 {
@@ -233,7 +246,7 @@ func GetProfileNumber(path string) float64 {
 	r := regexp.MustCompile(reg)
 	match := r.FindStringSubmatch(strings.ToLower(path))
 	if *optDebug {
-		fmt.Println("Get Profile number: ", path, "value:", match)
+		fmt.Println("Get Profile number: ", path, "-> ", match)
 	}
 	value, _ := strconv.ParseFloat(match[1], 64)
 	return value
@@ -365,7 +378,6 @@ func secondPass(files []string) {
 			if match {
 				WriteHeader()
 			}
-			//	fmt.Println(line)
 		}
 
 		if err := scanner.Err(); err != nil {
@@ -419,17 +431,14 @@ func main() {
 		fmt.Println(map_format)
 	}
 
-	// init the data 2D for test
-	//data := make(MyData)
-
 	// initialize map from netcdf structure
 	nc.Dimensions = make(map[string]int)
-	nc.Variables_1D = make(map[string][]float64)
 	nc.Attributes = make(map[string]string)
+	nc.Variables_1D = make(map[string][]float64)
 	nc.Variables_1D["PROFILE"] = []float64{}
-	//	nc.Variables_1D["TIME"] = []float64{}
-	//	nc.Variables_1D["LATITUDE"] = []float64{}
-	//	nc.Variables_1D["LONGITUDE"] = []float64{}
+	nc.Variables_1D["TIME"] = []float64{}
+	nc.Variables_1D["LATITUDE"] = []float64{}
+	nc.Variables_1D["LONGITUDE"] = []float64{}
 
 	// get files list from argument line
 	// Args returns the non-option arguments.
@@ -451,21 +460,6 @@ func main() {
 
 	// first pass, return dimensions fron cnv files
 	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = firstPass(files)
-	//fmt.Printf("x: %d, y: %d\n", nc.Dimensions["TIME"], nc.Dimensions["DEPTH"])
-
-	// initialize 1D data, put it in function
-	nc.Variables_1D["TIME"] = make([]float64, nc.Dimensions["TIME"])
-	nc.Variables_1D["LATITUDE"] = make([]float64, nc.Dimensions["LATITUDE"])
-	nc.Variables_1D["LONGITUDE"] = make([]float64, nc.Dimensions["LONGITUDE"])
-	//	for i := 0; i < nc.Dimensions["TIME"]; i++ {
-	//		fmt.Println(nc.Variables_1D["TIME"])
-	//		fmt.Printf("i: %d\n", i)
-	//		v := nc.Variables_1D["TIME"]
-	//		v[i] = 1e36
-	//		nc.Variables_1D["TIME"] = v
-	//		//		nc.Variables_1D["LATITUDE"][i] = 1e36
-	//		//		nc.Variables_1D["LONGITUDE"][i] = 1e3*/6
-	//	}
 
 	// initialize 2D data
 	nc.Variables_2D = make(AllData_2D)
@@ -475,10 +469,6 @@ func main() {
 
 	// second pass, read files again, extract data and fill slices
 	secondPass(files)
-	//	for i, v := range nc.Variables_2D {
-	//			fmt.Printf("%s:", i)
-	//			fmt.Println(v.data)*/
-	//	}
 
 	// write netcdf file
 	CreateNetcdfFile(outputFilename+".nc", nc)
