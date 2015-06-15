@@ -26,7 +26,8 @@ Compile and test (linux, cygwin):
 With Windows console, use :
 > go run *.go --files=data/fr24/dfr24*.cnv 
 
-Usage:`
+Usage:
+```
 > go run *.go -h
 Usage: C:\cygwin\tmp\go-build214590755\command-line-arguments\_obj\exe\config.exe [-dehv] [-c value] [-f value] [-m value] [parameters ...]
  -c, --config=value
@@ -38,7 +39,7 @@ Usage: C:\cygwin\tmp\go-build214590755\command-line-arguments\_obj\exe\config.ex
  -m, --cycle_mesure=value
                     Name of cycle_mesure
  -v, --version      Show version, then exit.
-`
+```
 
 
 
