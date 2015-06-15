@@ -20,6 +20,9 @@ Install package go-netcdf from https://github.com/fhs/go-netcdf/
 Install getopt package
 > go get code.google.com/p/getopt
 
+Add some Seabird cnv files under data directory, 
+for example data/fr24/*.cnv
+
 Run and test (linux, cygwin):
 > go run *.go data/fr24/dfr24*.cnv 
 

@@ -248,6 +248,7 @@ func GetProfileNumber(path string) float64 {
 	if *optDebug {
 		fmt.Println("Get Profile number: ", path, "-> ", match)
 	}
+	// add test !!!!!!!!!!!!!!
 	value, _ := strconv.ParseFloat(match[1], 64)
 	return value
 }
