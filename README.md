@@ -8,7 +8,7 @@ Install golang from https://golang.org
 
 Install tdm-gcc from http://tdm-gcc.tdragon.net/
 
-Install Git for Windows
+Install Git for Windows https://git-scm.com/download/win
 
 Install Mercurial (hg) from https://mercurial.selenic.com/
 
