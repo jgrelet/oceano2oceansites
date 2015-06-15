@@ -20,7 +20,7 @@ $ go get github.com/fhs/go-netcdf/netcdf
 ```
 Install getopt package
 ```
-go get code.google.com/p/getopt
+$ go get code.google.com/p/getopt
 ```
 Add some Seabird cnv files under data directory, 
 for example data/fr24/*.cnv
