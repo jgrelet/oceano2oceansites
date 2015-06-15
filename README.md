@@ -29,7 +29,7 @@ Run and test (linux, cygwin):
 ```
 $ go run *.go data/fr24/dfr24*.cnv 
 ```
-on Windows console, use :
+with a Windows console, use :
 ```
 $ go run *.go --files=data/fr24/dfr24*.cnv 
 ```
