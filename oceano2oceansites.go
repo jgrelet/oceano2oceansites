@@ -246,7 +246,7 @@ func GetProfileNumber(path string) float64 {
 	r := regexp.MustCompile(reg)
 	match := r.FindStringSubmatch(strings.ToLower(path))
 	if *optDebug {
-		fmt.Println("Get Profile number: ", path, "-> ", match)
+		fmt.Println("Get profile number: ", path, "-> ", match)
 	}
 	// add test !!!!!!!!!!!!!!
 	value, _ := strconv.ParseFloat(match[1], 64)
