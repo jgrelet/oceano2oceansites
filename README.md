@@ -20,16 +20,19 @@ Install package go-netcdf from https://github.com/fhs/go-netcdf/
 Install getopt package
 > go get code.google.com/p/getopt
 
-Compile and test (linux, cygwin):
+Run and test (linux, cygwin):
 > go run *.go data/fr24/dfr24*.cnv 
 
-With Windows console, use :
+on Windows console, use :
 > go run *.go --files=data/fr24/dfr24*.cnv 
+
+Compile it:
+> go build
 
 Usage:
 ```
-> go run *.go -h
-Usage: C:\cygwin\tmp\go-build214590755\command-line-arguments\_obj\exe\config.exe [-dehv] [-c value] [-f value] [-m value] [parameters ...]
+> oceano2oceansites -h
+Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameters ...]
  -c, --config=value
                     Name of the configuration file to use.
  -d                 debug
@@ -39,7 +42,10 @@ Usage: C:\cygwin\tmp\go-build214590755\command-line-arguments\_obj\exe\config.ex
  -m, --cycle_mesure=value
                     Name of cycle_mesure
  -v, --version      Show version, then exit.
+
 ```
+
+
 
 
 
