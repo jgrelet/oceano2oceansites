@@ -2,7 +2,7 @@
 
 This application read Seabird CTD cnv files, extract data from header files and write result into one ASCII file and NetCDF OceanSITES file.
 
-Installation:
+Installation for Windows:
 
 Install golang from https://golang.org
 
@@ -12,12 +12,37 @@ Install Git for Windows https://git-scm.com/download/win
 
 Install Mercurial (hg) from https://mercurial.selenic.com/
 
+Update your path env with setx
+```
+$ setx path "%path%;C:\opt\go\bin;C:\opt\TDM-GCC-64\bin;C:\opt\netCDF-4.3.3.1\bin;C:\Program F
+iles (x86)\Git\bin;C:\Program Files\Mercurial\"
+```
+or see http://www.computerhope.com/issues/ch000549.htm
+
 Insall Netcdf 4.3 NC4-64 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
 
 Install package go-netcdf from https://github.com/fhs/go-netcdf/
 ```
 $ go get github.com/fhs/go-netcdf/netcdf
 ```
+Installation should be failed during compilation, The pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html
+
+A faster implementation is to change these cgo directives in dataset.go and attribute.go before compilation
+Replace :
+```
+// #cgo pkg-config: nectcdf
+```
+with:
+```
+// #cgo windows CFLAGS: -I C:/opt/netCDF-4.3.3.1/include
+// #cgo windows LDFLAGS: -lnetcdf -lhdf5 -lhdf5_hl -lzlib -L C:/opt/netCDF-4.3.3.1/lib
+```
+Restart package installation
+```
+// #cgo pkg-config: nectcdf
+```
+The netcdf.a library sould be installed under `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
+
 Install getopt package
 ```
 $ go get code.google.com/p/getopt
