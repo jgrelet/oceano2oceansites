@@ -2,7 +2,7 @@
 
 This application read Seabird CTD cnv files, extract data from header files and write result into one ASCII file and NetCDF OceanSITES file.
 
-Installation for Windows:
+Installation for Windows (programs are installed under `c:\opt` instead of the default installation):
 
 Install golang from https://golang.org
 
