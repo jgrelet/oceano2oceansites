@@ -107,11 +107,12 @@ All the physical parameters definition are decribed inside `code_roscop.csv`. Yo
 Example:
 ```
 TYPE;string;string;float64;float64;string;float64
-SSPS;SEA SURFACE PRACTICAL SALINITY;P.S.S.78;0;40;%6.3lf;1e36
-SSTP;SEA SURFACE TEMPERATURE;Celsius degree;-1.5;38;%6.3lf;1e36
 TEMP;SEA TEMPERATURE;Celsius degree;0;30;%6.3lf;1e36
+SSTP;SEA SURFACE TEMPERATURE;Celsius degree;-1.5;38;%6.3lf;1e36
 PSAL;PRACTICAL SALINITY SCALE 1978;P.S.S.78;33;37;%6.3lf;1e36
-PSAL;PRACTICAL SALINITY SCALE 1978;P.S.S.78;33;37;%6.3lf;1e36
+SSPS;SEA SURFACE PRACTICAL SALINITY;P.S.S.78;0;40;%6.3lf;1e36
+DOX1;DISSOLVED OXYGEN;ml/l;0;10;%5.2lf;1e36
+DOX2;DISSOLVED OXYGEN;micromole/kg;0;450;%7.3lf;1e36
 ...
 ```
 
