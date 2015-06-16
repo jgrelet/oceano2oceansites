@@ -1,4 +1,4 @@
-TYPE;string;string;float64;float64;string;floa1e36
+TYPE;string;string;float64;float64;string;float64
 CUPW;14C PRODUCTION UNKNOWN FILTER;milligram carbon/(m3.day);0;200;%6.2lf;1e36
 C1UW;14C UPTAKE 0.2-1 MICRON;milligram carbon/(m3.day);0;100;%6.2lf;1e36
 BFUP;19'BUTANOYLOXYFUCOXANTHINE;milligram/m3;0;5;%6.3lf;1e36
