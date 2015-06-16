@@ -3,17 +3,14 @@ package main
 import (
 	"bufio"
 	"code.google.com/p/getopt"
-	"errors"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	//	"runtime"  cf runtime.GOSS get osname
 )
 
 const PROGNAME string = "oceano2oceansites"
@@ -94,53 +91,7 @@ var regSystemTime = regexp.MustCompile(`System UpLoad Time =\s+(.*)`)
 var regNmeaLatitude = regexp.MustCompile(`NMEA Latitude\s*=\s*(\d+\s+\d+.\d+\s+\w)`)
 var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s+\w)`)
 
-var outputFilename string = "test_ctd"
-
-//var nc map[string]map[string]string
 var nc Nc
-
-func Julian(date string) float64 {
-	const DIFF_ORIGIN = 2433283.0 // diff between UNIX DATE and 1950/1/1 00:00:00
-
-	t, _ := time.Parse("20060102150405", date)
-	a := int(14-t.Month()) / 12
-	y := t.Year() + 4800 - a
-	m := int(t.Month()) + 12*a - 3
-	julianDay := int(t.Day()) + (153*m+2)/5 + 365*y + y/4
-	julianDay = julianDay - y/100 + y/400 - 32045.0 - DIFF_ORIGIN //+
-	//float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
-	if *optDebug {
-		fmt.Println("Julian day:", date, " -> ", julianDay)
-	}
-	return float64(julianDay) + float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
-}
-
-func positionDeci(pos string) (float64, error) {
-
-	var multiplier float64 = 1
-	var value float64
-
-	var regNmeaPos = regexp.MustCompile(`(\d+)\s+(\d+.\d+)\s+(\w)`)
-
-	if strings.Contains(pos, "S") || strings.Contains(pos, "W") {
-		multiplier = -1.0
-	}
-	match := regNmeaPos.MatchString(pos)
-	if match {
-		res := regNmeaPos.FindStringSubmatch(pos)
-		deg, _ := strconv.ParseFloat(res[1], 64)
-		min, _ := strconv.ParseFloat(res[2], 64)
-		tmp := math.Abs(min)
-		sec := (tmp - min) * 100.0
-		value = (deg + (min+sec/100.0)/60.0) * multiplier
-		if *optDebug {
-			fmt.Println("positionDeci:", pos, " -> ", value)
-		}
-	} else {
-		return 1e36, errors.New("positionDeci: failed to decode position")
-	}
-	return value, nil
-}
 
 func DecodeHeader(str string) {
 	// decode Systeme Upload Time
@@ -235,12 +186,6 @@ func DecodeHeader(str string) {
 	}
 }
 
-func WriteHeader() {
-	if *optDebug {
-		fmt.Printf("%s\n", header.Time)
-	}
-}
-
 func GetProfileNumber(path string) float64 {
 	reg := fmt.Sprintf("%s(\\d{%s})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
 	r := regexp.MustCompile(reg)
@@ -323,8 +268,9 @@ func secondPass(files []string) {
 
 	fmt.Printf("Second pass:\n")
 
+	outputAsciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
 	// open output file for writing result
-	fout, err := os.Create(outputFilename)
+	fout, err := os.Create(outputAsciiFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -375,9 +321,10 @@ func secondPass(files []string) {
 				fmt.Fprintf(w, "\n")
 				line++
 			}
+			// write header in ascii file
 			match = regEndOfHeader.MatchString(str)
 			if match {
-				WriteHeader()
+				fmt.Fprintf(w, "%s\n", hdr)
 			}
 		}
 
@@ -425,13 +372,6 @@ func main() {
 		nc.Attributes["cycle_mesure"] = *optCycleMesure
 	}
 
-	// read configuration file, by default, optCfgfile = cfgname
-	GetConfig(*optCfgfile)
-
-	if *optDebug {
-		fmt.Println(map_format)
-	}
-
 	// initialize map from netcdf structure
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
@@ -440,6 +380,13 @@ func main() {
 	nc.Variables_1D["TIME"] = []float64{}
 	nc.Variables_1D["LATITUDE"] = []float64{}
 	nc.Variables_1D["LONGITUDE"] = []float64{}
+
+	// read configuration file, by default, optCfgfile = cfgname
+	GetConfig(*optCfgfile)
+
+	if *optDebug {
+		fmt.Println(map_format)
+	}
 
 	// get files list from argument line
 	// Args returns the non-option arguments.
@@ -472,5 +419,7 @@ func main() {
 	secondPass(files)
 
 	// write netcdf file
-	CreateNetcdfFile(outputFilename+".nc", nc)
+	// TODOS: add type
+	outputNetcdfFilename := fmt.Sprintf("OS_%s_CTD.nc", nc.Attributes["cycle_mesure"])
+	CreateNetcdfFile(outputNetcdfFilename, nc)
 }

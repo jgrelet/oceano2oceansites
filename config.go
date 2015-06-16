@@ -20,6 +20,8 @@ func GetConfig(configFile string) {
 		format = cfg.Ctd.Format
 		//		cruisePrefix = cfg.Ctd.CruisePrefix
 		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
+		// TODOS: complete
+		nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
 	} else {
 		log.Fatal(err)
 	}
