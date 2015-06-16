@@ -103,6 +103,17 @@ split          = ETDD,2,PRES,3,DEPH,4,TEMP,5,CNDC,7,FLU2,13,TUR3,14,DOX2,15,NAVG
 header and format are used for output ASCII file. header give also the parameter list for Netcdf file
 split is used to extract parameter from seabird cnv files.
 
+All the physical parameters definition are decribed inside `code_roscop.csv`. You can update this file with your own definition.
+Example:
+```
+TYPE;string;string;float64;float64;string;float64
+SSPS;SEA SURFACE PRACTICAL SALINITY;P.S.S.78;0;40;%6.3lf;1e36
+SSTP;SEA SURFACE TEMPERATURE;Celsius degree;-1.5;38;%6.3lf;1e36
+TEMP;SEA TEMPERATURE;Celsius degree;0;30;%6.3lf;1e36
+PSAL;PRACTICAL SALINITY SCALE 1978;P.S.S.78;33;37;%6.3lf;1e36
+PSAL;PRACTICAL SALINITY SCALE 1978;P.S.S.78;33;37;%6.3lf;1e36
+```
+
 Check data with ncdump:
 ```
 $ ncdump -v TIME  test_ctd.nc
