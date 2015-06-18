@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/fhs/go-netcdf/netcdf"
-	//	"os"
 )
 
-// CreateExampleFile creates an example NetCDF file containing only one variable.
+// creates the NetCDF file following nc structure.
 func CreateNetcdfFile(filename string, nc Nc) error {
 
 	// read roscop definition file for variables attributes

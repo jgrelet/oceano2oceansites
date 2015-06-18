@@ -24,7 +24,8 @@ func isArray(a interface{}) bool {
 	return false
 }
 
-func Julian(date string) float64 {
+// convert date/time to a decimal julian day with origin 1950/1/1
+func Date2JulianDec(date string) float64 {
 	const DIFF_ORIGIN = 2433283.0 // diff between UNIX DATE and 1950/1/1 00:00:00
 
 	t, _ := time.Parse("20060102150405", date)
@@ -40,7 +41,8 @@ func Julian(date string) float64 {
 	return float64(julianDay) + float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
 }
 
-func positionDeci(pos string) (float64, error) {
+// convert position "DD MM.SS S" to decimal position
+func PositionDeci(pos string) (float64, error) {
 
 	var multiplier float64 = 1
 	var value float64

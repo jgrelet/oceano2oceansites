@@ -93,6 +93,8 @@ var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s
 
 var nc Nc
 
+// parse header line from .cnv and extract correct information
+// use regular expression
 func DecodeHeader(str string) {
 	// decode Systeme Upload Time
 	var v float64 = 1e36
@@ -108,7 +110,7 @@ func DecodeHeader(str string) {
 		// http://golang.org/src/time/format.go
 		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
 			if *optDebug {
-				v = Julian(t.Format("20060102150405"))
+				v = Date2JulianDec(t.Format("20060102150405"))
 				nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
 			}
 		} else {
@@ -118,7 +120,7 @@ func DecodeHeader(str string) {
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
-		if v, err := positionDeci(str); err == nil {
+		if v, err := PositionDeci(str); err == nil {
 			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], v)
 		} else {
 			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
@@ -126,7 +128,7 @@ func DecodeHeader(str string) {
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
-		if v, err := positionDeci(str); err == nil {
+		if v, err := PositionDeci(str); err == nil {
 			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
 		} else {
 			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
@@ -186,6 +188,9 @@ func DecodeHeader(str string) {
 	}
 }
 
+// return the profile number from filename. Use CruisePrefix and
+// StationPrefixLength defined in configuration file
+// TODOS:  the prefix could be extract from filename
 func GetProfileNumber(path string) float64 {
 	reg := fmt.Sprintf("%s(\\d{%s})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
 	r := regexp.MustCompile(reg)
@@ -198,6 +203,7 @@ func GetProfileNumber(path string) float64 {
 	return value
 }
 
+// extract data following order gave by hash map_var
 func DecodeData(str string, profile float64) {
 	fields := strings.Fields(str)
 	for key, value := range map_var {
@@ -208,6 +214,9 @@ func DecodeData(str string, profile float64) {
 	data["PRFL"] = profile
 }
 
+// initialize a slice with 2 dimensions to store data
+// It should be notice that this table has two dimensions allows to write
+// data straightforward, it will then be flatten to write netcdf file
 func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
 	mt := new(Data_2D)
 	mt.data = make([][]float64, width)
@@ -228,7 +237,6 @@ func firstPass(files []string) (int, int) {
 	var depth int = 0
 
 	fmt.Printf("First pass:\n")
-
 	// loop over each files passed throw command line
 	for _, file := range files {
 		fid, err := os.Open(file)
@@ -236,7 +244,6 @@ func firstPass(files []string) (int, int) {
 			log.Fatal(err)
 		}
 		defer fid.Close()
-
 		//	profile := GetProfileNumber(file)  // ?
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
@@ -262,12 +269,11 @@ func firstPass(files []string) (int, int) {
 	return len(files), depth
 }
 
+// read all cnv files and extract data
 func secondPass(files []string) {
 
 	var nbProfile int = 0
-
 	fmt.Printf("Second pass:\n")
-
 	outputAsciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
 	// open output file for writing result
 	fout, err := os.Create(outputAsciiFilename)
@@ -275,7 +281,6 @@ func secondPass(files []string) {
 		log.Fatal(err)
 	}
 	defer fout.Close()
-
 	// use buffered mode for writing
 	w := bufio.NewWriter(fout)
 
@@ -287,7 +292,6 @@ func secondPass(files []string) {
 			log.Fatal(err)
 		}
 		defer fid.Close()
-
 		// fmt.Printf("Read %s\n", file)
 
 		profile := GetProfileNumber(file)
