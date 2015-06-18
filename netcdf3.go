@@ -16,8 +16,7 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 	//	}
 	//	os.Exit(0)
 
-	// if *optEcho
-	fmt.Printf("writing netCDF: %s\n", filename)
+	fmt.Fprintf(echo, "writing netCDF: %s\n", filename)
 
 	// get variables_1D size
 	len_1D := nc.Dimensions["TIME"]
@@ -106,10 +105,7 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 
 	// Create the data with the above dimensions and write it to the file.
 	for key, value := range nc.Variables_1D {
-
-		// if *optEcho
-		fmt.Printf("writing %s: %d\n", key, len(value))
-
+		fmt.Fprintf(echo, "writing %s: %d\n", key, len(value))
 		err = map_1D[key].WriteFloat64s([]float64(value))
 		if err != nil {
 			return err
@@ -121,11 +117,9 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 		i := 0
 		ht := len(value.data)
 		wd := len(value.data[0])
-
-		// if *optEcho
-		fmt.Printf("writing %s: %d x %d\n", key, ht, wd)
-
-		// Write<type> netcdf methods need []<type>, [][]data has flatten
+		fmt.Fprintf(echo, "writing %s: %d x %d\n", key, ht, wd)
+		fmt.Fprintf(debug, "writing %s: %d x %d\n", key, ht, wd)
+		// Write<type> netcdf methods need []<type>, [][]data will be flatten
 		gopher := make([]float64, ht*wd)
 		for x := 0; x < ht; x++ {
 			for y := 0; y < wd; y++ {
@@ -138,9 +132,6 @@ func CreateNetcdfFile(filename string, nc Nc) error {
 			return err
 		}
 	}
-
-	// if *optEcho
-	fmt.Printf("writing %s done ...\n", filename)
-
+	fmt.Fprintf(echo, "writing %s done ...\n", filename)
 	return nil
 }

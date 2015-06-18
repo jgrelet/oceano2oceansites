@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"code.google.com/p/getopt"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -74,6 +76,12 @@ var header Header
 var optDebug *bool
 var optEcho *bool
 
+// use in debug mode
+var debug io.Writer = ioutil.Discard
+
+// use in echo mode
+var echo io.Writer = ioutil.Discard
+
 // define regexp
 var regIsHeader = regexp.MustCompile(`^[*#]`)
 var regEndOfHeader = regexp.MustCompile(`\*END\*`)
@@ -103,16 +111,12 @@ func DecodeHeader(str string) {
 	if match {
 		res := regSystemTime.FindStringSubmatch(str)
 		value := res[1]
-		if *optDebug {
-			fmt.Printf("%s -> ", value)
-		}
+		fmt.Fprintf(debug, "%s -> ", value)
 		// parse time with non standard format, see:
 		// http://golang.org/src/time/format.go
 		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
-			if *optDebug {
-				v = Date2JulianDec(t.Format("20060102150405"))
-				nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
-			}
+			v = Date2JulianDec(t.Format("20060102150405"))
+			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
 		} else {
 			fmt.Println("Failed to decode time:", err)
 			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], 1e36)
@@ -138,18 +142,15 @@ func DecodeHeader(str string) {
 	if match {
 		res := regCruise.FindStringSubmatch(str)
 		value := res[1]
-		if *optDebug {
-			fmt.Println(value)
-		}
+		fmt.Fprintln(debug, value)
 		nc.Attributes["cycle_mesure"] = value
 	}
 	match = regShip.MatchString(str)
 	if match {
 		res := regShip.FindStringSubmatch(str)
 		value := res[1]
-		if *optDebug {
-			fmt.Println(value)
-		}
+		fmt.Fprintln(debug, value)
+
 		nc.Attributes["plateforme"] = value
 	}
 	match = regStation.MatchString(str)
@@ -157,9 +158,7 @@ func DecodeHeader(str string) {
 		res := regStation.FindStringSubmatch(str)
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
-			if *optDebug {
-				fmt.Println(v)
-			}
+			fmt.Fprintln(debug, v)
 			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], v)
 		} else {
 			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], 1e36)
@@ -170,9 +169,7 @@ func DecodeHeader(str string) {
 		res := regBottomDepth.FindStringSubmatch(str)
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
-			if *optDebug {
-				fmt.Println(v)
-			}
+			fmt.Fprintln(debug, v)
 			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], v)
 		} else {
 			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], 1e36)
@@ -195,9 +192,7 @@ func GetProfileNumber(path string) float64 {
 	reg := fmt.Sprintf("%s(\\d{%s})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
 	r := regexp.MustCompile(reg)
 	match := r.FindStringSubmatch(strings.ToLower(path))
-	if *optDebug {
-		fmt.Println("Get profile number: ", path, "-> ", match)
-	}
+	fmt.Fprintln(debug, "Get profile number: ", path, "-> ", match)
 	// add test !!!!!!!!!!!!!!
 	value, _ := strconv.ParseFloat(match[1], 64)
 	return value
@@ -236,7 +231,7 @@ func firstPass(files []string) (int, int) {
 	var line int = 0
 	var depth int = 0
 
-	fmt.Printf("First pass:\n")
+	fmt.Fprintf(echo, "First pass ...\n")
 	// loop over each files passed throw command line
 	for _, file := range files {
 		fid, err := os.Open(file)
@@ -254,9 +249,7 @@ func firstPass(files []string) (int, int) {
 				line += 1
 			}
 		}
-		if *optDebug {
-			fmt.Printf("Read %s size: %d\n", file, line)
-		}
+		fmt.Fprintf(debug, "Read %s size: %d\n", file, line)
 		if line > depth {
 			depth = line
 		}
@@ -273,7 +266,7 @@ func firstPass(files []string) (int, int) {
 func secondPass(files []string) {
 
 	var nbProfile int = 0
-	fmt.Printf("Second pass:\n")
+	fmt.Fprintf(echo, "Second pass ...\n")
 	outputAsciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
 	// open output file for writing result
 	fout, err := os.Create(outputAsciiFilename)
@@ -304,24 +297,19 @@ func secondPass(files []string) {
 			} else {
 				DecodeData(str, profile)
 				for i := range hdr {
-					if *optEcho {
-						fmt.Printf(map_format[hdr[i]]+" ", data[hdr[i]])
-					}
+					// write date to stdout
+					//fmt.Fprintf(echo, map_format[hdr[i]]+" ", data[hdr[i]])
 					// write data to ascii file
 					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
 
 					// fill 2D slice for netcdf
 					if hdr[i] != "PRFL" {
-						if *optEcho {
-							//fmt.Printf("%1d %2d %s %6.3f\n", nbProfile, line, hdr[i], data[hdr[i]])
-						}
+						//fmt.Fprintf(echo, "%1d %2d %s %6.3f\n", nbProfile, line, hdr[i], data[hdr[i]])
 						nc.Variables_2D[hdr[i]].data[nbProfile][line] = data[hdr[i]]
 					}
 				}
 				// add new line
-				if *optEcho {
-					fmt.Printf("\n")
-				}
+				//fmt.Fprintf(echo, "\n")
 				fmt.Fprintf(w, "\n")
 				line++
 			}
@@ -340,19 +328,18 @@ func secondPass(files []string) {
 		// increment index in sclice
 		nbProfile += 1
 	}
-	if *optDebug {
-		fmt.Println(nc.Variables_1D["PROFILE"])
-	}
+	fmt.Fprintln(debug, nc.Variables_1D["PROFILE"])
 }
 
 func main() {
 
+	var files []string
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	// parse option, move outside main
 	optDebug = getopt.Bool('d', "debug", "Display debug info")
-	optEcho = getopt.Bool('e', "debug", "Display processing in stdout")
+	optEcho = getopt.Bool('e', "echo", "Display processing in stdout")
 	optHelp := getopt.Bool('h', "help", "Help")
 	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
 	optCfgfile := getopt.StringLong("config", 'c', cfgname, "Name of the configuration file to use.")
@@ -371,6 +358,12 @@ func main() {
 		fmt.Println(PROGNAME + ": v" + PROGVERSION)
 		os.Exit(0)
 	}
+	if *optDebug {
+		debug = os.Stdout
+	}
+	if *optEcho {
+		echo = os.Stdout
+	}
 	if *optCycleMesure != "" {
 		fmt.Println(*optCycleMesure)
 		nc.Attributes["cycle_mesure"] = *optCycleMesure
@@ -387,15 +380,11 @@ func main() {
 
 	// read configuration file, by default, optCfgfile = cfgname
 	GetConfig(*optCfgfile)
-
-	if *optDebug {
-		fmt.Println(map_format)
-	}
-
+	// debug
+	fmt.Fprintln(debug, map_format)
 	// get files list from argument line
 	// Args returns the non-option arguments.
 	// see https://code.google.com/p/getopt/source/browse/set.go#27
-	var files []string
 	if *optFiles == "" {
 		files = getopt.Args()
 	} else {
@@ -406,9 +395,7 @@ func main() {
 		getopt.Usage()
 		os.Exit(0)
 	}
-	if *optDebug {
-		fmt.Println(files)
-	}
+	fmt.Fprintln(debug, files)
 
 	// first pass, return dimensions fron cnv files
 	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = firstPass(files)
@@ -425,5 +412,7 @@ func main() {
 	// write netcdf file
 	// TODOS: add type
 	outputNetcdfFilename := fmt.Sprintf("OS_%s_CTD.nc", nc.Attributes["cycle_mesure"])
-	CreateNetcdfFile(outputNetcdfFilename, nc)
+	if err := CreateNetcdfFile(outputNetcdfFilename, nc); err != nil {
+		log.Fatal(err)
+	}
 }
