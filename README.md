@@ -53,15 +53,19 @@ for example data/fr24/*.cnv
 
 Run and test (linux, cygwin):
 ```
-$ go run *.go data/fr24/dfr24*.cnv 
+$ go run *.go -e data/fr25/dfr25*.cnv 
 ```
 with a Windows console, use :
 ```
-$ go run *.go --files=data/fr24/dfr24*.cnv 
+$ go run *.go --files=data/fr25/dfr25*.cnv -e
 ```
 Compile it:
 ```
 $ go build
+```
+Install binary under go/bin:
+```
+$ go install
 ```
 
 Usage:
