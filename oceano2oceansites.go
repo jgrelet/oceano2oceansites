@@ -409,6 +409,10 @@ func main() {
 	// second pass, read files again, extract data and fill slices
 	secondPass(files)
 
+	// add some global attributes for profile, change in future
+	nc.Attributes["data_type"] = "OceanSITES profile data"
+	nc.Attributes["timezone"] = "GMT"
+
 	// write netcdf file
 	// TODOS: add type
 	outputNetcdfFilename := fmt.Sprintf("OS_%s_CTD.nc", nc.Attributes["cycle_mesure"])
