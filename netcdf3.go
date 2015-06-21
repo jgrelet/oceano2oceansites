@@ -6,7 +6,7 @@ import (
 )
 
 // creates the NetCDF file following nc structure.
-func CreateNetcdfFile(filename string, nc Nc) error {
+func WriteNetcdfFile(filename string, nc Nc) error {
 
 	// read roscop definition file for variables attributes
 	var roscop = codeRoscopFromCsv("code_roscop.csv")

@@ -76,10 +76,10 @@ var header Header
 var optDebug *bool
 var optEcho *bool
 
-// use in debug mode
+// use for debug mode
 var debug io.Writer = ioutil.Discard
 
-// use in echo mode
+// use for echo mode
 var echo io.Writer = ioutil.Discard
 
 // define regexp
@@ -267,15 +267,7 @@ func secondPass(files []string) {
 
 	var nbProfile int = 0
 	fmt.Fprintf(echo, "Second pass ...\n")
-	outputAsciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
-	// open output file for writing result
-	fout, err := os.Create(outputAsciiFilename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer fout.Close()
-	// use buffered mode for writing
-	w := bufio.NewWriter(fout)
+	//	outputAsciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
 
 	// loop over each files passed throw command line
 	for _, file := range files {
@@ -296,34 +288,34 @@ func secondPass(files []string) {
 				DecodeHeader(str)
 			} else {
 				DecodeData(str, profile)
-				for i := range hdr {
+				for _, key := range hdr {
 					// write date to stdout
 					//fmt.Fprintf(echo, map_format[hdr[i]]+" ", data[hdr[i]])
 					// write data to ascii file
-					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
+					//					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
 
 					// fill 2D slice for netcdf
-					if hdr[i] != "PRFL" {
+					if key != "PRFL" {
 						//fmt.Fprintf(echo, "%1d %2d %s %6.3f\n", nbProfile, line, hdr[i], data[hdr[i]])
-						nc.Variables_2D[hdr[i]].data[nbProfile][line] = data[hdr[i]]
+						nc.Variables_2D[key].data[nbProfile][line] = data[key]
 					}
 				}
 				// add new line
 				//fmt.Fprintf(echo, "\n")
-				fmt.Fprintf(w, "\n")
+				//				fmt.Fprintf(w, "\n")
 				line++
 			}
 			// write header in ascii file
-			match = regEndOfHeader.MatchString(str)
-			if match {
-				fmt.Fprintf(w, "%s\n", hdr)
-			}
+			//			match = regEndOfHeader.MatchString(str)
+			//			if match {
+			//				fmt.Fprintf(w, "%s\n", hdr)
+			//			}
 		}
 
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
-		w.Flush()
+		//		w.Flush()
 
 		// increment index in sclice
 		nbProfile += 1
@@ -413,10 +405,12 @@ func main() {
 	nc.Attributes["data_type"] = "OceanSITES profile data"
 	nc.Attributes["timezone"] = "GMT"
 
+	// write ASCII file
+	WriteAsciiFiles(nc, map_format, hdr)
+
 	// write netcdf file
-	// TODOS: add type
 	outputNetcdfFilename := fmt.Sprintf("OS_%s_CTD.nc", nc.Attributes["cycle_mesure"])
-	if err := CreateNetcdfFile(outputNetcdfFilename, nc); err != nil {
+	if err := WriteNetcdfFile(outputNetcdfFilename, nc); err != nil {
 		log.Fatal(err)
 	}
 }
