@@ -22,6 +22,12 @@ func GetConfig(configFile string) {
 		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
 		// TODOS: complete
 		nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
+		nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
+		nc.Attributes["institute"] = cfg.Cruise.Institute
+		nc.Attributes["pi"] = cfg.Cruise.Pi
+		nc.Attributes["timezone"] = cfg.Cruise.Timezone
+		nc.Attributes["type"] = cfg.Ctd.Type
+		nc.Attributes["sn"] = cfg.Ctd.Sn
 	} else {
 		log.Fatal(err)
 	}

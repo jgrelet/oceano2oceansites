@@ -35,6 +35,9 @@ type Config struct {
 		CycleMesure string
 		Plateforme  string
 		Callsign    string
+		Institute   string
+		Pi          string
+		Timezone    string
 	}
 	Ctd struct {
 		CruisePrefix        string
@@ -42,6 +45,8 @@ type Config struct {
 		Header              string
 		Split               string
 		Format              string
+		Type                string
+		Sn                  string
 	}
 	Ctdall struct {
 		Header string
@@ -61,6 +66,8 @@ type Nc struct {
 	Variables_1D map[string][]float64
 	Variables_2D AllData_2D
 	Attributes   map[string]string
+	Extras_f     map[string]float64
+	Extras_s     map[string]string
 }
 
 // configuration file
@@ -103,7 +110,7 @@ var nc Nc
 
 // parse header line from .cnv and extract correct information
 // use regular expression
-func DecodeHeader(str string) {
+func DecodeHeader(str string, profile float64) {
 	// decode Systeme Upload Time
 	var v float64 = 1e36
 
@@ -115,6 +122,7 @@ func DecodeHeader(str string) {
 		// parse time with non standard format, see:
 		// http://golang.org/src/time/format.go
 		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
+			nc.Extras_s[fmt.Sprintf("DATE:%d", int(profile))] = t.Format("20060102150405")
 			v = Date2JulianDec(t.Format("20060102150405"))
 			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
 		} else {
@@ -198,9 +206,14 @@ func GetProfileNumber(path string) float64 {
 	return value
 }
 
-// extract data following order gave by hash map_var
+// extract data following order gave in hash map_var
 func DecodeData(str string, profile float64) {
+	// split the string str using whitespace characters
 	fields := strings.Fields(str)
+	// get the parameter code and column from configuration file .ini (split var)
+	// TODOS, change name split and map_var
+	// for each physical parameter, extract its dat from the rigth column
+	// and save it in map data
 	for key, value := range map_var {
 		if v, err := strconv.ParseFloat(fields[value], 64); err == nil {
 			data[key] = v
@@ -267,7 +280,6 @@ func secondPass(files []string) {
 
 	var nbProfile int = 0
 	fmt.Fprintf(echo, "Second pass ...\n")
-	//	outputAsciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
 
 	// loop over each files passed throw command line
 	for _, file := range files {
@@ -285,37 +297,29 @@ func secondPass(files []string) {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
 			if match {
-				DecodeHeader(str)
+				DecodeHeader(str, profile)
 			} else {
 				DecodeData(str, profile)
 				for _, key := range hdr {
-					// write date to stdout
-					//fmt.Fprintf(echo, map_format[hdr[i]]+" ", data[hdr[i]])
-					// write data to ascii file
-					//					fmt.Fprintf(w, map_format[hdr[i]]+" ", data[hdr[i]])
-
 					// fill 2D slice for netcdf
 					if key != "PRFL" {
-						//fmt.Fprintf(echo, "%1d %2d %s %6.3f\n", nbProfile, line, hdr[i], data[hdr[i]])
+						//fmt.Println("key: ", key, " data: ", data[key])
 						nc.Variables_2D[key].data[nbProfile][line] = data[key]
+					} else {
+						// store max depth for each profile witk ket as "DEPTH:1"
+						// add test to store max value
+						if data["DEPTH"] != 1e36 {
+							nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile))] = data["DEPTH"]
+						}
 					}
 				}
-				// add new line
-				//fmt.Fprintf(echo, "\n")
-				//				fmt.Fprintf(w, "\n")
 				line++
 			}
-			// write header in ascii file
-			//			match = regEndOfHeader.MatchString(str)
-			//			if match {
-			//				fmt.Fprintf(w, "%s\n", hdr)
-			//			}
 		}
 
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
-		//		w.Flush()
 
 		// increment index in sclice
 		nbProfile += 1
@@ -364,6 +368,8 @@ func main() {
 	// initialize map from netcdf structure
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
+	nc.Extras_f = make(map[string]float64)
+	nc.Extras_s = make(map[string]string)
 	nc.Variables_1D = make(map[string][]float64)
 	nc.Variables_1D["PROFILE"] = []float64{}
 	nc.Variables_1D["TIME"] = []float64{}
@@ -403,7 +409,6 @@ func main() {
 
 	// add some global attributes for profile, change in future
 	nc.Attributes["data_type"] = "OceanSITES profile data"
-	nc.Attributes["timezone"] = "GMT"
 
 	// write ASCII file
 	WriteAsciiFiles(nc, map_format, hdr)
