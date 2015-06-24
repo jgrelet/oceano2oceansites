@@ -8,7 +8,7 @@ import (
 // creates the NetCDF file following nc structure.
 func WriteNetcdfFile(filename string, nc Nc) error {
 
-	// read roscop definition file for variables attributes
+	// get roscop definition file for variables attributes
 	var roscop = nc.Roscop
 	//	for k, v := range roscop {
 	//		fmt.Printf("%s: ", k)
