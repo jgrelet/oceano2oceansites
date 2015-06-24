@@ -10,14 +10,16 @@ import (
 
 func GetConfig(configFile string) {
 
-	var split, header, format string
-	var hdr_format []string
+	//	var split, header, format string
+	var split, header string
+
+	//	var roscop = codeRoscopFromCsv("code_roscop.csv")
 
 	err := gcfg.ReadFileInto(&cfg, configFile)
 	if err == nil {
 		split = cfg.Ctd.Split
 		header = cfg.Ctd.Header
-		format = cfg.Ctd.Format
+		//		format = cfg.Ctd.Format
 		//		cruisePrefix = cfg.Ctd.CruisePrefix
 		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
 		// TODOS: complete
@@ -37,13 +39,12 @@ func GetConfig(configFile string) {
 			map_var[fields[i]] = v - 1
 		}
 	}
-	// Loop over the map.
-	//hdr = make([]string, len(strings.Fields(header)))
+	// split header
 	hdr = strings.Fields(header)
 
-	hdr_format = strings.Fields(format)
-	for i := 0; i < len(hdr); i++ {
-		map_format[hdr[i]] = hdr_format[i]
+	// fill map_format from code_roscop
+	for _, key := range hdr {
+		map_format[key] = nc.Roscop[key].format
 	}
 	if *optDebug {
 		fmt.Println(header)

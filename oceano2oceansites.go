@@ -68,6 +68,7 @@ type Nc struct {
 	Attributes   map[string]string
 	Extras_f     map[string]float64
 	Extras_s     map[string]string
+	Roscop       map[string]RoscopAttribute
 }
 
 // configuration file
@@ -375,6 +376,7 @@ func main() {
 	nc.Variables_1D["TIME"] = []float64{}
 	nc.Variables_1D["LATITUDE"] = []float64{}
 	nc.Variables_1D["LONGITUDE"] = []float64{}
+	nc.Roscop = codeRoscopFromCsv("code_roscop.csv")
 
 	// read configuration file, by default, optCfgfile = cfgname
 	GetConfig(*optCfgfile)

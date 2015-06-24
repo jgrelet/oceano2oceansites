@@ -9,7 +9,7 @@ import (
 func WriteNetcdfFile(filename string, nc Nc) error {
 
 	// read roscop definition file for variables attributes
-	var roscop = codeRoscopFromCsv("code_roscop.csv")
+	var roscop = nc.Roscop
 	//	for k, v := range roscop {
 	//		fmt.Printf("%s: ", k)
 	//		fmt.Println(v)
@@ -68,6 +68,8 @@ func WriteNetcdfFile(filename string, nc Nc) error {
 		a.WriteBytes([]byte(roscop[key].format))
 		a = v.Attr("_FillValue")
 		a.WriteFloat64s([]float64{roscop[key]._FillValue})
+		a = v.Attr("format")
+		a.WriteBytes([]byte(roscop[key].format))
 	}
 
 	map_2D := make(map[string]netcdf.Var)
@@ -92,6 +94,8 @@ func WriteNetcdfFile(filename string, nc Nc) error {
 		a.WriteBytes([]byte(roscop[key].format))
 		a = v.Attr("_FillValue")
 		a.WriteFloat64s([]float64{roscop[key]._FillValue})
+		a = v.Attr("format")
+		a.WriteBytes([]byte(roscop[key].format))
 	}
 
 	// defines global attributes
