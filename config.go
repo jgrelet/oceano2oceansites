@@ -13,13 +13,9 @@ func GetConfig(configFile string) {
 	//	var split, header, format string
 	var split, header string
 
-	//	var roscop = codeRoscopFromCsv("code_roscop.csv")
-
 	err := gcfg.ReadFileInto(&cfg, configFile)
 	if err == nil {
 		split = cfg.Ctd.Split
-		header = cfg.Ctd.Header
-		//		format = cfg.Ctd.Format
 		//		cruisePrefix = cfg.Ctd.CruisePrefix
 		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
 		// TODOS: complete
@@ -33,14 +29,17 @@ func GetConfig(configFile string) {
 	} else {
 		log.Fatal(err)
 	}
+
+	// First column should be PRFL
+	hdr = append(hdr, "PRFL")
+	// store the position (column) of each physical parameter
 	fields := strings.Split(split, ",")
 	for i := 0; i < len(fields); i += 2 {
 		if v, err := strconv.Atoi(fields[i+1]); err == nil {
 			map_var[fields[i]] = v - 1
+			hdr = append(hdr, fields[i])
 		}
 	}
-	// split header
-	hdr = strings.Fields(header)
 
 	// fill map_format from code_roscop
 	for _, key := range hdr {

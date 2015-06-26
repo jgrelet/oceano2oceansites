@@ -42,16 +42,12 @@ type Config struct {
 	Ctd struct {
 		CruisePrefix        string
 		StationPrefixLength string
-		Header              string
 		Split               string
-		Format              string
 		Type                string
 		Sn                  string
 	}
 	Ctdall struct {
-		Header string
-		Split  string
-		Format string
+		Split string
 	}
 }
 
