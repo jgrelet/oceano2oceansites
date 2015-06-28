@@ -120,8 +120,10 @@ func DecodeHeader(str string, profile float64) {
 		// http://golang.org/src/time/format.go
 		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
 			nc.Extras_s[fmt.Sprintf("DATE:%d", int(profile))] = t.Format("20060102150405")
-			v = Date2JulianDec(t.Format("20060102150405"))
+			var t = New("Jan 02 2006 15:04:05", value)
+			v = t.Date2JulianDec()
 			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
+			nc.Extras_f[fmt.Sprintf("DATE:%d", int(profile))] = t.JulianDay()
 		} else {
 			fmt.Println("Failed to decode time:", err)
 			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], 1e36)

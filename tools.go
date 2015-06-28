@@ -11,30 +11,29 @@ import (
 	"time"
 )
 
-func isArray(a interface{}) bool {
-	var v reflect.Value
-	v = reflect.ValueOf(a)
+type Time struct {
+	time.Time
+}
 
-	var k reflect.Kind
-	k = v.Kind()
-
-	if k == reflect.Array {
-		return true
-	}
-	return false
+func New(format, value string) *Time {
+	t, _ := time.Parse(format, value)
+	return &Time{t}
 }
 
 // convert date/time to a decimal julian day with origin 1950/1/1
-func Date2JulianDec(date string) float64 {
+func (t *Time) Date2JulianDec() float64 {
 	const DIFF_ORIGIN = 2433283.0 // diff between UNIX DATE and 1950/1/1 00:00:00
-
-	t, _ := time.Parse("20060102150405", date)
 	a := int(14-t.Month()) / 12
 	y := t.Year() + 4800 - a
 	m := int(t.Month()) + 12*a - 3
 	julianDay := int(t.Day()) + (153*m+2)/5 + 365*y + y/4
 	julianDay = julianDay - y/100 + y/400 - 32045.0 - DIFF_ORIGIN
-	fmt.Fprintln(debug, "Julian day:", date, " -> ", julianDay)
+	fmt.Println("Julian day:", julianDay)
+	return float64(julianDay) + float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
+}
+
+func (t *Time) JulianDay() float64 {
+	julianDay := t.YearDay()
 	return float64(julianDay) + float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
 }
 
@@ -62,4 +61,17 @@ func PositionDeci(pos string) (float64, error) {
 		return 1e36, errors.New("positionDeci: failed to decode position")
 	}
 	return value, nil
+}
+
+func isArray(a interface{}) bool {
+	var v reflect.Value
+	v = reflect.ValueOf(a)
+
+	var k reflect.Kind
+	k = v.Kind()
+
+	if k == reflect.Array {
+		return true
+	}
+	return false
 }

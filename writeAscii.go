@@ -49,11 +49,12 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 	lon := nc.Variables_1D["LONGITUDE"]
 	profile := nc.Variables_1D["PROFILE"]
 	date := nc.Extras_s
+	dayd := nc.Extras_f
 	// loop over each profile
 	for x := 0; x < len_1D; x++ {
 		// write header profile, level = -1
 		key := fmt.Sprintf("DATE:%d", int(profile[x]))
-		fmt.Fprintf(ascii, "%4d %4d %f %f %f %s", int(profile[x]), -1, time[x], lat[x], lon[x], date[key])
+		fmt.Fprintf(ascii, "%4d %4d %f %f %f %s", int(profile[x]), -1, dayd[key], lat[x], lon[x], date[key])
 		fmt.Fprintf(hdr_id, "%4d %4d %f %f %f %s\n", int(profile[x]), -1, time[x], lat[x], lon[x], date[key])
 		// fill last header columns with 1e36
 		for i := 0; i < len(hdr)-6; i++ {
