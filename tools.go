@@ -15,7 +15,7 @@ type Time struct {
 	time.Time
 }
 
-func New(format, value string) *Time {
+func NewTime(format, value string) *Time {
 	t, _ := time.Parse(format, value)
 	return &Time{t}
 }
