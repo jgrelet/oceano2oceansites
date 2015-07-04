@@ -2,7 +2,12 @@
 
 This application read Seabird CTD cnv files, extract data from header files and write result into one ASCII file and NetCDF OceanSITES file.
 
-Installation for Windows (programs are installed under `c:\opt` instead of the default installation):
+Binary programs under Windows and Linux are available from the depot under release:
+https://github.com/jgrelet/oceano2oceansites/releases
+
+Installation from sources for Windows:
+
+Pprograms are installed under `c:\opt` instead of the default installation.
 
 Install golang from https://golang.org
 
@@ -203,7 +208,7 @@ data:
  TIME = 23820.5651041667, 23821.5832638889, 23823.3512615741, 23826.5581481481 ;
 }
 ```
-Binary programs under Windows and Linux are available from the depot under release.
+
 
 
 
