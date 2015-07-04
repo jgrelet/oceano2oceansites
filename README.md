@@ -7,7 +7,7 @@ https://github.com/jgrelet/oceano2oceansites/releases
 
 Installation from sources for Windows:
 
-Pprograms are installed under `c:\opt` instead of the default installation.
+Programs are installed under `c:\opt` instead of the default installation:
 
 Install golang from https://golang.org
 
