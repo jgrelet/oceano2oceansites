@@ -28,7 +28,7 @@ func (t *Time) Date2JulianDec() float64 {
 	m := int(t.Month()) + 12*a - 3
 	julianDay := int(t.Day()) + (153*m+2)/5 + 365*y + y/4
 	julianDay = julianDay - y/100 + y/400 - 32045.0 - DIFF_ORIGIN
-	fmt.Println("Julian day:", julianDay)
+	//fmt.Println("Julian day:", julianDay)
 	return float64(julianDay) + float64(t.Hour())/24 + float64(t.Minute())/1440 + float64(t.Second())/86400
 }
 
