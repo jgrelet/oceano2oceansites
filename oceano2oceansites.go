@@ -12,11 +12,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const PROGNAME string = "oceano2oceansites"
-const PROGVERSION string = "0.1.0"
+const PROGVERSION string = "0.2.0"
 
 type Header struct {
 	Time      string
@@ -38,6 +37,9 @@ type Config struct {
 		Institute   string
 		Pi          string
 		Timezone    string
+		BeginDate   string
+		EndDate     string
+		Creator     string
 	}
 	Ctd struct {
 		CruisePrefix        string
@@ -62,13 +64,12 @@ type Nc struct {
 	Variables_1D map[string][]float64
 	Variables_2D AllData_2D
 	Attributes   map[string]string
-	Extras_f     map[string]float64
-	Extras_s     map[string]string
+	Extras_f     map[string]float64 // used to store max profile DEPTH
 	Roscop       map[string]RoscopAttribute
 }
 
 // configuration file
-const cfgname string = "test.ini"
+var cfgname string = "oceano2oceansites.ini"
 
 // Create an empty map.
 var map_var = map[string]int{}
@@ -107,31 +108,23 @@ var nc Nc
 
 // parse header line from .cnv and extract correct information
 // use regular expression
+// to parse time with non standard format, see:
+// http://golang.org/src/time/format.go
 func DecodeHeader(str string, profile float64) {
 	// decode Systeme Upload Time
-	var v float64 = 1e36
-
 	match := regSystemTime.MatchString(str)
 	if match {
 		res := regSystemTime.FindStringSubmatch(str)
 		value := res[1]
 		fmt.Fprintf(debug, "%s -> ", value)
-		// parse time with non standard format, see:
-		// http://golang.org/src/time/format.go
-		if t, err := time.Parse("Jan 02 2006 15:04:05", value); err == nil {
-			nc.Extras_s[fmt.Sprintf("DATE:%d", int(profile))] = t.Format("20060102150405")
-			var t = NewTime("Jan 02 2006 15:04:05", value)
-			v = t.Date2JulianDec()
-			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
-			nc.Extras_f[fmt.Sprintf("DATE:%d", int(profile))] = t.JulianDay()
-		} else {
-			fmt.Println("Failed to decode time:", err)
-			nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], 1e36)
-		}
+		// create new Time object, see tools.go
+		var t = NewTimeFromString("Jan 02 2006 15:04:05", value)
+		v := t.Time2JulianDec()
+		nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
-		if v, err := PositionDeci(str); err == nil {
+		if v, err := Position2Decimal(str); err == nil {
 			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], v)
 		} else {
 			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
@@ -139,7 +132,7 @@ func DecodeHeader(str string, profile float64) {
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
-		if v, err := PositionDeci(str); err == nil {
+		if v, err := Position2Decimal(str); err == nil {
 			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
 		} else {
 			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
@@ -243,7 +236,7 @@ func firstPass(files []string) (int, int) {
 	var line int = 0
 	var depth int = 0
 
-	fmt.Fprintf(echo, "First pass ...\n")
+	fmt.Fprintf(echo, "First pass: ")
 	// loop over each files passed throw command line
 	for _, file := range files {
 		fid, err := os.Open(file)
@@ -271,6 +264,7 @@ func firstPass(files []string) (int, int) {
 			log.Fatal(err)
 		}
 	}
+	fmt.Fprintf(echo, "%d files read ...\n", len(files))
 	return len(files), depth
 }
 
@@ -305,7 +299,7 @@ func secondPass(files []string) {
 						//fmt.Println("key: ", key, " data: ", data[key])
 						nc.Variables_2D[key].data[nbProfile][line] = data[key]
 					} else {
-						// store max depth for each profile witk ket as "DEPTH:1"
+						// store max depth for each profile with key as "DEPTH:1"
 						// add test to store max value
 						if data["DEPTH"] != 1e36 {
 							nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile))] = data["DEPTH"]
@@ -331,6 +325,13 @@ func main() {
 	var files []string
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	if os.Getenv("OCEANO2OCEANSITES") != "" {
+		cfgname = os.Getenv("OCEANO2OCEANSITES")
+	}
+	fmt.Fprintf(debug, "Configuration file:", os.Getenv("OCEANO2OCEANSITES"))
+	fmt.Fprintf(debug, "GOPATH:", os.Getenv("GOPATH"))
+	fmt.Fprintf(debug, "GOBIN:", os.Getenv("GOBIN"))
 
 	// parse option, move outside main
 	optDebug = getopt.Bool('d', "debug", "Display debug info")
@@ -368,7 +369,7 @@ func main() {
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
 	nc.Extras_f = make(map[string]float64)
-	nc.Extras_s = make(map[string]string)
+	//	nc.Extras_s = make(map[string]string)
 	nc.Variables_1D = make(map[string][]float64)
 	nc.Variables_1D["PROFILE"] = []float64{}
 	nc.Variables_1D["TIME"] = []float64{}
