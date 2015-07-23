@@ -8,6 +8,35 @@ import (
 	"strings"
 )
 
+type Config struct {
+	Global struct {
+		Author string
+		Debug  bool
+		Echo   bool
+	}
+	Cruise struct {
+		CycleMesure string
+		Plateforme  string
+		Callsign    string
+		Institute   string
+		Pi          string
+		Timezone    string
+		BeginDate   string
+		EndDate     string
+		Creator     string
+	}
+	Ctd struct {
+		CruisePrefix        string
+		StationPrefixLength string
+		Split               string
+		Type                string
+		Sn                  string
+	}
+	Ctdall struct {
+		Split string
+	}
+}
+
 func GetConfig(configFile string) {
 
 	//	var split, header, format string
@@ -24,8 +53,12 @@ func GetConfig(configFile string) {
 		nc.Attributes["institute"] = cfg.Cruise.Institute
 		nc.Attributes["pi"] = cfg.Cruise.Pi
 		nc.Attributes["timezone"] = cfg.Cruise.Timezone
+		nc.Attributes["begin_date"] = cfg.Cruise.BeginDate
+		nc.Attributes["end_date"] = cfg.Cruise.EndDate
+		nc.Attributes["creator"] = cfg.Cruise.Creator
 		nc.Attributes["type"] = cfg.Ctd.Type
 		nc.Attributes["sn"] = cfg.Ctd.Sn
+
 	} else {
 		log.Fatal(err)
 	}
