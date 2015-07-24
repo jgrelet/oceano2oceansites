@@ -3,10 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/fhs/go-netcdf/netcdf"
+	"strings"
 )
 
 // creates the NetCDF file following nc structure.
-func WriteNetcdfFile(filename string, nc Nc) error {
+func WriteNetcdfFile(nc Nc) error {
+
+	// build filename
+	filename := fmt.Sprintf("OS_%s%s_CTD.nc",
+		strings.ToUpper(nc.Attributes["cycle_mesure"]), strings.ToUpper(prefixAll))
+	//fmt.Println(filename)
 
 	// get roscop definition file for variables attributes
 	var roscop = nc.Roscop
@@ -73,7 +79,16 @@ func WriteNetcdfFile(filename string, nc Nc) error {
 	}
 
 	map_2D := make(map[string]netcdf.Var)
-	for key, _ := range nc.Variables_2D {
+
+	// use the order list gave by split or splitAll (config file) because
+	// the iteration order is not specified and is not guaranteed to be
+	// the same from one iteration to the next in golang
+	// for key, _ := range nc.Variables_2D {
+	for _, key := range hdr {
+		// remove PRFL from the key list
+		if key == "PRFL" {
+			continue
+		}
 		v, err := ds.AddVar(key, netcdf.DOUBLE, dim_2D)
 		if err != nil {
 			return err
@@ -116,8 +131,14 @@ func WriteNetcdfFile(filename string, nc Nc) error {
 		}
 	}
 
-	// write data 2D (value.data) to netcdf variables (key)
-	for key, value := range nc.Variables_2D {
+	// write data 2D (value.data) to netcdf variables
+	// for key, value := range nc.Variables_2D {
+	for _, key := range hdr {
+		// remove PRFL from the key list
+		if key == "PRFL" {
+			continue
+		}
+		value := nc.Variables_2D[key]
 		i := 0
 		ht := len(value.data)
 		wd := len(value.data[0])
