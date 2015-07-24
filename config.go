@@ -29,8 +29,8 @@ type Config struct {
 		CruisePrefix        string
 		StationPrefixLength string
 		Split               string
-		Type                string
-		Sn                  string
+		TypeInstrument      string
+		InstrumentNumber    string
 	}
 	Ctdall struct {
 		Split string
@@ -56,10 +56,12 @@ func GetConfig(configFile string) {
 		nc.Attributes["begin_date"] = cfg.Cruise.BeginDate
 		nc.Attributes["end_date"] = cfg.Cruise.EndDate
 		nc.Attributes["creator"] = cfg.Cruise.Creator
-		nc.Attributes["type"] = cfg.Ctd.Type
-		nc.Attributes["sn"] = cfg.Ctd.Sn
+		nc.Attributes["type_instrument"] = cfg.Ctd.TypeInstrument
+		nc.Attributes["instrument_number"] = cfg.Ctd.InstrumentNumber
 
 	} else {
+		fmt.Println("function GetConfig error:")
+		fmt.Printf("Please, check location for %s file\n", configFile)
 		log.Fatal(err)
 	}
 

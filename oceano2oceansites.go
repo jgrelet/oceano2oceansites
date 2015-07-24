@@ -37,6 +37,7 @@ type Nc struct {
 
 // configuration file
 var cfgname string = "oceano2oceansites.ini"
+var code_roscop string = "code_roscop.csv"
 
 // Create an empty map.
 var map_var = map[string]int{}
@@ -65,7 +66,11 @@ func main() {
 	if os.Getenv("OCEANO2OCEANSITES") != "" {
 		cfgname = os.Getenv("OCEANO2OCEANSITES")
 	}
+	if os.Getenv("ROSCOP") != "" {
+		code_roscop = os.Getenv("ROSCOP")
+	}
 	fmt.Fprintf(debug, "Configuration file:", os.Getenv("OCEANO2OCEANSITES"))
+	fmt.Fprintf(debug, "Code ROSCOP file:", os.Getenv("ROSCOP"))
 	fmt.Fprintf(debug, "GOPATH:", os.Getenv("GOPATH"))
 	fmt.Fprintf(debug, "GOBIN:", os.Getenv("GOBIN"))
 
@@ -111,7 +116,7 @@ func main() {
 	nc.Variables_1D["TIME"] = []float64{}
 	nc.Variables_1D["LATITUDE"] = []float64{}
 	nc.Variables_1D["LONGITUDE"] = []float64{}
-	nc.Roscop = codeRoscopFromCsv("code_roscop.csv")
+	nc.Roscop = codeRoscopFromCsv(code_roscop)
 
 	// read configuration file, by default, optCfgfile = cfgname
 	GetConfig(*optCfgfile)

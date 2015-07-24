@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strconv"
 )
@@ -28,7 +29,10 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 	if err != nil {
 		// err is printable
 		// elements passed are separated by space automatically
-		fmt.Println("Error:", err)
+		fmt.Println("function codeRoscopFromCsv error")
+		fmt.Printf("Please, check location for %s file\n", filename)
+		//os.Exit(1)
+		log.Fatal(err)
 	}
 	// automatically call Close() at the end of current method
 	defer file.Close()
