@@ -8,4 +8,5 @@ TODOS for oceano2oceansites project:
 - add option --top
 - order parameters in netcdf file  done 24/07/2015
 - extract only station number from seabird header file
+- add filetr fore PAR, in config file ?
 
