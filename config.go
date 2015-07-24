@@ -29,22 +29,22 @@ type Config struct {
 		CruisePrefix        string
 		StationPrefixLength string
 		Split               string
+		SplitAll            string
 		TypeInstrument      string
 		InstrumentNumber    string
-	}
-	Ctdall struct {
-		Split string
 	}
 }
 
 func GetConfig(configFile string) {
 
 	//	var split, header, format string
-	var split, header string
+	var split, splitAll, header string
 
 	err := gcfg.ReadFileInto(&cfg, configFile)
 	if err == nil {
 		split = cfg.Ctd.Split
+		splitAll = cfg.Ctd.SplitAll
+
 		//		cruisePrefix = cfg.Ctd.CruisePrefix
 		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
 		// TODOS: complete
@@ -67,8 +67,17 @@ func GetConfig(configFile string) {
 
 	// First column should be PRFL
 	hdr = append(hdr, "PRFL")
+
+	// fill map_var from split
 	// store the position (column) of each physical parameter
-	fields := strings.Split(split, ",")
+	var fields []string
+	if *optAll {
+		fields = strings.Split(splitAll, ",")
+	} else {
+		fields = strings.Split(split, ",")
+	}
+	fmt.Fprintln(debug, fields)
+
 	for i := 0; i < len(fields); i += 2 {
 		if v, err := strconv.Atoi(fields[i+1]); err == nil {
 			map_var[fields[i]] = v - 1
