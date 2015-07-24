@@ -13,13 +13,6 @@ import (
 const PROGNAME string = "oceano2oceansites"
 const PROGVERSION string = "0.2.0"
 
-type Header struct {
-	Time      string
-	Julian    float64
-	Latitude  float64
-	Longitude float64
-}
-
 type Data_2D struct {
 	data [][]float64
 }
@@ -39,15 +32,20 @@ type Nc struct {
 var cfgname string = "oceano2oceansites.ini"
 var code_roscop string = "code_roscop.csv"
 
+// file prefix for --all option: "-all" for all parameters, "" empty by default
+var prefixAll = ""
+
 // Create an empty map.
 var map_var = map[string]int{}
 var map_format = map[string]string{}
 var data = map[string]float64{}
 var hdr []string
 var cfg Config
-var header Header
+
+// global arg list options
 var optDebug *bool
 var optEcho *bool
+var optAll *bool
 
 // use for debug mode
 var debug io.Writer = ioutil.Discard
@@ -78,6 +76,7 @@ func main() {
 	optDebug = getopt.Bool('d', "debug", "Display debug info")
 	optEcho = getopt.Bool('e', "echo", "Display processing in stdout")
 	optHelp := getopt.Bool('h', "help", "Help")
+	optAll = getopt.Bool('a', "all", "Process all parameters")
 	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
 	optCfgfile := getopt.StringLong("config", 'c', cfgname, "Name of the configuration file to use.")
 	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
@@ -104,6 +103,9 @@ func main() {
 	if *optCycleMesure != "" {
 		fmt.Println(*optCycleMesure)
 		nc.Attributes["cycle_mesure"] = *optCycleMesure
+	}
+	if *optAll {
+		prefixAll = "-all"
 	}
 
 	// initialize map from netcdf structure
@@ -146,8 +148,7 @@ func main() {
 	WriteAsciiFiles(nc, map_format, hdr)
 
 	// write netcdf file
-	outputNetcdfFilename := fmt.Sprintf("OS_%s_CTD.nc", nc.Attributes["cycle_mesure"])
-	if err := WriteNetcdfFile(outputNetcdfFilename, nc); err != nil {
+	if err := WriteNetcdfFile(nc); err != nil {
 		log.Fatal(err)
 	}
 }
