@@ -1,7 +1,11 @@
 TODOS for oceano2oceansites project:
 
-- add env var OCEANO2OCEANSITES for config file .ini  done
+- add env var OCEANO2OCEANSITES for config file .ini  done 22/07/2015
 - add env var ROSCOP for code_roscop.csv, if not enc var, this file should be
   in GOBIN dir or current dir
-
+- check variable in config file (eg DEPTH)
+- add option --all  done 23/07/2015
+- add option --top
+- order parameters in netcdf file  done 24/07/2015
+- extract only station number from seabird header file
 
