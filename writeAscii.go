@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 const (
@@ -14,8 +15,15 @@ const (
 
 func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 	// define 2 files, profiles header and data
-	headerFilename := fmt.Sprintf("%s.ctd", nc.Attributes["cycle_mesure"])
-	asciiFilename := fmt.Sprintf("%s_ctd", nc.Attributes["cycle_mesure"])
+	var asciiFilename string
+
+	// build filenames
+	headerFilename := fmt.Sprintf("%s.ctd",
+		strings.ToLower(nc.Attributes["cycle_mesure"]))
+	asciiFilename = fmt.Sprintf("%s%s_ctd",
+		strings.ToLower(nc.Attributes["cycle_mesure"]), prefixAll)
+	//	fmt.Println(headerFilename)
+	//	fmt.Println(asciiFilename)
 
 	// open header file for writing result
 	fid_hdr, err := os.Create(headerFilename)
@@ -38,20 +46,27 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 	fbuf_ascii := bufio.NewWriter(fid_ascii)
 
 	// write header to header file
-	fmt.Fprintf(fbuf_hdr, "%s  %s  %s  %s  %s  %s\n",
+	fmt.Fprintf(fbuf_hdr, "%s  %s  %s  %s %s  %s\n",
 		nc.Attributes["cycle_mesure"],
-		nc.Attributes["plateforme"], nc.Attributes["institute"],
-		nc.Attributes["type"], nc.Attributes["sn"], nc.Attributes["pi"])
+		nc.Attributes["plateforme"],
+		nc.Attributes["institute"],
+		nc.Attributes["type_instrument"],
+		nc.Attributes["instrument_number"],
+		nc.Attributes["pi"])
 
 	// write header to ascii file, first line
-	fmt.Fprintf(fbuf_ascii, "%s  %s  %s  %s  %s  %s\n",
+	fmt.Fprintf(fbuf_ascii, "%s  %s  %s  %s %s  %s\n",
 		nc.Attributes["cycle_mesure"],
-		nc.Attributes["plateforme"], nc.Attributes["institute"],
-		nc.Attributes["type"], nc.Attributes["sn"], nc.Attributes["pi"])
+		nc.Attributes["plateforme"],
+		nc.Attributes["institute"],
+		nc.Attributes["type_instrument"],
+		nc.Attributes["instrument_number"],
+		nc.Attributes["pi"])
 
 	// write physical parameters in second line
 	for _, key := range hdr {
 		fmt.Fprintf(fbuf_ascii, "%s   ", key)
+		fmt.Fprintf(debug, "%s   ", key)
 	}
 	fmt.Fprintln(fbuf_ascii) // add new line
 
@@ -69,7 +84,7 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 		// write profile informations to ASCII data file with DEPTH = -1
 		t := NewTimeFromJulian(time[x])
 		// TODOS: adapt profile format to stationPrefixLength
-		fmt.Fprintf(fbuf_ascii, "%5.0f %4d %f %f %f %s",
+		fmt.Fprintf(fbuf_ascii, "%05.0f %4d %f %f %f %s",
 			profile[x],
 			codeForProfile,
 			t.JulianDayOfYear(),
@@ -78,7 +93,7 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 			t.Format("20060102150405"))
 
 		// write profile informations to header file
-		fmt.Fprintf(fbuf_hdr, "%5.0f %s %s %s %4.4g %4.4g\n",
+		fmt.Fprintf(fbuf_hdr, "%05.0f %s %s %s %4.4g %4.4g\n",
 			profile[x],
 			t.Format("01/02/2006 15:04:05"),
 			DecimalPosition2String(lat[x], 0),
@@ -94,8 +109,8 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 
 		// loop over each level
 		for y := 0; y < len_2D; y++ {
-			fmt.Fprintf(fbuf_ascii, "%5.0f ", profile[x])
-			// loop over each physical parameter (key)
+			fmt.Fprintf(fbuf_ascii, "%05.0f ", profile[x])
+			// loop over each physical parameter (key) in the rigth order
 			for _, key := range hdr {
 				// if key not in map, goto next key
 				if _, ok := nc.Variables_2D[key]; ok {
