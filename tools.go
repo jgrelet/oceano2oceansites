@@ -38,13 +38,20 @@ func NewTimeFromString(format, value string) *Time {
 
 // construct time object from number of second since 01/01/1970
 func NewTimeFromSec(nsec int64) *Time {
-	t := time.Unix(nsec, 0)
+	t := time.Unix(nsec, 0).UTC()
 	return &Time{t, t.Unix()}
 }
 
 // construct time object from decimal julian day since 01/01/1950
 func NewTimeFromJulian(julian float64) *Time {
-	t := time.Unix(int64(julian*86400.0)+oceanSitesToInternal+internalToUnix, 0)
+	t := time.Unix(int64(julian*86400.0)+oceanSitesToInternal+internalToUnix, 0).UTC()
+	return &Time{t, t.Unix()}
+}
+
+// construct time object from decimal julian day from current year
+func NewTimeFromJulianDay(julian float64, c *Time) *Time {
+	nsec := time.Date(c.Year(), time.January, 0, 0, 0, 0, 0, time.UTC)
+	t := time.Unix(int64(julian*86400.0)+nsec.Unix(), 0).UTC()
 	return &Time{t, t.Unix()}
 }
 
@@ -110,17 +117,16 @@ func DecimalPosition2String(position float64, hemi int) string {
 	} else {
 		geo = pos
 	}
-	h := math.Floor(position)
-	m := (position - h) * 60
-	if math.Abs(m) > 59 {
-		if position > 0 {
-			h = h + 1
-		} else {
-			h = h - 1
-		}
-		m = 0
+	tmp := math.Abs(position)
+	deg := int(tmp)
+	tmp = (tmp - float64(deg)) * 60
+	min := tmp
+
+	if hemi == 1 {
+		return fmt.Sprintf("%03d°%06.3f %c", deg, min, geo)
+	} else {
+		return fmt.Sprintf("%02d°%06.3f %c", deg, min, geo)
 	}
-	return fmt.Sprintf("%02.0f°%06.3f %c", math.Abs(h), math.Abs(m), geo)
 }
 
 func isArray(a interface{}) bool {
