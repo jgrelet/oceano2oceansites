@@ -32,6 +32,16 @@ type Config struct {
 		SplitAll            string
 		TypeInstrument      string
 		InstrumentNumber    string
+		TitleSummary        string
+	}
+	Btl struct {
+		CruisePrefix        string
+		StationPrefixLength string
+		Split               string
+		TypeInstrument      string
+		InstrumentNumber    string
+		TitleSummary        string
+		Comment             string
 	}
 }
 
