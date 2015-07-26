@@ -82,7 +82,15 @@ func DecodeHeader(str string, profile float64) {
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
 			fmt.Fprintln(debug, v)
-			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], v)
+			// ch
+			//			format := "%0" + cfg.Ctd.StationPrefixLength + ".0f"
+			//			p := fmt.Sprintf(format, profile)
+			//			//s := fmt.Sprintf(format, v)
+			//			fmt.Println(p, v)
+			//			if p != v {
+			//				fmt.Printf("Warning: profile for header differ from file name: %s <=> %s\n", p, v)
+			//			}
+			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], profile)
 		} else {
 			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], 1e36)
 		}
@@ -112,6 +120,15 @@ func DecodeHeader(str string, profile float64) {
 			fmt.Println(value)
 		}
 	}
+	match = regType.MatchString(str)
+	if match {
+		res := regType.FindStringSubmatch(str)
+		value := res[1]
+		if *optDebug {
+			fmt.Println(value)
+		}
+		nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile))] = value
+	}
 }
 
 // return the profile number from filename. Use CruisePrefix and
@@ -124,6 +141,8 @@ func GetProfileNumber(path string) float64 {
 	fmt.Fprintln(debug, "Get profile number: ", path, "-> ", match)
 	// add test !!!!!!!!!!!!!!
 	value, _ := strconv.ParseFloat(match[1], 64)
+	// get profile name, eg: csp00101
+	nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(value))] = match[0]
 	return value
 }
 
@@ -200,12 +219,16 @@ func firstPass(files []string) (int, int) {
 // read all cnv files and extract data
 func secondPass(files []string) {
 
-	var nbProfile int = 0
 	fmt.Fprintf(echo, "Second pass ...\n")
+
+	// initialize profile and pressure max
+	var nbProfile int = 0
 
 	// loop over each files passed throw command line
 	for _, file := range files {
 		var line int = 0
+		var presMax float64 = 0
+
 		fid, err := os.Open(file)
 		if err != nil {
 			log.Fatal(err)
@@ -221,18 +244,16 @@ func secondPass(files []string) {
 			if match {
 				DecodeHeader(str, profile)
 			} else {
+				// fill map data with information contain in read line str
 				DecodeData(str, profile)
 				for _, key := range hdr {
+					if key == "PRES" && data[key] > presMax {
+						presMax = data[key]
+					}
 					// fill 2D slice for netcdf
 					if key != "PRFL" {
 						//fmt.Println("key: ", key, " data: ", data[key])
 						nc.Variables_2D[key].data[nbProfile][line] = data[key]
-					} else {
-						// store max depth for each profile with key as "DEPTH:1"
-						// add test to store max value
-						if data["DEPTH"] != 1e36 {
-							nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile))] = data["DEPTH"]
-						}
 					}
 				}
 				line++
@@ -245,6 +266,13 @@ func secondPass(files []string) {
 
 		// increment index in sclice
 		nbProfile += 1
+
+		// store max depth for each profile with key as "DEPTH:1"
+		nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] = presMax
+
+		// store last julian day for end profiel
+		nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"]
+		//fmt.Println(presMax)
 	}
 	fmt.Fprintln(debug, nc.Variables_1D["PROFILE"])
 }
