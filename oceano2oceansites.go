@@ -24,7 +24,8 @@ type Nc struct {
 	Variables_1D map[string][]float64
 	Variables_2D AllData_2D
 	Attributes   map[string]string
-	Extras_f     map[string]float64 // used to store max profile DEPTH
+	Extras_f     map[string]float64 // used to store max of profiles value
+	Extras_s     map[string]string  // used to store max of profiles type
 	Roscop       map[string]RoscopAttribute
 }
 
@@ -112,7 +113,7 @@ func main() {
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
 	nc.Extras_f = make(map[string]float64)
-	//	nc.Extras_s = make(map[string]string)
+	nc.Extras_s = make(map[string]string)
 	nc.Variables_1D = make(map[string][]float64)
 	nc.Variables_1D["PROFILE"] = []float64{}
 	nc.Variables_1D["TIME"] = []float64{}
