@@ -134,29 +134,51 @@ func DecodeHeader(str string, profile float64) {
 // return the profile number from filename. Use CruisePrefix and
 // StationPrefixLength defined in configuration file
 // TODOS:  the prefix could be extract from filename
-func GetProfileNumber(path string) float64 {
+func GetProfileNumber(str string) float64 {
+	var value float64
+	var err error
+
 	reg := fmt.Sprintf("%s(\\d{%s})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
-	r := regexp.MustCompile(reg)
-	match := r.FindStringSubmatch(strings.ToLower(path))
-	fmt.Fprintln(debug, "Get profile number: ", path, "-> ", match)
-	// add test !!!!!!!!!!!!!!
-	value, _ := strconv.ParseFloat(match[1], 64)
-	// get profile name, eg: csp00101
-	nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(value))] = match[0]
+	res := regexp.MustCompile(reg)
+	match := res.MatchString(str)
+	if match {
+		t := res.FindStringSubmatch(strings.ToLower(str))
+		fmt.Fprintf(debug, "Get profile number: %s -> %s\n", str, t[1])
+		if value, err = strconv.ParseFloat(t[1], 64); err == nil {
+			// get profile name, eg: csp00101
+			nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(value))] = t[1]
+		} else {
+			log.Fatal(err)
+		}
+
+	} else {
+		log.Fatal("func GetProfileNumber", err)
+	}
 	return value
+
 }
 
-// extract data following order gave in hash map_var
+// extract data from the line read in str with order gave by hash map_var
+// values:  1318 81.583900 3.000 2.983 29.5431 29.5464 5 ...
+// map_var: PRES:2 DEPTH:3 PSAL:21 DOX2:18 ...
 func DecodeData(str string, profile float64) {
+
 	// split the string str using whitespace characters
-	fields := strings.Fields(str)
-	// get the parameter code and column from configuration file .ini (split var)
-	// TODOS, change name split and map_var
-	// for each physical parameter, extract its dat from the rigth column
+	values := strings.Fields(str)
+	nb_value := len(values)
+
+	// for each physical parameter, extract its data from the rigth column
 	// and save it in map data
-	for key, value := range map_var {
-		if v, err := strconv.ParseFloat(fields[value], 64); err == nil {
+	for key, column := range map_var {
+		if column > nb_value {
+			log.Fatal(fmt.Sprintf("Error in func DecodeData() "+
+				"configuration mismatch\nFound %d values, and we try to use column %d",
+				nb_value, column))
+		}
+		if v, err := strconv.ParseFloat(values[column], 64); err == nil {
 			data[key] = v
+		} else {
+			log.Fatal(err)
 		}
 	}
 	data["PRFL"] = profile
@@ -182,7 +204,10 @@ func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
 func firstPass(files []string) (int, int) {
 
 	var line int = 0
-	var depth int = 0
+	var maxLine int = 0
+	var pres float64 = 0
+	var maxPres float64 = 0
+	var maxPresAll float64 = 0
 
 	fmt.Fprintf(echo, "First pass: ")
 	// loop over each files passed throw command line
@@ -192,28 +217,46 @@ func firstPass(files []string) (int, int) {
 			log.Fatal(err)
 		}
 		defer fid.Close()
-		//	profile := GetProfileNumber(file)  // ?
+
+		profile := GetProfileNumber(file)
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
 			if !match {
-				//	DecodeData(str, profile) // ?
-				line += 1
+				values := strings.Fields(str)
+				if pres, err = strconv.ParseFloat(values[map_var["PRES"]], 64); err != nil {
+					log.Fatal(err)
+				}
+			}
+			if pres > maxPres {
+				maxPres = pres
+				line = line + 1
+			}
+			if err := scanner.Err(); err != nil {
+				log.Fatal(err)
 			}
 		}
-		fmt.Fprintf(debug, "Read %s size: %d\n", file, line)
-		if line > depth {
-			depth = line
-		}
-		line = 0
+		fmt.Fprintf(debug, "Read %s size: %d max pres: %4.f\n", file, line, maxPres)
 
-		if err := scanner.Err(); err != nil {
-			log.Fatal(err)
+		if line > maxLine {
+			maxLine = line
 		}
+		// store the maximum pressure value
+		nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] = maxPres
+		if maxPres > maxPresAll {
+			maxPresAll = maxPres
+		}
+		// reset value for next loop
+		maxPres = 0
+		pres = 0
+		line = 0
 	}
-	fmt.Fprintf(echo, "%d files read ...\n", len(files))
-	return len(files), depth
+
+	fmt.Fprintf(echo, "First pass: %d files read, maximum pressure found: %4.0f db\n", len(files), maxPresAll)
+	fmt.Fprintf(debug, "First pass: %d files read, maximum pressure found: %4.0f db\n", len(files), maxPresAll)
+	fmt.Fprintf(debug, "First pass: size %d x %d\n", len(files), maxLine)
+	return len(files), maxLine
 }
 
 // read all cnv files and extract data
@@ -227,7 +270,6 @@ func secondPass(files []string) {
 	// loop over each files passed throw command line
 	for _, file := range files {
 		var line int = 0
-		var presMax float64 = 0
 
 		fid, err := os.Open(file)
 		if err != nil {
@@ -246,31 +288,28 @@ func secondPass(files []string) {
 			} else {
 				// fill map data with information contain in read line str
 				DecodeData(str, profile)
+				// fill 2D slice
 				for _, key := range hdr {
-					if key == "PRES" && data[key] > presMax {
-						presMax = data[key]
-					}
-					// fill 2D slice for netcdf
 					if key != "PRFL" {
-						//fmt.Println("key: ", key, " data: ", data[key])
+						//fmt.Println("Line: ", line, "key: ", key, " data: ", data[key])
 						nc.Variables_2D[key].data[nbProfile][line] = data[key]
 					}
+				}
+				// exit loop if reach maximum pressure for the profile
+				if data["PRES"] == nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] {
+					break
 				}
 				line++
 			}
 		}
-
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
 
-		// increment index in sclice
+		// increment sclice index
 		nbProfile += 1
 
-		// store max depth for each profile with key as "DEPTH:1"
-		nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] = presMax
-
-		// store last julian day for end profiel
+		// store last julian day for end profile
 		nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"]
 		//fmt.Println(presMax)
 	}
