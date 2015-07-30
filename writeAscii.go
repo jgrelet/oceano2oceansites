@@ -18,12 +18,12 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 	var asciiFilename string
 
 	// build filenames
-	headerFilename := fmt.Sprintf("%s.ctd",
-		strings.ToLower(nc.Attributes["cycle_mesure"]))
-	asciiFilename = fmt.Sprintf("%s%s_ctd",
-		strings.ToLower(nc.Attributes["cycle_mesure"]), prefixAll)
-	//	fmt.Println(headerFilename)
-	//	fmt.Println(asciiFilename)
+	str := nc.Attributes["cycle_mesure"]
+	str = strings.Replace(str, "\r", "", -1)
+	headerFilename := fmt.Sprintf("%s.ctd", strings.ToLower(str))
+	asciiFilename = fmt.Sprintf("%s%s_ctd", strings.ToLower(str), prefixAll)
+	//fmt.Println(headerFilename)
+	//fmt.Println(asciiFilename)
 
 	// open header file for writing result
 	fid_hdr, err := os.Create(headerFilename)
@@ -46,7 +46,7 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 	fbuf_ascii := bufio.NewWriter(fid_ascii)
 
 	// write header to string
-	str := fmt.Sprintf("%s  %s  %s  %s %s  %s\n",
+	str = fmt.Sprintf("%s  %s  %s  %s %s  %s\n",
 		nc.Attributes["cycle_mesure"],
 		nc.Attributes["plateforme"],
 		nc.Attributes["institute"],
@@ -110,7 +110,7 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 			nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile[x]))],
 			bath[x],
 			nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile[x]))],
-			nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(profile[x]))])
+			cfg.Ctd.CruisePrefix+nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(profile[x]))])
 
 		// write profile information to header file
 		fmt.Fprintf(fbuf_hdr, str)
@@ -126,6 +126,11 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 
 		// loop over each level
 		for y := 0; y < len_2D; y++ {
+			// goto next profile when max depth reach
+			if nc.Variables_2D["PRES"].data[x][y] >=
+				nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile[x]))] {
+				continue
+			}
 			fmt.Fprintf(fbuf_ascii, "%05.0f ", profile[x])
 			// loop over each physical parameter (key) in the rigth order
 			for _, key := range hdr {
@@ -142,11 +147,7 @@ func WriteAsciiFiles(nc Nc, map_format map[string]string, hdr []string) {
 				}
 			}
 			fmt.Fprintf(fbuf_ascii, "\n")
-			// goto next profile when max depth reach
-			if nc.Variables_2D["DEPTH"].data[x][y] >=
-				nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile[x]))] {
-				continue
-			}
+
 		}
 		fbuf_ascii.Flush()
 		fbuf_hdr.Flush()
