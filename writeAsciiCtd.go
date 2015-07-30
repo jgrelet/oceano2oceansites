@@ -1,4 +1,4 @@
-// writeAscii.go
+// writeAsciiCtd.go
 package main
 
 import (
