@@ -45,7 +45,7 @@ type Config struct {
 	}
 }
 
-func GetConfig(configFile string) {
+func GetConfig(nc Nc, configFile string) Nc {
 
 	//	var split, header, format string
 	var split, splitAll, header string
@@ -102,4 +102,5 @@ func GetConfig(configFile string) {
 	if *optDebug {
 		fmt.Println(header)
 	}
+	return nc
 }

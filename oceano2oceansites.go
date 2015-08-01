@@ -29,6 +29,13 @@ type Nc struct {
 	Roscop       map[string]RoscopAttribute
 }
 
+type Process interface {
+	Read()
+	WriteHeader()
+	WriteAscii()
+	WriteNetcdf()
+}
+
 // configuration file
 var cfgname string = "oceano2oceansites.ini"
 var code_roscop string = "code_roscop.csv"
@@ -54,7 +61,10 @@ var debug io.Writer = ioutil.Discard
 // use for echo mode
 var echo io.Writer = ioutil.Discard
 
-var nc Nc
+//var nc interface{}
+
+type Ctd struct{ Nc }
+type Btl struct{ Nc }
 
 func main() {
 
@@ -85,6 +95,37 @@ func main() {
 
 	// parse options line argument
 	getopt.Parse()
+
+	if *optFiles == "" {
+		files = getopt.Args()
+	} else {
+		files, _ = filepath.Glob(*optFiles)
+	}
+	// if no files supplied for arg list, test if files is empty
+	if len(files) == 0 {
+		getopt.Usage()
+		fmt.Println("\nPlease, specify files to process or define --files options")
+		os.Exit(0)
+	}
+	fmt.Fprintln(debug, files)
+
+	// read the first file and try to find origin
+	typeInstrument := AnalyseFirstFile(files)
+	fmt.Println(typeInstrument)
+
+	nc := new(Btl)
+	//	t := []Nc{Ctd, Btl}
+	//	var nca = make([]interface{}, 2)
+	//	for i, v := range t {
+	//		nca[i] = v
+	//	}
+
+	//	switch typeInstrument {
+	//	case CTD:
+	//		nc = new(Ctd)
+	//	case BTL:
+	//		nc = new(Btl)
+	//	}
 
 	// process bloc when option is set
 	if *optHelp {
@@ -122,34 +163,24 @@ func main() {
 	nc.Roscop = codeRoscopFromCsv(code_roscop)
 
 	// read configuration file, by default, optCfgfile = cfgname
-	GetConfig(*optCfgfile)
+	nc.Nc = GetConfig(nc.Nc, *optCfgfile)
 	// debug
 	fmt.Fprintln(debug, map_format)
 	// get files list from argument line
 	// Args returns the non-option arguments.
 	// see https://code.google.com/p/getopt/source/browse/set.go#27
-	if *optFiles == "" {
-		files = getopt.Args()
-	} else {
-		files, _ = filepath.Glob(*optFiles)
-	}
-	// if no files supplied for arg list, test if files is empty
-	if len(files) == 0 {
-		getopt.Usage()
-		os.Exit(0)
-	}
-	fmt.Fprintln(debug, files)
 
-	readSeabirdCnv(files)
+	// read and process all data files
+	nc.Read(files)
 
 	// add some global attributes for profile, change in future
 	nc.Attributes["data_type"] = "OceanSITES profile data"
 
 	// write ASCII file
-	WriteAsciiFiles(nc, map_format, hdr)
+	nc.WriteAscii(map_format, hdr)
 
 	// write netcdf file
-	if err := WriteNetcdfFile(nc); err != nil {
+	if err := nc.WriteNetcdf(); err != nil {
 		log.Fatal(err)
 	}
 }

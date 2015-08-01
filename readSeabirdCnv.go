@@ -33,7 +33,7 @@ var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s
 // use regular expression
 // to parse time with non standard format, see:
 // http://golang.org/src/time/format.go
-func DecodeHeader(str string, profile float64) {
+func (nc *Ctd) DecodeHeader(str string, profile float64) {
 	// decode Systeme Upload Time
 	match := regSystemTime.MatchString(str)
 	if match {
@@ -134,7 +134,7 @@ func DecodeHeader(str string, profile float64) {
 // return the profile number from filename. Use CruisePrefix and
 // StationPrefixLength defined in configuration file
 // TODOS:  the prefix could be extract from filename
-func GetProfileNumber(str string) float64 {
+func (nc *Ctd) GetProfileNumber(str string) float64 {
 	var value float64
 	var err error
 
@@ -161,7 +161,7 @@ func GetProfileNumber(str string) float64 {
 // extract data from the line read in str with order gave by hash map_var
 // values:  1318 81.583900 3.000 2.983 29.5431 29.5464 5 ...
 // map_var: PRES:2 DEPTH:3 PSAL:21 DOX2:18 ...
-func DecodeData(str string, profile float64) {
+func (nc *Ctd) DecodeData(str string, profile float64) {
 
 	// split the string str using whitespace characters
 	values := strings.Fields(str)
@@ -201,7 +201,7 @@ func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
 }
 
 // read all cnv files and return dimensions
-func firstPass(files []string) (int, int) {
+func (nc *Ctd) firstPass(files []string) (int, int) {
 
 	var line int = 0
 	var maxLine int = 0
@@ -218,7 +218,7 @@ func firstPass(files []string) (int, int) {
 		}
 		defer fid.Close()
 
-		profile := GetProfileNumber(file)
+		profile := nc.GetProfileNumber(file)
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
 			str := scanner.Text()
@@ -260,7 +260,7 @@ func firstPass(files []string) (int, int) {
 }
 
 // read all cnv files and extract data
-func secondPass(files []string) {
+func (nc *Ctd) secondPass(files []string) {
 
 	fmt.Fprintf(echo, "Second pass ...\n")
 
@@ -278,16 +278,16 @@ func secondPass(files []string) {
 		defer fid.Close()
 		// fmt.Printf("Read %s\n", file)
 
-		profile := GetProfileNumber(file)
+		profile := nc.GetProfileNumber(file)
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
 			if match {
-				DecodeHeader(str, profile)
+				nc.DecodeHeader(str, profile)
 			} else {
 				// fill map data with information contain in read line str
-				DecodeData(str, profile)
+				nc.DecodeData(str, profile)
 				// fill 2D slice
 				for _, key := range hdr {
 					if key != "PRFL" {
@@ -318,10 +318,10 @@ func secondPass(files []string) {
 
 // read cnv files in two pass, the first to get dimensions
 // second to get data
-func readSeabirdCnv(files []string) {
+func (nc *Ctd) Read(files []string) {
 
 	// first pass, return dimensions fron cnv files
-	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = firstPass(files)
+	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = nc.firstPass(files)
 
 	// initialize 2D data
 	nc.Variables_2D = make(AllData_2D)
@@ -330,5 +330,5 @@ func readSeabirdCnv(files []string) {
 	}
 
 	// second pass, read files again, extract data and fill slices
-	secondPass(files)
+	nc.secondPass(files)
 }

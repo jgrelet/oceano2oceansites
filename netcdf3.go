@@ -7,7 +7,7 @@ import (
 )
 
 // creates the NetCDF file following nc structure.
-func WriteNetcdfFile(nc Nc) error {
+func (nc *Nc) WriteNetcdf() error {
 
 	// build filename
 	filename := fmt.Sprintf("OS_%s%s_CTD.nc",
