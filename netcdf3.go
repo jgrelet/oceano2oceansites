@@ -7,7 +7,10 @@ import (
 )
 
 // creates the NetCDF file following nc structure.
+//func WriteNetcdf(any interface{}) error {
 func (nc *Nc) WriteNetcdf() error {
+
+	//nc := any.(Nc)
 
 	// build filename
 	filename := fmt.Sprintf("OS_%s%s_CTD.nc",

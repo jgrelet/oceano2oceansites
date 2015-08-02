@@ -30,10 +30,11 @@ type Nc struct {
 }
 
 type Process interface {
-	Read()
-	WriteHeader()
-	WriteAscii()
-	WriteNetcdf()
+	Read([]string)
+	GetConfig(string)
+	//	WriteHeader(map[string]string, []string)
+	WriteAscii(map[string]string, []string)
+	WriteNetcdf() error
 }
 
 // configuration file
@@ -61,7 +62,7 @@ var debug io.Writer = ioutil.Discard
 // use for echo mode
 var echo io.Writer = ioutil.Discard
 
-//var nc interface{}
+var nc Process
 
 type Ctd struct{ Nc }
 type Btl struct{ Nc }
@@ -90,7 +91,7 @@ func main() {
 	optAll = getopt.Bool('a', "all", "Process all parameters")
 	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
 	optCfgfile := getopt.StringLong("config", 'c', cfgname, "Name of the configuration file to use.")
-	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
+	//	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
 	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv")
 
 	// parse options line argument
@@ -109,23 +110,17 @@ func main() {
 	}
 	fmt.Fprintln(debug, files)
 
-	// read the first file and try to find origin
+	// read the first file and try to find the instrument type, return a bit mask
 	typeInstrument := AnalyseFirstFile(files)
-	fmt.Println(typeInstrument)
 
-	nc := new(Btl)
-	//	t := []Nc{Ctd, Btl}
-	//	var nca = make([]interface{}, 2)
-	//	for i, v := range t {
-	//		nca[i] = v
-	//	}
-
-	//	switch typeInstrument {
-	//	case CTD:
-	//		nc = new(Ctd)
-	//	case BTL:
-	//		nc = new(Btl)
-	//	}
+	// following the instrument type, allocate the rigth receiver based on
+	// Process interface
+	switch typeInstrument {
+	case CTD:
+		nc = &Ctd{}
+	case BTL:
+		nc = &Btl{}
+	}
 
 	// process bloc when option is set
 	if *optHelp {
@@ -142,28 +137,16 @@ func main() {
 	if *optEcho {
 		echo = os.Stdout
 	}
-	if *optCycleMesure != "" {
-		fmt.Println(*optCycleMesure)
-		nc.Attributes["cycle_mesure"] = *optCycleMesure
-	}
+	//	if *optCycleMesure != "" {
+	//		fmt.Println(*optCycleMesure)
+	//		nc.Attributes["cycle_mesure"] = *optCycleMesure
+	//	}
 	if *optAll {
 		prefixAll = "-all"
 	}
 
-	// initialize map from netcdf structure
-	nc.Dimensions = make(map[string]int)
-	nc.Attributes = make(map[string]string)
-	nc.Extras_f = make(map[string]float64)
-	nc.Extras_s = make(map[string]string)
-	nc.Variables_1D = make(map[string][]float64)
-	nc.Variables_1D["PROFILE"] = []float64{}
-	nc.Variables_1D["TIME"] = []float64{}
-	nc.Variables_1D["LATITUDE"] = []float64{}
-	nc.Variables_1D["LONGITUDE"] = []float64{}
-	nc.Roscop = codeRoscopFromCsv(code_roscop)
-
 	// read configuration file, by default, optCfgfile = cfgname
-	nc.Nc = GetConfig(nc.Nc, *optCfgfile)
+	nc.GetConfig(*optCfgfile)
 	// debug
 	fmt.Fprintln(debug, map_format)
 	// get files list from argument line
@@ -172,9 +155,6 @@ func main() {
 
 	// read and process all data files
 	nc.Read(files)
-
-	// add some global attributes for profile, change in future
-	nc.Attributes["data_type"] = "OceanSITES profile data"
 
 	// write ASCII file
 	nc.WriteAscii(map_format, hdr)

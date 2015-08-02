@@ -45,11 +45,25 @@ type Config struct {
 	}
 }
 
-func GetConfig(nc Nc, configFile string) Nc {
+func (nc *Nc) GetConfig(configFile string) {
 
 	//	var split, header, format string
 	var split, splitAll, header string
 
+	// initialize map from netcdf structure
+	nc.Dimensions = make(map[string]int)
+	nc.Attributes = make(map[string]string)
+	nc.Extras_f = make(map[string]float64)
+	nc.Extras_s = make(map[string]string)
+	nc.Variables_1D = make(map[string][]float64)
+	nc.Variables_1D["PROFILE"] = []float64{}
+	nc.Variables_1D["TIME"] = []float64{}
+	nc.Variables_1D["LATITUDE"] = []float64{}
+	nc.Variables_1D["LONGITUDE"] = []float64{}
+	nc.Roscop = codeRoscopFromCsv(code_roscop)
+
+	// add some global attributes for profile, change in future
+	nc.Attributes["data_type"] = "OceanSITES profile data"
 	err := gcfg.ReadFileInto(&cfg, configFile)
 	if err == nil {
 		split = cfg.Ctd.Split
@@ -102,5 +116,5 @@ func GetConfig(nc Nc, configFile string) Nc {
 	if *optDebug {
 		fmt.Println(header)
 	}
-	return nc
+	//return nc
 }
