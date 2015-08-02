@@ -1,13 +1,11 @@
 package main
 
 import (
-	"code.google.com/p/getopt"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 const PROGNAME string = "oceano2oceansites"
@@ -51,11 +49,6 @@ var data = map[string]float64{}
 var hdr []string
 var cfg Config
 
-// global arg list options
-var optDebug *bool
-var optEcho *bool
-var optAll *bool
-
 // use for debug mode
 var debug io.Writer = ioutil.Discard
 
@@ -84,31 +77,8 @@ func main() {
 	fmt.Fprintf(debug, "GOPATH:", os.Getenv("GOPATH"))
 	fmt.Fprintf(debug, "GOBIN:", os.Getenv("GOBIN"))
 
-	// parse option, move outside main
-	optDebug = getopt.Bool('d', "debug", "Display debug info")
-	optEcho = getopt.Bool('e', "echo", "Display processing in stdout")
-	optHelp := getopt.Bool('h', "help", "Help")
-	optAll = getopt.Bool('a', "all", "Process all parameters")
-	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
-	optCfgfile := getopt.StringLong("config", 'c', cfgname, "Name of the configuration file to use.")
-	//	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
-	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv")
-
-	// parse options line argument
-	getopt.Parse()
-
-	if *optFiles == "" {
-		files = getopt.Args()
-	} else {
-		files, _ = filepath.Glob(*optFiles)
-	}
-	// if no files supplied for arg list, test if files is empty
-	if len(files) == 0 {
-		getopt.Usage()
-		fmt.Println("\nPlease, specify files to process or define --files options")
-		os.Exit(0)
-	}
-	fmt.Fprintln(debug, files)
+	// get options on argument line
+	files, optCfgfile := GetOptions()
 
 	// read the first file and try to find the instrument type, return a bit mask
 	typeInstrument := AnalyseFirstFile(files)
@@ -122,36 +92,10 @@ func main() {
 		nc = &Btl{}
 	}
 
-	// process bloc when option is set
-	if *optHelp {
-		getopt.Usage()
-		os.Exit(0)
-	}
-	if *optVersion {
-		fmt.Println(PROGNAME + ": v" + PROGVERSION)
-		os.Exit(0)
-	}
-	if *optDebug {
-		debug = os.Stdout
-	}
-	if *optEcho {
-		echo = os.Stdout
-	}
-	//	if *optCycleMesure != "" {
-	//		fmt.Println(*optCycleMesure)
-	//		nc.Attributes["cycle_mesure"] = *optCycleMesure
-	//	}
-	if *optAll {
-		prefixAll = "-all"
-	}
-
 	// read configuration file, by default, optCfgfile = cfgname
-	nc.GetConfig(*optCfgfile)
+	nc.GetConfig(optCfgfile)
 	// debug
 	fmt.Fprintln(debug, map_format)
-	// get files list from argument line
-	// Args returns the non-option arguments.
-	// see https://code.google.com/p/getopt/source/browse/set.go#27
 
 	// read and process all data files
 	nc.Read(files)
