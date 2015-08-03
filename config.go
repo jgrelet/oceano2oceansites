@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/gcfg"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -64,10 +65,21 @@ func (nc *Nc) GetConfig(configFile string) {
 
 	// add some global attributes for profile, change in future
 	nc.Attributes["data_type"] = "OceanSITES profile data"
+
 	err := gcfg.ReadFileInto(&cfg, configFile)
 	if err == nil {
-		split = cfg.Ctd.Split
-		splitAll = cfg.Ctd.SplitAll
+		switch typeInstrument {
+		case CTD:
+			split = cfg.Ctd.Split
+			splitAll = cfg.Ctd.SplitAll
+		case BTL:
+			split = cfg.Btl.Split
+		default:
+			fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
+			fmt.Println("Exiting...")
+			os.Exit(0)
+
+		}
 
 		//		cruisePrefix = cfg.Ctd.CruisePrefix
 		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
@@ -100,7 +112,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	} else {
 		fields = strings.Split(split, ",")
 	}
-	fmt.Fprintln(debug, fields)
+	fmt.Fprintln(debug, "getConfig: ", fields)
 
 	for i := 0; i < len(fields); i += 2 {
 		if v, err := strconv.Atoi(fields[i+1]); err == nil {
@@ -113,8 +125,8 @@ func (nc *Nc) GetConfig(configFile string) {
 	for _, key := range hdr {
 		map_format[key] = nc.Roscop[key].format
 	}
-	if *optDebug {
-		fmt.Println(header)
-	}
+
+	fmt.Fprintln(debug, "getConfig: ", header)
+
 	//return nc
 }

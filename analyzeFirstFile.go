@@ -24,6 +24,8 @@ const (
 //	SADCP
 //)
 
+var typeInstrument InstrumentType
+
 // define bitmask
 const (
 	isSBE InstrumentType = 1 << iota

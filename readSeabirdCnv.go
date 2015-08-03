@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -33,7 +34,7 @@ var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s
 // use regular expression
 // to parse time with non standard format, see:
 // http://golang.org/src/time/format.go
-func (nc *Ctd) DecodeHeader(str string, profile float64) {
+func (nc *Nc) DecodeHeader(str string, profile float64) {
 	// decode Systeme Upload Time
 	match := regSystemTime.MatchString(str)
 	if match {
@@ -134,7 +135,7 @@ func (nc *Ctd) DecodeHeader(str string, profile float64) {
 // return the profile number from filename. Use CruisePrefix and
 // StationPrefixLength defined in configuration file
 // TODOS:  the prefix could be extract from filename
-func (nc *Ctd) GetProfileNumber(str string) float64 {
+func (nc *Nc) GetProfileNumber(str string) float64 {
 	var value float64
 	var err error
 
@@ -200,12 +201,14 @@ func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
 	return &mp
 }
 
-// read all cnv files and return dimensions
+// read .cnv files and return dimensions
 func (nc *Ctd) firstPass(files []string) (int, int) {
 
 	var line int = 0
 	var maxLine int = 0
 	var pres float64 = 0
+	var depth float64 = 0
+	var maxDepth float64 = 0
 	var maxPres float64 = 0
 	var maxPresAll float64 = 0
 
@@ -225,12 +228,20 @@ func (nc *Ctd) firstPass(files []string) (int, int) {
 			match := regIsHeader.MatchString(str)
 			if !match {
 				values := strings.Fields(str)
+				// read the pressure
 				if pres, err = strconv.ParseFloat(values[map_var["PRES"]], 64); err != nil {
 					log.Fatal(err)
+				}
+				// read the depth
+				if depth, err = strconv.ParseFloat(values[map_var["DEPTH"]], 64); err != nil {
+					log.Fatal(err)
+				} else {
+					//p(math.Floor(depth))
 				}
 			}
 			if pres > maxPres {
 				maxPres = pres
+				maxDepth = depth
 				line = line + 1
 			}
 			if err := scanner.Err(); err != nil {
@@ -242,13 +253,15 @@ func (nc *Ctd) firstPass(files []string) (int, int) {
 		if line > maxLine {
 			maxLine = line
 		}
-		// store the maximum pressure value
+		// store the maximum pressure and maximum depth value per cast
 		nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] = maxPres
+		nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile))] = math.Floor(maxDepth)
 		if maxPres > maxPresAll {
 			maxPresAll = maxPres
 		}
 		// reset value for next loop
 		maxPres = 0
+		maxDepth = 0
 		pres = 0
 		line = 0
 	}
@@ -259,7 +272,7 @@ func (nc *Ctd) firstPass(files []string) (int, int) {
 	return len(files), maxLine
 }
 
-// read all cnv files and extract data
+// read .cnv files and extract data
 func (nc *Ctd) secondPass(files []string) {
 
 	fmt.Fprintf(echo, "Second pass ...\n")

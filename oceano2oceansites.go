@@ -55,11 +55,18 @@ var debug io.Writer = ioutil.Discard
 // use for echo mode
 var echo io.Writer = ioutil.Discard
 
+// usefull macro
+var p = fmt.Println
+var f = fmt.Printf
+
+// nc implement interface Process
 var nc Process
 
+// define new receiver type based on netcdf equivalent structure
 type Ctd struct{ Nc }
 type Btl struct{ Nc }
 
+// main body
 func main() {
 
 	var files []string
@@ -81,7 +88,7 @@ func main() {
 	files, optCfgfile := GetOptions()
 
 	// read the first file and try to find the instrument type, return a bit mask
-	typeInstrument := AnalyseFirstFile(files)
+	typeInstrument = AnalyseFirstFile(files)
 
 	// following the instrument type, allocate the rigth receiver based on
 	// Process interface
@@ -90,6 +97,10 @@ func main() {
 		nc = &Ctd{}
 	case BTL:
 		nc = &Btl{}
+	default:
+		fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
+		fmt.Println("Exiting...")
+		os.Exit(0)
 	}
 
 	// read configuration file, by default, optCfgfile = cfgname

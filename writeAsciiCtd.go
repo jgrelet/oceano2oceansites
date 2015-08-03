@@ -100,14 +100,15 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 			lon[x],
 			t1.Format("20060102150405"))
 
-		// write profile informations to header file
+		// write profile informations to header file, max depth CTD and
+		// bathymetrie are in meters
 		str = fmt.Sprintf("%05.0f %s %s %s %s %4.4g %4.4g %s %s\n",
 			profile[x],
 			t1.Format("02/01/2006 15:04:05"),
 			t2.Format("02/01/2006 15:04:05"),
 			DecimalPosition2String(lat[x], 0),
 			DecimalPosition2String(lon[x], 0),
-			nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile[x]))],
+			nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile[x]))],
 			bath[x],
 			nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile[x]))],
 			cfg.Ctd.CruisePrefix+nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(profile[x]))])
