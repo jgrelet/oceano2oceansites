@@ -14,6 +14,13 @@ func sw_smow(T float64) float64 {
 	return dens
 }
 
+// Density of Sea Water at atmospheric pressure using
+// UNESCO 1983 (EOS 1980) polynomial.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// Output:
+// density  [kg/m^3] of salt water with properties S,T
 func sw_dens0(S, T float64) float64 {
 	const b0, b1, b2, b3, b4 = 8.24493e-1, -4.0899e-3, 7.6438e-5, -8.2467e-7, 5.3875e-9
 	const c0, c1, c2 = -5.72466e-3, +1.0227e-4, -1.6546e-6
@@ -23,6 +30,14 @@ func sw_dens0(S, T float64) float64 {
 	return dens
 }
 
+// Secant Bulk Modulus (K) of Sea Water using Equation of state 1980.
+// UNESCO polynomial implementation.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// Secant Bulk Modulus  [bars]
 func sw_seck(S, T, P float64) float64 {
 
 	P = P / 10.0 // convert from db to atmospheric pressure units
@@ -69,6 +84,13 @@ func sw_seck(S, T, P float64) float64 {
 	return K
 }
 
+// Sound Velocity in sea water using UNESCO 1983 polynomial.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// sound velocity  [m/s]
 func sw_svel(S, T, P float64) float64 {
 
 	P = P / 10 // convert db to bars as used in UNESCO routines
@@ -125,6 +147,12 @@ func sw_svel(S, T, P float64) float64 {
 	return svel
 }
 
+// Calculates depth in metres from pressure in dbars.
+// Input:
+// P = pressure    [db]
+// LAT = Latitude in decimal degress north [-90..+90]
+// Output:
+// depth [metres]
 func sw_dpth(P, LAT float64) float64 {
 
 	const c1, c2, c3, c4, gam_dash = +9.72659, -2.2512E-5, +2.279E-10, -1.82E-15, 2.184e-6
@@ -139,6 +167,13 @@ func sw_dpth(P, LAT float64) float64 {
 	return DEPTHM
 }
 
+// Calculates adiabatic temperature gradient as per UNESCO 1983 routines.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// adiabatic temperature gradient [degree_C/db]
 func sw_adtg(S, T, P float64) float64 {
 
 	const a0, a1, a2, a3 = 3.5803E-5, +8.5258E-6, -6.836E-8, 6.6228E-10
@@ -157,6 +192,13 @@ func sw_adtg(S, T, P float64) float64 {
 	return ADTG
 }
 
+// Calculates potential temperature as per UNESCO 1983 report.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// reference pressure  [db]
 func sw_ptmp(S, T, P, PR float64) float64 {
 
 	// theta1
@@ -181,6 +223,13 @@ func sw_ptmp(S, T, P, PR float64) float64 {
 	return PT
 }
 
+// Density of Sea Water using UNESCO 1983 (EOS 80) polynomial.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// density  [kg/m^3]
 func sw_dens(S, T, P float64) float64 {
 
 	densP0 := sw_dens0(S, T)
@@ -190,24 +239,53 @@ func sw_dens(S, T, P float64) float64 {
 	return dens
 }
 
+// Calculates depth in metres from pressure in dbars.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// svel = sound velocity  [m/s]
 func sw_sigmat(S, T, P float64) float64 {
 
 	dens := sw_dens(S, T, 0)
 	return dens - 1000.0
 }
 
+// Calculates depth in metres from pressure in dbars.
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// svel = sound velocity  [m/s]
 func sw_sigmateta(S, T, P float64) float64 {
 
 	dens := sw_dens(S, sw_ptmp(S, T, P, 0), 0)
 	return dens - 1000.0
 }
 
+// Specific Volume Anomaly calculated as
+// svan = 1/sw_dens(s,t,p) - 1/sw_dens(35,0,p)
+// Input:
+// S = salinity    [psu      (PSS-78)]
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// Specific Volume Anomaly  [m^3 kg^-1]
 func sw_svan(S, T, P float64) float64 {
 
 	svan := (1 / sw_dens(S, T, P)) - (1 / sw_dens(35, 0, P))
 	return svan
 }
 
+// Calculates salinity
+// Input:
+// C = conductivity []
+// T = temperature [degree C (ITS-90)]
+// P = pressure    [db]
+// Output:
+// salinity
 func sw_sal(C, T, P float64) float64 {
 
 	// salinity constants
@@ -236,262 +314,3 @@ func sw_sal(C, T, P float64) float64 {
 	T -= 15
 	return (sum1 + sum2*T/(1+0.0162*T))
 }
-
-/*
-=head1 DESCRIPTION
-
-All the functions need IPTS-68 scale for temperature. If your temperature data are
-in IPTS-90 scale, you need to convert them before use:
-
-T68 = T90 * 1.00024
-
-=over 2
-
-=item sw_svel = &sw_svel(S,T,P)
-
-
-Sound Velocity in sea water using UNESCO 1983 polynomial.
-
-INPUT:
-
-S = salinity    [psu      (PSS-78)]
-
-T = temperature [degree C (IPTS-68)]
-
-P = pressure    [db]
-
-OUTPUT:
-
-svel = sound velocity  [m/s]
-
-=back
-
-=over 2
-
-
-=item dpth = &sw_dpth(P,L)
-
-
-Calculates depth in meters from pressure in dbars.
-
-INPUT:
-
-P   = Pressure    [db]
-
-L   = Latitude in decimal degres north [-90..+90]
-
-OUTPUT:
-
-dpth = depth [meters]
-
-REFERENCES:
-
-Unesco 1983. Algorithms for computation of fundamental properties of
-seawater, 1983. _Unesco Tech. Pap. in Mar. Sci._, No. 44, 53 pp.
-
-=back
-
-=over 2
-
-=item adtg = &sw_adtg(S,T,P)
-
-
-Calculates adiabatic temperature gradient as per UNESCO 1983 routines.
-
-INPUT:
-
-S = salinity    [psu      (PSS-78) ]
-
-T = temperature [degree C (IPTS-68)]
-
-P = pressure    [db]
-
-
-OUTPUT:
-
-ADTG = adiabatic temperature gradient [degree_C/db]
-
-
-REFERENCES:
-
-Fofonoff, P. and Millard, R.C. Jr
-Unesco 1983. Algorithms for computation of fundamental properties of
-seawater. Unesco Tech. Pap. in Mar. Sci., No. 44, 53 pp.  Eqn.(31) p.39
-
-Bryden, H. 1973.
-"New Polynomials for thermal expansion, adiabatic temperature gradient
-and potential temperature of sea water."
-DEEP-SEA RES., 1973, Vol20,401-408.
-
-=back
-
-=over 2
-
-=item  teta = &sw_ptmp(S,T,P,PR)
-
-Calculates potential temperature as per UNESCO 1983 report.
-
-potential temperature IPTS68 = teta(s,t,p,pr)
-
-potential temperature IPTS90 = teta(s,t,p,pr) / 1.00024
-
-INPUT:
-
-S  = salinity    [psu      (PSS-78) ]
-
-T  = temperature [degree C (IPTS-68)]
-
-P  = pressure    [db]
-
-PR = Reference pressure  [db]
-
-OUTPUT:
-
-ptmp = Potential temperature relative to PR [degree C (IPTS-68)]
-
-REFERENCES:
-
-Fofonoff, P. and Millard, R.C. Jr
-Unesco 1983. Algorithms for computation of fundamental properties of
-seawater, 1983. _Unesco Tech. Pap. in Mar. Sci._, No. 44, 53 pp.
-Eqn.(31) p.39
-
-Bryden, H. 1973.
-"New Polynomials for thermal expansion, adiabatic temperature gradient
-and potential temperature of sea water."
-DEEP-SEA RES., 1973, Vol20,401-408.
-
-=back
-
-=over 2
-
-=item dens = &sw_dens(S,T,P)
-
-
-Density of Sea Water using UNESCO 1983 (EOS 80) polynomial.
-
-INPUT:
-
-S = salinity    [psu      (PSS-78)]
-
-T = temperature [degree C (IPTS-68)]
-
-P = pressure    [db]
-
-OUTPUT:
-
-dens = density  [kg/m^3]
-
-REFERENCES:
-
-Fofonoff, P. and Millard, R.C. Jr
-Unesco 1983. Algorithms for computation of fundamental properties of
-seawater, 1983. _Unesco Tech. Pap. in Mar. Sci._, No. 44, 53 pp.
-
-Millero, F.J., Chen, C.T., Bradshaw, A., and Schleicher, K.
-" A new high pressure equation of state for seawater"
-Deap-Sea Research., 1980, Vol27A, pp255-264.
-
-=back
-
-=over 2
-
-=item sigmat = &sw_sigmat(S,T,P)
-
-Sigma t = Density(s,t,0) - 1000.0 of Sea Water cf sw_dens().
-
-=back
-
-=over 2
-
-=item sigmateta = &sw_sigmateta(S,T,P)
-
-Sigma teta = Density(s,teta(s,t,p,0),0) - 1000.0 of Sea Water.
-
-=back
-
-=over 2
-
-=item svan = &sw_svan(S,T,P)
-
-Specific Volume Anomaly calculated as
-
-svan = 1/sw_dens(s,t,p) - 1/sw_dens(35,0,p)
-
-Note that it is often quoted in literature as 1e8*units
-
-INPUT:
-
-S = salinity    [psu      (PSS-78) ]
-
-T = temperature [degree C (IPTS-68)]
-
-P = Pressure    [db]
-
-OUTPUT:
-
-svan = Specific Volume Anomaly  [m^3 kg^-1]
-
-REFERENCE:
-
-Fofonoff, N.P. and Millard, R.C. Jr
-
-Unesco 1983. Algorithms for computation of fundamental properties of
-seawater, 1983. _Unesco Tech. Pap. in Mar. Sci._, No. 44, 53 pp.
-Eqn (9) p.15.
-
-S. Pond & G.Pickard  2nd Edition 1986
-
-Introductory Dynamical Oceanogrpahy
-Pergamon Press Sydney.  ISBN 0-08-028728-X
-
-=back
-
-=over 2
-
-=item sal = &sw_sal(C,T,P)
-
-Calculates salinity from conductivity, temperature and pressure.
-
-INPUT:
-
-C = conductivity  [Siemens/meters]
-
-T = temperature   [degree C (IPTS-68)]
-
-P = Pressure      [db]
-
-OUTPUT:
-
-sal = salinity    [psu      (PSS-78)]
-
-=back
-
-=head1 AUTHOR
-
-From Matlab scripts "SEAWATER Library" and written in perl by
-Jacques Grelet, C<< <jacques.grelet at ird.fr> >>
-
-Phillip P. Morgan  CSIRO
-Phil.Morganmarine.csiro.au
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Oceano::Seawater
-
-=head1 ACKNOWLEDGEMENTS
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2007 Jacques Grelet, all rights reserved.
-
-This program is free software you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=cut
-
-1    // End of Oceano::Seawater
-
-*/
