@@ -59,7 +59,7 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 		if v, err := Position2Decimal(str); err == nil {
 			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
 		} else {
-			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
+			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], 1e36)
 		}
 	}
 	match = regCruise.MatchString(str)

@@ -3,7 +3,7 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	//	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -57,26 +57,26 @@ func AnalyseFirstFile(files []string) InstrumentType {
 
 		match := regIsSeabird.MatchString(str)
 		if match {
-			res := regIsSeabird.FindStringSubmatch(str)
-			value := res[1]
+			//res := regIsSeabird.FindStringSubmatch(str)
+			//value := res[1]
 			result = result | isSBE
-			fmt.Fprintln(debug, value, result)
+			//fmt.Fprintln(debug, value, result)
 		}
 		match = regIsCnv.MatchString(str)
 		if match {
-			res := regIsCnv.FindStringSubmatch(str)
-			value := res[1]
+			//res := regIsCnv.FindStringSubmatch(str)
+			//value := res[1]
 			result = result | isCTD
-			fmt.Fprintln(debug, value, result)
+			//fmt.Fprintln(debug, value, result)
 		}
 		match = regIsBtottle.MatchString(str)
 		if match {
-			res := regIsBtottle.FindStringSubmatch(str)
-			value := res[1]
+			//res := regIsBtottle.FindStringSubmatch(str)
+			//value := res[1]
 			result = result | isBTL
-			fmt.Fprintln(debug, value, result)
+			//fmt.Fprintln(debug, value, result)
 		}
 	}
-	fmt.Fprintln(debug, result)
+	//fmt.Fprintln(debug, result)
 	return result
 }

@@ -49,7 +49,7 @@ type Config struct {
 func (nc *Nc) GetConfig(configFile string) {
 
 	//	var split, header, format string
-	var split, splitAll, header string
+	var split, splitAll string
 
 	// initialize map from netcdf structure
 	nc.Dimensions = make(map[string]int)
@@ -101,8 +101,15 @@ func (nc *Nc) GetConfig(configFile string) {
 		log.Fatal(err)
 	}
 
-	// First column should be PRFL
-	hdr = append(hdr, "PRFL")
+	switch typeInstrument {
+	case CTD:
+		// First column should be PRFL
+		hdr = append(hdr, "PRFL")
+	case BTL:
+		hdr = append(hdr, "PRFL")
+		hdr = append(hdr, "ETDD")
+	default:
+	}
 
 	// fill map_var from split
 	// store the position (column) of each physical parameter
@@ -114,19 +121,18 @@ func (nc *Nc) GetConfig(configFile string) {
 	}
 	fmt.Fprintln(debug, "getConfig: ", fields)
 
+	// construct header slice from split
 	for i := 0; i < len(fields); i += 2 {
 		if v, err := strconv.Atoi(fields[i+1]); err == nil {
 			map_var[fields[i]] = v - 1
 			hdr = append(hdr, fields[i])
 		}
 	}
+	fmt.Fprintln(debug, "getConfig: ", hdr)
 
 	// fill map_format from code_roscop
 	for _, key := range hdr {
 		map_format[key] = nc.Roscop[key].format
 	}
-
-	fmt.Fprintln(debug, "getConfig: ", header)
-
 	//return nc
 }

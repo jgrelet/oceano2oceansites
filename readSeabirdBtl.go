@@ -15,6 +15,7 @@ var regIsHour = regexp.MustCompile(`^\s+(\d+:\d+:\d+)`)
 
 //var regIsDate = regexp.MustCompile(`^\s+\d+\s+(\w{3}\s+\d{2}\s+\d{4})`)
 var regIsMontDayYear = regexp.MustCompile(`^\s+\d+\s+(\w{3})\s+(\d{2})\s+(\d{4})`)
+var regIsHeaderBtl = regexp.MustCompile(`^[*#]|^\s+\w+`)
 
 // read .btl files and return dimensions
 func (nc *Btl) firstPass(files []string) (int, int) {
@@ -38,10 +39,11 @@ func (nc *Btl) firstPass(files []string) (int, int) {
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
 			str := scanner.Text()
-			match := regIsHeader.MatchString(str)
+			match := regIsHeaderBtl.MatchString(str)
 			if !match {
+				p(str)
 				values := strings.Fields(str)
-				p(map_var["BOTL"])
+				p("BOTL", map_var["BOTL"])
 				p(values[map_var["BOTL"]])
 				if bottle, err = strconv.ParseFloat(values[map_var["BOTL"]], 64); err != nil {
 					log.Fatal(err)
