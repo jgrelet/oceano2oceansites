@@ -25,6 +25,17 @@ const (
 	internalToOceanSites int64 = -oceanSitesToInternal
 )
 
+// define constante for profile
+type ProfileType int
+
+const (
+	UNKNOW ProfileType = iota // UNKNOW == 0
+	PHY                       // PHY = 1
+	BIO                       // BIO == 2
+	GEO                       // GEO == 3
+
+)
+
 type Time struct {
 	time.Time
 	nsec int64 // the number of seconds elapsed since January 1, 1970 UTC

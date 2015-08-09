@@ -125,6 +125,20 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 	if match {
 		res := regType.FindStringSubmatch(str)
 		value := res[1]
+		var v float64
+		switch value {
+		case "PHY":
+			v = float64(PHY)
+		case "GEO":
+			v = float64(GEO)
+		case "BIO":
+			v = float64(BIO)
+		default:
+			v = float64(UNKNOW)
+		}
+		//f("Type: %f\n", v)
+		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"], v)
+
 		if *optDebug {
 			fmt.Println(value)
 		}
