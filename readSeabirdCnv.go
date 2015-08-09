@@ -124,7 +124,7 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 	match = regType.MatchString(str)
 	if match {
 		res := regType.FindStringSubmatch(str)
-		value := res[1]
+		value := strings.ToUpper(res[1]) // convert to upper case
 		var v float64
 		switch value {
 		case "PHY":
