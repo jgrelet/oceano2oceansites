@@ -56,11 +56,11 @@ func (nc *Nc) GetConfig(configFile string) {
 	nc.Attributes = make(map[string]string)
 	nc.Extras_f = make(map[string]float64)
 	nc.Extras_s = make(map[string]string)
-	nc.Variables_1D = make(map[string][]float64)
-	nc.Variables_1D["PROFILE"] = []float64{}
-	nc.Variables_1D["TIME"] = []float64{}
-	nc.Variables_1D["LATITUDE"] = []float64{}
-	nc.Variables_1D["LONGITUDE"] = []float64{}
+	nc.Variables_1D = make(map[string][]interface{})
+	nc.Variables_1D["PROFILE"] = []interface{}{}
+	nc.Variables_1D["TIME"] = []interface{}{}
+	nc.Variables_1D["LATITUDE"] = []interface{}{}
+	nc.Variables_1D["LONGITUDE"] = []interface{}{}
 	nc.Roscop = codeRoscopFromCsv(code_roscop)
 
 	// add some global attributes for profile, change in future

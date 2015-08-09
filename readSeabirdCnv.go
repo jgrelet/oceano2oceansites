@@ -190,9 +190,9 @@ func (nc *Ctd) DecodeData(str string, profile float64) {
 // data straightforward, it will then be flatten to write netcdf file
 func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
 	mt := new(Data_2D)
-	mt.data = make([][]float64, width)
+	mt.data = make([][]interface{}, width)
 	for i := range mt.data {
-		mt.data[i] = make([]float64, height)
+		mt.data[i] = make([]interface{}, height)
 		for j := range mt.data[i] {
 			mt.data[i][j] = 1e36
 		}

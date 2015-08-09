@@ -19,7 +19,7 @@ type AllData_2D map[string]Data_2D
 
 type Nc struct {
 	Dimensions   map[string]int
-	Variables_1D map[string][]float64
+	Variables_1D map[string][]interface{}
 	Variables_2D AllData_2D
 	Attributes   map[string]string
 	Extras_f     map[string]float64 // used to store max of profiles value
