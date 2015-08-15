@@ -124,7 +124,21 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 	match = regType.MatchString(str)
 	if match {
 		res := regType.FindStringSubmatch(str)
-		value := res[1]
+		value := strings.ToUpper(res[1]) // convert to upper case
+		var v float64
+		switch value {
+		case "PHY":
+			v = float64(PHY)
+		case "GEO":
+			v = float64(GEO)
+		case "BIO":
+			v = float64(BIO)
+		default:
+			v = float64(UNKNOW)
+		}
+		//f("Type: %f\n", v)
+		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"], v)
+
 		if *optDebug {
 			fmt.Println(value)
 		}
@@ -162,7 +176,7 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 // extract data from the line read in str with order gave by hash map_var
 // values:  1318 81.583900 3.000 2.983 29.5431 29.5464 5 ...
 // map_var: PRES:2 DEPTH:3 PSAL:21 DOX2:18 ...
-func (nc *Ctd) DecodeData(str string, profile float64) {
+func (nc *Ctd) DecodeData(str string, profile float64, file string, line int) {
 
 	// split the string str using whitespace characters
 	values := strings.Fields(str)
@@ -179,6 +193,7 @@ func (nc *Ctd) DecodeData(str string, profile float64) {
 		if v, err := strconv.ParseFloat(values[column], 64); err == nil {
 			data[key] = v
 		} else {
+			log.Printf("Can't parse line: %d in file: %s\n", line, file)
 			log.Fatal(err)
 		}
 	}
@@ -293,6 +308,7 @@ func (nc *Ctd) secondPass(files []string) {
 
 		profile := nc.GetProfileNumber(file)
 		scanner := bufio.NewScanner(fid)
+		downcast := true
 		for scanner.Scan() {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
@@ -300,17 +316,24 @@ func (nc *Ctd) secondPass(files []string) {
 				nc.DecodeHeader(str, profile)
 			} else {
 				// fill map data with information contain in read line str
-				nc.DecodeData(str, profile)
-				// fill 2D slice
-				for _, key := range hdr {
-					if key != "PRFL" {
-						//fmt.Println("Line: ", line, "key: ", key, " data: ", data[key])
-						nc.Variables_2D[key].data[nbProfile][line] = data[key]
+				nc.DecodeData(str, profile, file, line)
+
+				if downcast {
+					// fill 2D slice
+					for _, key := range hdr {
+						if key != "PRFL" {
+							//fmt.Println("Line: ", line, "key: ", key, " data: ", data[key])
+							nc.Variables_2D[key].data[nbProfile][line] = data[key]
+						}
 					}
-				}
-				// exit loop if reach maximum pressure for the profile
-				if data["PRES"] == nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] {
-					break
+					// exit loop if reach maximum pressure for the profile
+					if data["PRES"] == nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] {
+						downcast = false
+					}
+				} else {
+					// store last julian day for end profile
+					nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"]
+					//fmt.Println(presMax)
 				}
 				line++
 			}
