@@ -19,7 +19,7 @@ type AllData_2D map[string]Data_2D
 
 type Nc struct {
 	Dimensions   map[string]int
-	Variables_1D map[string][]interface{}
+	Variables_1D map[string]interface{}
 	Variables_2D AllData_2D
 	Attributes   map[string]string
 	Extras_f     map[string]float64 // used to store max of profiles value
@@ -45,7 +45,7 @@ var prefixAll = ""
 // Create an empty map.
 var map_var = map[string]int{}
 var map_format = map[string]string{}
-var data = map[string]float64{}
+var data = make(map[string]interface{})
 var hdr []string
 var cfg Config
 

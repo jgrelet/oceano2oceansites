@@ -51,16 +51,20 @@ func (nc *Nc) GetConfig(configFile string) {
 	//	var split, header, format string
 	var split, splitAll string
 
-	// initialize map from netcdf structure
+	// define map from netcdf structure
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
 	nc.Extras_f = make(map[string]float64)
 	nc.Extras_s = make(map[string]string)
-	nc.Variables_1D = make(map[string][]interface{})
-	nc.Variables_1D["PROFILE"] = []interface{}{}
-	nc.Variables_1D["TIME"] = []interface{}{}
-	nc.Variables_1D["LATITUDE"] = []interface{}{}
-	nc.Variables_1D["LONGITUDE"] = []interface{}{}
+	nc.Variables_1D = make(map[string]interface{})
+
+	// initialize map entry from nil interface to empty slice of float64
+	nc.Variables_1D["PROFILE"] = []float64{}
+	nc.Variables_1D["TIME"] = []float64{}
+	nc.Variables_1D["LATITUDE"] = []float64{}
+	nc.Variables_1D["LONGITUDE"] = []float64{}
+	nc.Variables_1D["BATH"] = []float64{}
+	nc.Variables_1D["TYPECAST"] = []float64{}
 	nc.Roscop = codeRoscopFromCsv(code_roscop)
 
 	// add some global attributes for profile, change in future
@@ -101,6 +105,7 @@ func (nc *Nc) GetConfig(configFile string) {
 		log.Fatal(err)
 	}
 
+	// add specific column(s) to the first header line in ascii file
 	switch typeInstrument {
 	case CTD:
 		// First column should be PRFL
@@ -111,7 +116,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	default:
 	}
 
-	// fill map_var from split
+	// fill map_var from split (read in .ini configuration file)
 	// store the position (column) of each physical parameter
 	var fields []string
 	if *optAll {

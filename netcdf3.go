@@ -127,8 +127,10 @@ func (nc *Nc) WriteNetcdf() error {
 
 	// Create the data with the above dimensions and write it to the file.
 	for key, value := range nc.Variables_1D {
-		fmt.Fprintf(echo, "writing %s: %d\n", key, len(value))
-		err = map_1D[key].WriteFloat64s([]float64(value))
+
+		v := value.([]float64)
+		fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
+		err = map_1D[key].WriteFloat64s(v)
 		if err != nil {
 			return err
 		}

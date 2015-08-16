@@ -41,6 +41,22 @@ type Time struct {
 	nsec int64 // the number of seconds elapsed since January 1, 1970 UTC
 }
 
+// initialize a slice with 2 dimensions to store data
+// It should be notice that this table has two dimensions allows to write
+// data straightforward, it will then be flatten to write netcdf file
+func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
+	mt := new(Data_2D)
+	mt.data = make([][]float64, width)
+	for i := range mt.data {
+		mt.data[i] = make([]float64, height)
+		for j := range mt.data[i] {
+			mt.data[i][j] = 1e36
+		}
+	}
+	mp[name] = *mt
+	return &mp
+}
+
 // construct time object from a string date
 func NewTimeFromString(format, value string) *Time {
 	t, _ := time.Parse(format, value)

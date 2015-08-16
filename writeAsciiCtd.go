@@ -79,11 +79,11 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 	// get data (slices) from nc struct
 	len_1D := nc.Dimensions["TIME"]
 	len_2D := nc.Dimensions["DEPTH"]
-	time := nc.Variables_1D["TIME"]
-	lat := nc.Variables_1D["LATITUDE"]
-	lon := nc.Variables_1D["LONGITUDE"]
-	profile := nc.Variables_1D["PROFILE"]
-	bath := nc.Variables_1D["BATH"]
+	time := nc.Variables_1D["TIME"].([]float64)
+	lat := nc.Variables_1D["LATITUDE"].([]float64)
+	lon := nc.Variables_1D["LONGITUDE"].([]float64)
+	profile := nc.Variables_1D["PROFILE"].([]float64)
+	bath := nc.Variables_1D["BATH"].([]float64)
 
 	// loop over each profile
 	for x := 0; x < len_1D; x++ {

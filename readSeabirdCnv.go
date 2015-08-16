@@ -44,22 +44,22 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 		// create new Time object, see tools.go
 		var t = NewTimeFromString("Jan 02 2006 15:04:05", value)
 		v := t.Time2JulianDec()
-		nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"], v)
+		nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"].([]float64), v)
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
 		if v, err := Position2Decimal(str); err == nil {
-			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], v)
+			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"].([]float64), v)
 		} else {
-			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"], 1e36)
+			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"].([]float64), 1e36)
 		}
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
 		if v, err := Position2Decimal(str); err == nil {
-			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], v)
+			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"].([]float64), v)
 		} else {
-			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"], 1e36)
+			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"].([]float64), 1e36)
 		}
 	}
 	match = regCruise.MatchString(str)
@@ -91,9 +91,9 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 			//			if p != v {
 			//				fmt.Printf("Warning: profile for header differ from file name: %s <=> %s\n", p, v)
 			//			}
-			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], profile)
+			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"].([]float64), profile)
 		} else {
-			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"], 1e36)
+			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"].([]float64), 1e36)
 		}
 	}
 	match = regBottomDepth.MatchString(str)
@@ -102,15 +102,15 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
 			fmt.Fprintf(debug, "Bath: %f\n", v)
-			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], v)
+			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"].([]float64), v)
 		} else {
 			fmt.Fprintf(debug, "Bath: %f\n", v)
-			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], 1e36)
+			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"].([]float64), 1e36)
 		}
 	}
 	match = regDummyBottomDepth.MatchString(str)
 	if match {
-		nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"], 1e36)
+		nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"].([]float64), 1e36)
 		fmt.Fprintf(debug, "Bath: %g\n", 1e36)
 	}
 	match = regOperator.MatchString(str)
@@ -137,7 +137,7 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 			v = float64(UNKNOW)
 		}
 		//f("Type: %f\n", v)
-		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"], v)
+		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
 
 		if *optDebug {
 			fmt.Println(value)
@@ -198,22 +198,6 @@ func (nc *Ctd) DecodeData(str string, profile float64, file string, line int) {
 		}
 	}
 	data["PRFL"] = profile
-}
-
-// initialize a slice with 2 dimensions to store data
-// It should be notice that this table has two dimensions allows to write
-// data straightforward, it will then be flatten to write netcdf file
-func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
-	mt := new(Data_2D)
-	mt.data = make([][]interface{}, width)
-	for i := range mt.data {
-		mt.data[i] = make([]interface{}, height)
-		for j := range mt.data[i] {
-			mt.data[i][j] = 1e36
-		}
-	}
-	mp[name] = *mt
-	return &mp
 }
 
 // read .cnv files and return dimensions
@@ -323,7 +307,7 @@ func (nc *Ctd) secondPass(files []string) {
 					for _, key := range hdr {
 						if key != "PRFL" {
 							//fmt.Println("Line: ", line, "key: ", key, " data: ", data[key])
-							nc.Variables_2D[key].data[nbProfile][line] = data[key]
+							nc.Variables_2D[key].data[nbProfile][line] = data[key].(float64)
 						}
 					}
 					// exit loop if reach maximum pressure for the profile
@@ -332,7 +316,7 @@ func (nc *Ctd) secondPass(files []string) {
 					}
 				} else {
 					// store last julian day for end profile
-					nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"]
+					nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
 					//fmt.Println(presMax)
 				}
 				line++
@@ -346,7 +330,7 @@ func (nc *Ctd) secondPass(files []string) {
 		nbProfile += 1
 
 		// store last julian day for end profile
-		nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"]
+		nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
 		//fmt.Println(presMax)
 	}
 	fmt.Fprintln(debug, nc.Variables_1D["PROFILE"])
