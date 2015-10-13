@@ -3,18 +3,35 @@ package main
 import (
 	"fmt"
 	"github.com/fhs/go-netcdf/netcdf"
+	"log"
+	"os"
 	"strings"
 )
 
 // creates the NetCDF file following nc structure.
 //func WriteNetcdf(any interface{}) error {
-func (nc *Nc) WriteNetcdf() error {
+func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 
-	//nc := any.(Nc)
+	var ncType string
+
+	switch inst {
+	case CTD:
+		ncType = "CTD"
+	case BTL:
+		ncType = "BTL"
+		//	case XBT:
+		//		ncType = "XBT"
+	default:
+		fmt.Printf("WriteNetcdf: invalide InstrumentType -> %d\n", inst)
+		fmt.Println("Exiting...")
+		os.Exit(0)
+	}
 
 	// build filename
-	filename := fmt.Sprintf("OS_%s%s_CTD.nc",
-		strings.ToUpper(nc.Attributes["cycle_mesure"]), strings.ToUpper(prefixAll))
+	filename := fmt.Sprintf("OS_%s%s_%s.nc",
+		strings.ToUpper(nc.Attributes["cycle_mesure"]),
+		strings.ToUpper(prefixAll),
+		ncType)
 	//fmt.Println(filename)
 
 	// get roscop definition file for variables attributes
@@ -34,7 +51,7 @@ func (nc *Nc) WriteNetcdf() error {
 	// Create a new NetCDF 3 file. The dataset is returned.
 	ds, err := netcdf.CreateFile(filename, netcdf.CLOBBER)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	defer ds.Close()
 
@@ -45,11 +62,11 @@ func (nc *Nc) WriteNetcdf() error {
 	// dimensions for ROSCOP paremeters as DEPTH, PRES, TEMP, PSAL, etc
 	dim_2D[0], err = ds.AddDim("TIME", uint64(len_1D))
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	dim_2D[1], err = ds.AddDim("DEPTH", uint64(len_2D))
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	// dimension for PROFILE, LATITUDE, LONGITUDE and BATH
 	dim_1D[0] = dim_2D[0]
@@ -59,7 +76,7 @@ func (nc *Nc) WriteNetcdf() error {
 	for key, _ := range nc.Variables_1D {
 		v, err := ds.AddVar(key, netcdf.DOUBLE, dim_1D)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 		map_1D[key] = v
 
@@ -94,7 +111,7 @@ func (nc *Nc) WriteNetcdf() error {
 		}
 		v, err := ds.AddVar(key, netcdf.DOUBLE, dim_2D)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 		map_2D[key] = v
 
@@ -132,7 +149,7 @@ func (nc *Nc) WriteNetcdf() error {
 		fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
 		err = map_1D[key].WriteFloat64s(v)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 	}
 
@@ -159,9 +176,9 @@ func (nc *Nc) WriteNetcdf() error {
 		}
 		err = map_2D[key].WriteFloat64s(gopher)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 	}
 	fmt.Fprintf(echo, "writing %s done ...\n", filename)
-	return nil
+	//return nil
 }
