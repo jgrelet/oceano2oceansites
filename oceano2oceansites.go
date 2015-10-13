@@ -32,7 +32,7 @@ type Process interface {
 	GetConfig(string)
 	//	WriteHeader(map[string]string, []string)
 	WriteAscii(map[string]string, []string)
-	WriteNetcdf() error
+	WriteNetcdf(InstrumentType)
 }
 
 // configuration file
@@ -79,13 +79,14 @@ func main() {
 	if os.Getenv("ROSCOP") != "" {
 		code_roscop = os.Getenv("ROSCOP")
 	}
-	fmt.Fprintf(debug, "Configuration file:", os.Getenv("OCEANO2OCEANSITES"))
-	fmt.Fprintf(debug, "Code ROSCOP file:", os.Getenv("ROSCOP"))
-	fmt.Fprintf(debug, "GOPATH:", os.Getenv("GOPATH"))
-	fmt.Fprintf(debug, "GOBIN:", os.Getenv("GOBIN"))
 
 	// get options on argument line
 	files, optCfgfile := GetOptions()
+
+	fmt.Fprintf(debug, "Configuration file: %s\n", os.Getenv("OCEANO2OCEANSITES"))
+	fmt.Fprintf(debug, "Code ROSCOP file: %s\n", os.Getenv("ROSCOP"))
+	fmt.Fprintf(debug, "GOPATH: %s\n", os.Getenv("GOPATH"))
+	fmt.Fprintf(debug, "GOBIN: %s\n", os.Getenv("GOBIN"))
 
 	// read the first file and try to find the instrument type, return a bit mask
 	typeInstrument = AnalyseFirstFile(files)
@@ -115,7 +116,8 @@ func main() {
 	nc.WriteAscii(map_format, hdr)
 
 	// write netcdf file
-	if err := nc.WriteNetcdf(); err != nil {
-		log.Fatal(err)
-	}
+	//if err := nc.WriteNetcdf(); err != nil {
+	//log.Fatal(err)
+	//}
+	nc.WriteNetcdf(typeInstrument)
 }
