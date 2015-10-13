@@ -67,6 +67,6 @@ func GetOptions() ([]string, string) {
 	//		fmt.Println(*optCycleMesure)
 	//		nc.Attributes["cycle_mesure"] = *optCycleMesure
 	//	}
-	fmt.Fprintln(debug, files)
+	fmt.Fprintln(debug, "Arg files list: ", files)
 	return files, *optCfgfile
 }
