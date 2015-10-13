@@ -121,29 +121,29 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 			fmt.Println(value)
 		}
 	}
-	match = regType.MatchString(str)
-	if match {
-		res := regType.FindStringSubmatch(str)
-		value := strings.ToUpper(res[1]) // convert to upper case
-		var v float64
-		switch value {
-		case "PHY":
-			v = float64(PHY)
-		case "GEO":
-			v = float64(GEO)
-		case "BIO":
-			v = float64(BIO)
-		default:
-			v = float64(UNKNOW)
-		}
-		//f("Type: %f\n", v)
-		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
+	//	match = regType.MatchString(str)
+	//	if match {
+	//		res := regType.FindStringSubmatch(str)
+	//		value := strings.ToUpper(res[1]) // convert to upper case
+	//		var v float64
+	//		switch value {
+	//		case "PHY":
+	//			v = float64(PHY)
+	//		case "GEO":
+	//			v = float64(GEO)
+	//		case "BIO":
+	//			v = float64(BIO)
+	//		default:
+	//			v = float64(UNKNOW)
+	//		}
+	//		//f("Type: %f\n", v)
+	//		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
 
-		if *optDebug {
-			fmt.Println(value)
-		}
-		nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile))] = value
-	}
+	//		if *optDebug {
+	//			fmt.Println(value)
+	//		}
+	//		nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile))] = value
+	//	}
 }
 
 // return the profile number from filename. Use CruisePrefix and

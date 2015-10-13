@@ -64,7 +64,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	nc.Variables_1D["LATITUDE"] = []float64{}
 	nc.Variables_1D["LONGITUDE"] = []float64{}
 	nc.Variables_1D["BATH"] = []float64{}
-	nc.Variables_1D["TYPECAST"] = []float64{}
+	//	nc.Variables_1D["TYPECAST"] = []float64{}
 	nc.Roscop = codeRoscopFromCsv(code_roscop)
 
 	// add some global attributes for profile, change in future
