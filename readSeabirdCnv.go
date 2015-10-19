@@ -121,6 +121,7 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 			fmt.Println(value)
 		}
 	}
+	// TODOS: uncomment, add optionnal value from seabird header
 	//	match = regType.MatchString(str)
 	//	if match {
 	//		res := regType.FindStringSubmatch(str)

@@ -83,11 +83,6 @@ func main() {
 	// get options on argument line
 	files, optCfgfile := GetOptions()
 
-	fmt.Fprintf(debug, "Configuration file: %s\n", os.Getenv("OCEANO2OCEANSITES"))
-	fmt.Fprintf(debug, "Code ROSCOP file: %s\n", os.Getenv("ROSCOP"))
-	fmt.Fprintf(debug, "GOPATH: %s\n", os.Getenv("GOPATH"))
-	fmt.Fprintf(debug, "GOBIN: %s\n", os.Getenv("GOBIN"))
-
 	// read the first file and try to find the instrument type, return a bit mask
 	typeInstrument = AnalyseFirstFile(files)
 
