@@ -3,6 +3,7 @@
 You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compilers and Netcdf library). The gcc compiler is need to link Netcdf library with the go-netcdf package. The installation of gcc under Windows 64 bit is a little tricky due to exception propagation.
 
 32 bit:
+
 Download golang from https://golang.org/dl and follow the installation instructions
 from binary: https://golang.org/doc/install 
 or from source : https://golang.org/doc/install/source
@@ -18,6 +19,7 @@ Install Mercurial (hg) from https://mercurial.selenic.com/
 Install Netcdf 4.3 NC4-32 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
 
 64 bit:
+
 Download golang from https://golang.org/dl and follow the installation instructions
 from binary: https://golang.org/doc/install 
 or from source : https://golang.org/doc/install/source
@@ -25,28 +27,36 @@ or from source : https://golang.org/doc/install/source
 Download the mingw on line installer from http://sourceforge.net/projects/mingw/files/latest/download?source=files
 
 Run it and select only msys-base
-Download and run gcc mingw64 installer from http://sourceforge.net/projects/mingw-w64/files/latest/download?source=files.
-Select:
+Download and run gcc mingw64 installer from:
+http://sourceforge.net/projects/mingw-w64/files/latest/download?source=files.
+
+In the installer, select:
+```
 version: 4.9.3
 Arch: x86_64
 threads: win32
 exception: sjlj or seh  (both option works)
 Build revision: 1 
-
+```
 Install Git for Windows https://git-scm.com/download/win
 
 Install Mercurial (hg) from https://mercurial.selenic.com/
 
-Install Netcdf 4.3 NC4-32 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
+Install Netcdf 4.3 NC4-64 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
 
 Setting environment:
-Rename fstab.sample into fstab under C:\MinGW\msys\1.0\etc
+
+Rename fstab.sample into fstab under:
+```C:\MinGW\msys\1.0\etc
+```
 Edit fstab and change mount /mingw to your gcc mingw64 directory.
+
 example:
+```
 c:/mingw-w64/x86_64-4.9.3-win32-seh-rt_v4-rev1/mingw64		/mingw
 c:/ActiveState/perl	/perl
 c:/users/<your_home>/go	/go
-
+```
 Update your path env with setx
 ```
 $ setx path "%path%;C:\go\bin;C:\opt\netCDF-4.3.3.1\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
