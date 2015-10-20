@@ -3,20 +3,18 @@
 This application read Seabird CTD cnv files, extract data from header files and write result into one ASCII file and NetCDF OceanSITES file.
 
 Binary programs under Windows and Linux are available from the depot under release:
+
 https://github.com/jgrelet/oceano2oceansites/releases
 
-See installation for:
-Windows: https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md
-Linux:  https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md
+See installation for OS:
+
+- Windows: https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md
+- Linux:  https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md
 
 Add some Seabird cnv files under data directory, 
 for example data/fr24/*.cnv
 
-Run and test (linux, cygwin):
-```
-$ go run *.go -e data/fr25/dfr25*.cnv 
-```
-with a Windows console, use :
+Run and test:
 ```
 $ go run *.go --files=data/fr25/dfr25*.cnv -e
 ```
