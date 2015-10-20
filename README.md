@@ -5,54 +5,10 @@ This application read Seabird CTD cnv files, extract data from header files and 
 Binary programs under Windows and Linux are available from the depot under release:
 https://github.com/jgrelet/oceano2oceansites/releases
 
-Installation from sources for Windows:
+See installation for:
+Windows: https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md
+Linux:  https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md
 
-Programs are installed under `c:\opt` instead of the default installation:
-
-Install golang from https://golang.org
-
-Install tdm-gcc from http://tdm-gcc.tdragon.net/
-
-Install Git for Windows https://git-scm.com/download/win
-
-Install Mercurial (hg) from https://mercurial.selenic.com/
-
-Update your path env with setx
-```
-$ setx path "%path%;C:\opt\go\bin;C:\opt\TDM-GCC-64\bin;C:\opt\netCDF-4.3.3.1\bin;C:\Program F
-iles (x86)\Git\bin;C:\Program Files\Mercurial\"
-```
-or see http://www.computerhope.com/issues/ch000549.htm
-
-Insall Netcdf 4.3 NC4-64 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
-
-Install package go-netcdf from https://github.com/fhs/go-netcdf/
-```
-$ go get github.com/fhs/go-netcdf/netcdf
-```
-Installation should be failed during compilation, The pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html
-
-A faster implementation is to change these cgo directives in `dataset.go` and `attribute.go` files before compilation
-
-Replace :
-```
-// #cgo pkg-config: nectcdf
-```
-with:
-```
-// #cgo windows CFLAGS: -I C:/opt/netCDF-4.3.3.1/include
-// #cgo windows LDFLAGS: -lnetcdf -lhdf5 -lhdf5_hl -lzlib -L C:/opt/netCDF-4.3.3.1/lib
-```
-Restart package installation
-```
-$ go get github.com/fhs/go-netcdf/netcdf
-```
-The netcdf.a library sould be installed under `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
-
-Install getopt package
-```
-$ go get code.google.com/p/getopt
-```
 Add some Seabird cnv files under data directory, 
 for example data/fr24/*.cnv
 
