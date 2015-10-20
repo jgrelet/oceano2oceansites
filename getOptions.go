@@ -2,7 +2,7 @@
 package main
 
 import (
-	"code.google.com/p/getopt"
+	"github.com/pborman/getopt"
 	"fmt"
 	"os"
 	"path/filepath"
