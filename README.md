@@ -42,8 +42,8 @@ Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameter
  -v, --version      Show version, then exit.
 
 ```
-The program use by default the configuration file oceano2oceansites.ini
-and the code_roscop.csv from the current directory.
+The program use by default the configuration files oceano2oceansites.ini
+and the code_roscop.csv in the current directory.
 
 You can set a different location or name by setting environment variables OCEANO2OCEANSITES and CODE_ROSCOP.
 
