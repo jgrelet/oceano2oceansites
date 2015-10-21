@@ -4,17 +4,17 @@ Intel processors:
 
 Download and install the latest go version
 
-Check if gcc compiler is install (debian):
+Check if gcc compiler is install (debian).
 
-Check if NetCDF library and include files are installed
-'''
+Check if NetCDF library and include files are installed:
+````
 dpkg --get-selections|grep netcdf
-'''
+````
 
 If not, install them with:
-'''
+````
 sudo apt-get install netcdf-bin libnetcdf-dev gcc
-'''
+````
 
 ARM processors:
 
