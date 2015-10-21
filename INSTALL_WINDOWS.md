@@ -74,7 +74,7 @@ Install package go-netcdf from https://github.com/fhs/go-netcdf/
 ```
 $ go get github.com/fhs/go-netcdf/netcdf
 ```
-Installation should be failed during compilation, The pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html
+Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html
 
 A faster implementation is to change these cgo directives in `dataset.go` and `attribute.go` files before compilation
 
@@ -82,14 +82,14 @@ Replace :
 ```
 // #cgo pkg-config: nectcdf
 ```
-with:
+with, following where NetCDF library is install, c:/opt in this case:
 ```
 // #cgo windows CFLAGS: -I C:/opt/netCDF-4.3.3.1/include
 // #cgo windows LDFLAGS: -lnetcdf -L C:/opt/netCDF-4.3.3.1/lib
 ```
 Restart package installation
 ```
-$ go get github.com/fhs/go-netcdf/netcdf
+$ go install github.com/fhs/go-netcdf/netcdf
 ```
 The netcdf.a library sould be installed under `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
 
