@@ -1,6 +1,6 @@
 # Linux installation
 
-Intel processors:
+###Intel processors:
 
 Download and install the latest go version
 
@@ -16,10 +16,23 @@ If not, install them with:
 sudo apt-get install netcdf-bin libnetcdf-dev gcc
 ````
 
-ARM processors:
+###ARM processors:
 
 On a Raspbery PI2, you  must install and compile the go compiler and NetCDF library from source, see:
+* https://golang.org/doc/install/source
+* http://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html#building
 
-https://golang.org/doc/install/source
+###Install packages 
+* package [go-netcdf](https://github.com/fhs/go-netcdf)
+````
+$ go get github.com/fhs/go-netcdf/netcdf
+````
+* package getopt 
+````
+$ go get github.com/pborman/getopt
+````
+* package [gcfg](https://gopkg.in/gcfg.v1)
+````
+go get gopkg.in/gcfg.v1
+````
 
-http://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html#building
