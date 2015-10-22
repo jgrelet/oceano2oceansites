@@ -35,37 +35,38 @@ Build revision: 1
 * Install Mercurial (hg) from https://mercurial.selenic.com/
 * Install Netcdf 4.3 NC4-64 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
 
-Setting environment:
-
-Rename fstab.sample into fstab under:
-```C:\MinGW\msys\1.0\etc
+###Setting environment:
+* Rename fstab.sample into fstab under:
 ```
-Edit fstab and change mount /mingw to your gcc mingw64 directory.
+C:\MinGW\msys\1.0\etc
+```
+* Edit fstab and change mount /mingw to your gcc mingw64 directory.
 
-example:
+_example:_
 ```
 c:/mingw-w64/x86_64-4.9.3-win32-seh-rt_v4-rev1/mingw64		/mingw
 c:/ActiveState/perl	/perl
 c:/users/<your_home>/go	/go
 ```
-Update your path env with setx
+* Update your path env with setx
 ```
 $ setx path "%path%;C:\go\bin;C:\opt\netCDF-4.3.3.1\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
 ```
-Run MSYS command tool from C:\MinGW\msys\1.0\msys.bat and check your go and gcc version:
-
+* Run MSYS command tool from C:\MinGW\msys\1.0\msys.bat and check your go and gcc version:
+```
 $ go version
 go version go1.5.1 windows/amd64
 
 $ gcc --version
 gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
-
-
-Install package go-netcdf from https://github.com/fhs/go-netcdf/
 ```
+
+###Install packages 
+* package [go-netcdf](https://github.com/fhs/go-netcdf)
+````
 $ go get github.com/fhs/go-netcdf/netcdf
-```
-Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html
+````
+_Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html_
 
 A faster implementation is to change these cgo directives in `dataset.go` and `attribute.go` files before compilation
 
@@ -84,9 +85,12 @@ $ go install github.com/fhs/go-netcdf/netcdf
 ```
 The netcdf.a library sould be installed under `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
 
-Install getopt package
-```
+* package getopt 
+````
 $ go get github.com/pborman/getopt
-```
-
+````
+* package [gcfg](https://gopkg.in/gcfg.v1)
+````
+go get gopkg.in/gcfg.v1
+````
 
