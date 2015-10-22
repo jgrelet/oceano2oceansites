@@ -2,35 +2,28 @@
 
 You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compilers and Netcdf library). The gcc compiler is need to link Netcdf library with the go-netcdf package. The installation of gcc under Windows 64 bit is a little tricky due to exception propagation.
 
-32 bit:
+###32 bit:
 
-Download golang from https://golang.org/dl and follow the installation instructions
-from binary: https://golang.org/doc/install 
-or from source : https://golang.org/doc/install/source
+* Download golang from https://golang.org/dl and follow the installation instructions
+  * from binary: https://golang.org/doc/install 
+  * from source : https://golang.org/doc/install/source
+* Download the mingw on line installer from http://sourceforge.net/projects/mingw/files/latest/download?source=files
+* Run it and select only msys-base, mingw-developper-tools and mingw32-base
 
-Download the mingw on line installer from http://sourceforge.net/projects/mingw/files/latest/download?source=files
+* Install Git for Windows https://git-scm.com/download/win
+* Install Mercurial (hg) from https://mercurial.selenic.com/
+* Install Netcdf 4.3 NC4-32 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
 
-Run it and select only msys-base, mingw-developper-tools and mingw32-base
+###64 bit:
 
-Install Git for Windows https://git-scm.com/download/win
-
-Install Mercurial (hg) from https://mercurial.selenic.com/
-
-Install Netcdf 4.3 NC4-32 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
-
-64 bit:
-
-Download golang from https://golang.org/dl and follow the installation instructions
-from binary: https://golang.org/doc/install 
-or from source : https://golang.org/doc/install/source
-
-Download the mingw on line installer from http://sourceforge.net/projects/mingw/files/latest/download?source=files
-
-Run it and select only msys-base
-Download and run gcc mingw64 installer from:
+* Download golang from https://golang.org/dl and follow the installation instructions
+  * from binary: https://golang.org/doc/install 
+  * from source : https://golang.org/doc/install/source
+* Download the mingw on line installer from http://sourceforge.net/projects/mingw/files/latest/download?source=files
+  * Run it and select only msys-base
+* Download and run gcc mingw64 installer from:
 http://sourceforge.net/projects/mingw-w64/files/latest/download?source=files.
-
-In the installer, select:
+* Run the installer and select:
 ```
 version: 4.9.3
 Arch: x86_64
@@ -38,11 +31,9 @@ threads: win32
 exception: sjlj or seh  (both option works)
 Build revision: 1 
 ```
-Install Git for Windows https://git-scm.com/download/win
-
-Install Mercurial (hg) from https://mercurial.selenic.com/
-
-Install Netcdf 4.3 NC4-64 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
+* Install Git for Windows https://git-scm.com/download/win
+* Install Mercurial (hg) from https://mercurial.selenic.com/
+* Install Netcdf 4.3 NC4-64 from http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html
 
 Setting environment:
 
