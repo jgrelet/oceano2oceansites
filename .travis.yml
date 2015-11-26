@@ -9,3 +9,6 @@ before_install:
   - sudo apt-get update -q -y
   - sudo apt-get install libnetcdf-dev -y
 
+script:
+  - go install -v ./...
+  - go test -v ./...
