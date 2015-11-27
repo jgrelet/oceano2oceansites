@@ -17,10 +17,10 @@ before_install:
         sudo apt-get install libnetcdf-dev -y
     fi 
   # Install OS X netcdf
-        #brew update
   - |
     if test "$TRAVIS_OS_NAME" == "osx"; then
         brew tap homebrew/science
+        brew update
         brew install netcdf
     fi
 
