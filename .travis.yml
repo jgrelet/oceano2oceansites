@@ -12,6 +12,8 @@ os:
 before_install:
         # - sudo apt-get update -q -y
         # - sudo apt-get install libnetcdf-dev -y
+  - brew tap homebrew/science
+  - brew update
   - brew install  netcdf
 
 script:
