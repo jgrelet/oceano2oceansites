@@ -6,7 +6,7 @@ go:
   - 1.5.1
 
 os:
-        #  - linux
+  - linux
   - osx
 
 before_install:
@@ -20,7 +20,7 @@ before_install:
   - |
     if test "$TRAVIS_OS_NAME" == "osx"; then
         brew tap homebrew/science
-        brew update
+        #brew update
         brew install netcdf
     fi
 
