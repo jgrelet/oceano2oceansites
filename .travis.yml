@@ -12,7 +12,7 @@ os:
 before_install:
         # - sudo apt-get update -q -y
         # - sudo apt-get install libnetcdf-dev -y
-  - sudo port install netcdf
+  - brew install  netcdf
 
 script:
   - go install -v ./...
