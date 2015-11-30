@@ -2,7 +2,7 @@ language: go
 go:
 - 1.5.1
 os:
-        #- linux
+- linux
 - osx
 before_install:
 - ! "if test \"${TRAVIS_OS_NAME}\" == \"linux\"; then\n    sudo apt-get update -q
@@ -20,5 +20,5 @@ env:
   - secure: rmXDdTPQJLuJhS3WZ1f9rwgdJMjfSEtS2buk6Lt8DP50xJPcByEVCg2Lypopx+9CTfTEsFy6v2bTI2WT6b/5UGWuKTIHFRmwx74kLNbZE4m++XIVFqQAqiFjBHBLAPvf/2xBEGgyebkYW5uZSg83lG7lfB76fi3/RwdTr/88sdu6IfLi8DH6jlq5wmt88Hi2RO9qEb3rLA8ZZAH5v/z9mDJ+a86re78hCvOnPgG7I+kKAo2jB+UKnQP1MYgNcWskTyOYTzC90tcwVxtOtXNbZKHy9UJEQrazjY0Td+jvoDQW/Y7x9gZ1TYec8u61rqPt7/E7ak+Tp2wcagBlXT5cTyRrfoUI1SVwIej4TkCheIXJOeIkpUjUt8AR9zCR/r6vAavTdvdkc7BSNfguHIrzSR35gYuRgvHxRjHDBFkWVblrFm/5rjApj421kI833pnGJzQIMZxjyyLpYSXBOqcrCFYVkTdWXYbp6VlQ3AqcysW2K4uFHLb4z+p3ojjeJEShxHW/mT+n23DYFVBaBNMy7tdValoEoqjzju7UdMYZMrsh7R38faLvUKZfeyXXSG41NKBXh47Yg2I3sio9ItwizJavo4QRxQ3Ka5FAz+IaMRAjEyL6+dtEvqDGajg9NDgs9p9s+NlHbwVyY97mlf2S7+dARpu8ooMETszrVq5/jeg=
 
 after_success:    
-- ! "which oceano2oceansites"
-  #- ! "curl -T /home/travis/gopath/bin/oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/"
+        #- ! "which oceano2oceansites"
+- ! "curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/"
