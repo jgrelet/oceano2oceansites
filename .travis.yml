@@ -3,7 +3,7 @@ go:
 - 1.5.1
 os:
 - linux
-  #- osx
+- osx
 before_install:
 - ! "if test \"${TRAVIS_OS_NAME}\" == \"linux\"; then\n    sudo apt-get update -q
   -y\n    sudo apt-get install libnetcdf-dev -y\nfi \n"
