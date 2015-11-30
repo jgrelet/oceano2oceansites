@@ -21,4 +21,4 @@ env:
 
 after_success:    
 - ! "which oceano2oceansites"
-  #- ! "curl -T oceano2oceansites ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/"
+- ! "curl -T oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/"
