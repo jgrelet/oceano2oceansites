@@ -23,16 +23,15 @@ On a Raspbery PI2, you  must install and compile the go compiler and NetCDF libr
 * http://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html#building
 
 ###Install packages 
-* package [go-netcdf](https://github.com/fhs/go-netcdf)
+* package [oceano2oceansites](https://github.com/jgrelet/oceano2oceansites)
 ````
-$ go get github.com/fhs/go-netcdf/netcdf
+$ go get github.com/jgrelet/oceano2oceansites
 ````
-* package getopt 
-````
-$ go get github.com/pborman/getopt
-````
-* package [gcfg](https://gopkg.in/gcfg.v1)
-````
-go get gopkg.in/gcfg.v1
-````
+This will install automatically these following packages
+*  [go-netcdf](https://github.com/fhs/go-netcdf)
+*  [getopt](https:// github.com/pborman/getopt)
+*  [gcfg](https://gopkg.in/gcfg.v1)
+
+The package go-netcdf wrap the netcdf C library with go and need the installation 
+of pkgconfig utility and libnetcdf-dev.
 
