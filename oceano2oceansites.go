@@ -37,7 +37,7 @@ type Process interface {
 
 // configuration file
 var cfgname string = "oceano2oceansites.ini"
-var code_roscop string = "code_roscop.csv"
+var code_roscop string = ""
 
 // file prefix for --all option: "-all" for all parameters, "" empty by default
 var prefixAll = ""

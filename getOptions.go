@@ -2,8 +2,8 @@
 package main
 
 import (
-	"github.com/pborman/getopt"
 	"fmt"
+	"github.com/pborman/getopt"
 	"os"
 	"path/filepath"
 )

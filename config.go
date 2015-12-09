@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gopkg.in/gcfg.v1"
 	"fmt"
+	"gopkg.in/gcfg.v1"
 	"log"
 	"os"
 	"strconv"
