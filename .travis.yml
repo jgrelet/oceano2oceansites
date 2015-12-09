@@ -2,6 +2,7 @@ language: go
 
 go:
   - 1.5.1
+  - tip
 os:
   - linux
   - osx
@@ -25,6 +26,7 @@ script:
 
 after_success:    
   - curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/
+  - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T /usr/lib/libnetcdf.so.6 ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/netcdf/lib/libnetcdf.7.dylib ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/szip/lib/libsz.2.dylib  ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/hdf5/lib/libhdf5_hl.10.dylib ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi
