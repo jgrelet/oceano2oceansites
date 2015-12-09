@@ -85,12 +85,11 @@ $ go install github.com/fhs/go-netcdf/netcdf
 ```
 The netcdf.a library sould be installed under `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
 
-* package getopt 
+* package [oceano2oceansites](https://github.com/jgrelet/oceano2oceansites)
 ````
-$ go get github.com/pborman/getopt
+$ go get github.com/jgrelet/oceano2oceansites
 ````
-* package [gcfg](https://gopkg.in/gcfg.v1)
-````
-go get gopkg.in/gcfg.v1
-````
+This will install automatically these following packages
+*  [getopt](https:// github.com/pborman/getopt)
+*  [gcfg](https://gopkg.in/gcfg.v1)
 

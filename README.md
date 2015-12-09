@@ -12,11 +12,11 @@ See installation for OS:
 * [Linux](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md)
 
 Add some Seabird cnv files under data directory, 
-for example data/fr25/*.cnv
+for example data/csp/*.cnv
 
 Run and test:
 ```
-$ go run *.go --files=data/fr25/fr25*.cnv -e
+$ go run *.go --files=data/csp/csp*.cnv -e
 ```
 Compile it:
 ```
@@ -26,7 +26,6 @@ Install binary under go/bin:
 ```
 $ go install
 ```
-
 Usage:
 ```
 $ oceano2oceansites -h
@@ -42,10 +41,16 @@ Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameter
  -v, --version      Show version, then exit.
 
 ```
+Test binary:
+```
+$ oceano2oceansites -e --files=data/csp/csp*.cnv
+```
+
 The program use by default the configuration files oceano2oceansites.ini
 and the code_roscop.csv in the current directory.
 
-You can set a different location or name by setting environment variables OCEANO2OCEANSITES and CODE_ROSCOP.
+You can set a different location or file name by setting environment variables 
+OCEANO2OCEANSITES and CODE_ROSCOP.
 
 Edit config file:
 ```
@@ -64,19 +69,20 @@ endDate        = 13/04/2015
 creator        = Firstname.Name@domaine.fr
 
 [ctd]
-cruisePrefix   = fr25
-stationPrefixLength  = 3
+cruisePrefix   = csp
+stationPrefixLength  = 5
 titleSummary  = CTD profiles processed during this cruise
 typeInstrument   = SBE911+
 instrumentNumber  = 09Pxxxxx-xxx 
-split          = PRES,3,DEPTH,4,ETDD,2,TEMP,5,PSAL,18,DENS,20,SVEL,22,DOX2,15,FLU2,13,TUR3,14,NAVG,17
-
-splitAll          = PRES,3,DEPTH,4,ETDD,2,TE01,5,TE02,6,PSA1,18,PSA2,19,CND1,7,CND2,8,DEN1,20,DEN2,21,SVEL,22,DO12,15,DO22,16,DOV1,9,DOV2,10,DVT1,11,DVT2,12,FLU2,13,TUR3,14,NAVG,17
+split          = PRES,3,DEPTH,4,ETDD,2,TEMP,5,PSAL,22,DENS,24,SVEL,26,DOX2,19,FLU2,14,TUR3,13,LGH3,15,NUMP,18,NAVG,21
+splitAll       = PRES,3,DEPTH,4,ETDD,2,TE01,5,TE02,6,PSA1,22,PSA2,23,DO12,19,DO22,20,DEN1,24,DEN2,25,SVEL,26,CND1,7,CND2,8,DOV1,9,DVT1,10,DOV2,11,DVT2,12,TUR3,13,FLU2,14,LGH3,15,LGHT,16,LGH4,17,NUMP,18,NAVG,21
 ```
-split describe the column order of each physical parameter to extract from seabird cnv files. 
-The order is used for ASCII file output. 
+split describe the column order of each physical parameter to extract data from 
+seabird cnv files. 
+The order is used also for ASCII file output. 
 
-All the physical parameters definition are decribed inside `code_roscop.csv`. You can update this file with your own definition.
+All the physical parameters definition are decribed inside `code_roscop.csv`. 
+You can update this file with your own definition.
 Example:
 ```
 TYPE;string;string;float64;float64;string;float64
