@@ -1,11 +1,13 @@
 language: go
 
 go:
-  - 1.5.2
+  - 1.5
   - tip
 os:
   - linux
   - osx
+
+dist: trusty
 
 env:
   global:
