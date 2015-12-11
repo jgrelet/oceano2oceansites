@@ -24,7 +24,9 @@ before_install:
 script:
   - go install -v ./...
   - go test -v ./...
+  - oceano2oceansites -v
   - oceano2oceansites -e --files=data/csp/csp*.cnv
+  - oceano2oceansites -e --config=fr25.ini --files=data/fr25/fr25*.cnv
 
 after_success:    
   - curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/
