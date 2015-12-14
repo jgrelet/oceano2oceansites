@@ -28,16 +28,17 @@ type Config struct {
 	}
 	Ctd struct {
 		CruisePrefix        string
-		StationPrefixLength string
+		StationPrefixLength int
 		Split               string
 		SplitAll            string
 		TypeInstrument      string
 		InstrumentNumber    string
 		TitleSummary        string
+		Comment             string
 	}
 	Btl struct {
 		CruisePrefix        string
-		StationPrefixLength string
+		StationPrefixLength int
 		Split               string
 		TypeInstrument      string
 		InstrumentNumber    string
@@ -90,6 +91,7 @@ func (nc *Nc) GetConfig(configFile string) {
 		// TODOS: complete
 		nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
 		nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
+		nc.Attributes["callsign"] = cfg.Cruise.Callsign
 		nc.Attributes["institute"] = cfg.Cruise.Institute
 		nc.Attributes["pi"] = cfg.Cruise.Pi
 		nc.Attributes["timezone"] = cfg.Cruise.Timezone
