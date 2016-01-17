@@ -16,6 +16,7 @@ var optAll *bool
 func GetOptions() ([]string, string) {
 
 	var files []string
+	var err error
 
 	// parse option, moved outside main
 	optDebug = getopt.Bool('d', "debug", "Display debug info")
@@ -42,17 +43,19 @@ func GetOptions() ([]string, string) {
 	if *optEcho {
 		echo = os.Stdout
 	}
-
 	if *optAll {
 		prefixAll = "-all"
 	}
 	// get files list from argument line
-	// Args returns the non-option arguments.
-	// see https://code.google.com/p/getopt/source/browse/set.go#27
+	// Args() returns the non-option arguments
 	if *optFiles == "" {
 		files = getopt.Args()
 	} else {
-		files, _ = filepath.Glob(*optFiles)
+		files, err = filepath.Glob(*optFiles)
+	}
+	p(files)
+	if err != nil {
+		p(err)
 	}
 	if *optCfgfile != "" {
 		cfgname = *optCfgfile

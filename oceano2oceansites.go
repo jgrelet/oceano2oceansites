@@ -35,12 +35,17 @@ type Process interface {
 	WriteNetcdf(InstrumentType)
 }
 
-// configuration file
+// default configuration file
 var cfgname string = "oceano2oceansites.ini"
+
+// default physical parameters file definition is embeded in code_roscop.go
 var code_roscop string = ""
 
 // file prefix for --all option: "-all" for all parameters, "" empty by default
 var prefixAll = ""
+
+// default output directory
+var outputDir = "out"
 
 // Create an empty map.
 var map_var = map[string]int{}
@@ -94,8 +99,8 @@ func main() {
 	case BTL:
 		nc = &Btl{}
 	default:
-		fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
-		fmt.Println("Exiting...")
+		f("main: invalide option typeInstrument -> %d\n", typeInstrument)
+		p("Exiting...")
 		os.Exit(0)
 	}
 
@@ -111,8 +116,5 @@ func main() {
 	nc.WriteAscii(map_format, hdr)
 
 	// write netcdf file
-	//if err := nc.WriteNetcdf(); err != nil {
-	//log.Fatal(err)
-	//}
 	nc.WriteNetcdf(typeInstrument)
 }
