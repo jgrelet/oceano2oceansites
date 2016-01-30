@@ -3,9 +3,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/pborman/getopt"
 	"os"
 	"path/filepath"
+
+	"github.com/pborman/getopt"
 )
 
 // global arg list options
@@ -18,7 +19,7 @@ func GetOptions() ([]string, string) {
 	var files []string
 	var err error
 
-	// parse option, moved outside main
+	// parse options, moved outside main
 	optDebug = getopt.Bool('d', "debug", "Display debug info")
 	optEcho = getopt.Bool('e', "echo", "Display processing in stdout")
 	optHelp := getopt.Bool('h', "help", "Help")

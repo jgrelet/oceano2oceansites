@@ -11,29 +11,18 @@ import (
 const PROGNAME string = "oceano2oceansites"
 const PROGVERSION string = "0.2.0"
 
-type Data_2D struct {
-	data [][]float64
-}
+// use for echo mode
+// Discard is an io.Writer on which all Write calls succeed
+// without doing anything. Discard = devNull(0) = int(0)
+// when echo is define in program argument list, echo = os.Stdout
+var echo io.Writer = ioutil.Discard
 
-type AllData_2D map[string]Data_2D
+// use for debug mode
+var debug io.Writer = ioutil.Discard
 
-type Nc struct {
-	Dimensions   map[string]int
-	Variables_1D map[string]interface{}
-	Variables_2D AllData_2D
-	Attributes   map[string]string
-	Extras_f     map[string]float64 // used to store max of profiles value
-	Extras_s     map[string]string  // used to store max of profiles type
-	Roscop       map[string]RoscopAttribute
-}
-
-type Process interface {
-	Read([]string)
-	GetConfig(string)
-	//	WriteHeader(map[string]string, []string)
-	WriteAscii(map[string]string, []string)
-	WriteNetcdf(InstrumentType)
-}
+// usefull shortcut macros
+var p = fmt.Println
+var f = fmt.Printf
 
 // default configuration file
 var cfgname string = "oceano2oceansites.ini"
@@ -54,15 +43,35 @@ var data = make(map[string]interface{})
 var hdr []string
 var cfg Config
 
-// use for debug mode
-var debug io.Writer = ioutil.Discard
+// matrix used to store profils
+type Data_2D struct {
+	data [][]float64
+}
 
-// use for echo mode
-var echo io.Writer = ioutil.Discard
+// map used a matrix for each parameters
+type AllData_2D map[string]Data_2D
 
-// usefull macro
-var p = fmt.Println
-var f = fmt.Printf
+// the representation in memory of a data set is similar to
+// that of a netcdf file
+type Nc struct {
+	Dimensions   map[string]int
+	Variables_1D map[string]interface{}
+	Variables_2D AllData_2D
+	Attributes   map[string]string
+	Extras_f     map[string]float64 // used to store max of profiles value
+	Extras_s     map[string]string  // used to store max of profiles type
+	Roscop       map[string]RoscopAttribute
+}
+
+// interface common for all data sets (profile, trajectory and time-series
+// and instruments
+type Process interface {
+	Read([]string)
+	GetConfig(string)
+	//	WriteHeader(map[string]string, []string)
+	WriteAscii(map[string]string, []string)
+	WriteNetcdf(InstrumentType)
+}
 
 // nc implement interface Process
 var nc Process
@@ -74,7 +83,9 @@ type Btl struct{ Nc }
 // main body
 func main() {
 
+	// slice of filename to read and extract data
 	var files []string
+
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -85,7 +96,8 @@ func main() {
 		code_roscop = os.Getenv("ROSCOP")
 	}
 
-	// get options on argument line
+	// get options parse args list and return all given files to read
+	// and configuration file name
 	files, optCfgfile := GetOptions()
 
 	// read the first file and try to find the instrument type, return a bit mask
