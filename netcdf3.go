@@ -96,8 +96,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 		map_1D[key] = v
 
-		f("%s: %s\n", key, roscop[key].types)
-
 		// define variables attributes, get values from roscop map
 		// todos !!! for each type
 		a := v.Attr("long_name")
@@ -163,7 +161,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			log.Fatal(err)
 		}
 		map_2D[key] = v
-		f("%s: %s\n", key, roscop[key].types)
 
 		// define variables attributes, get values from roscop map
 		// todos !!! for each type
