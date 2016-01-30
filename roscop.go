@@ -17,7 +17,7 @@ type RoscopAttribute struct {
 	valid_max  float64
 	format     string
 	_FillValue float64
-	types	   string
+	types      string
 }
 
 // documentation for csv is at http://golang.org/pkg/encoding/csv/
