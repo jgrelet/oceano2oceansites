@@ -26,6 +26,7 @@ script:
   - go test -v ./...
   - oceano2oceansites -v
   - oceano2oceansites -e --files=data/csp/csp*.cnv
+  - ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH OS_CASSIOPEE_CTD.nc
   - oceano2oceansites -e --config=fr25.ini --files=data/fr25/fr25*.cnv
 
 after_success:    
