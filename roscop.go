@@ -79,14 +79,14 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 		return roscop
 	} else {
 		// roscop map is hard define here
-		return map[string]RoscopAttribute{
+		roscop := map[string]RoscopAttribute{
 			"CUPW":      {long_name: "14C PRODUCTION UNKNOWN FILTER", units: "milligram carbon/(m3.day)", valid_min: 0, valid_max: 200, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"C1UW":      {long_name: "14C UPTAKE 0.2-1 MICRON", units: "milligram carbon/(m3.day)", valid_min: 0, valid_max: 100, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"BFUP":      {long_name: "19'BUTANOYLOXYFUCOXANTHINE", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"DENS":      {long_name: "DENSITY (Sigma-theta)", units: "kg/m3", valid_min: 10, valid_max: 35, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"TH4W":      {long_name: "DISSOLVED 234TH", units: "Bq/m3", valid_min: 0, valid_max: 90, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"DRYT":      {long_name: "DRY BULB TEMPERATURE", units: "Celsius degree", valid_min: 0, valid_max: 90, format: "%5.1f", _FillValue: 1e+36, types: "float32"},
-			"ETDD":      {long_name: "ELLAPSED TIME", units: "decimal days", valid_min: 0, valid_max: 999, format: "%9.5f", _FillValue: 1e+36, types: "float64"},
+			"ETDD":      {long_name: "ELLAPSED TIME", units: "1", valid_min: 0, valid_max: 999, format: "%9.5f", _FillValue: 1e+36, types: "float64"},
 			"MPBS":      {long_name: "Pb IN THE SEDIMENT", units: "ppm", valid_min: 0, valid_max: 900, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"REDS":      {long_name: "REDOX POTENTIAL", units: "millivolt", valid_min: -110, valid_max: 200, format: "%+4.0f", _FillValue: 1e+36, types: "float32"},
 			"MSIS":      {long_name: "Si IN THE SEDIMENT", units: "%", valid_min: 0, valid_max: 99, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
@@ -159,7 +159,7 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"NTRI":      {long_name: "NITRITE (NO2-N) CONTENT", units: "millimole/m3", valid_min: 0, valid_max: 10, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"TICW":      {long_name: "TOTAL INORGANIC CARBON", units: "micromole/kg", valid_min: 0, valid_max: 9000, format: "%7.2f", _FillValue: 1e+36, types: "float32"},
 			"TUR5":      {long_name: "TURBIDITY", units: "relative unit", valid_min: 0, valid_max: 10, format: "%7.4f", _FillValue: 1e+36, types: "float32"},
-			"NAVG":      {long_name: "AVERAGED DATA CYCLE NUMBER", units: "number", valid_min: 0, valid_max: 999, format: "%3.0f", _FillValue: 1e+36, types: "float32"},
+			"NAVG":      {long_name: "AVERAGED DATA CYCLE NUMBER", units: "1", valid_min: 0, valid_max: 999, format: "%3.0f", _FillValue: 1e+36, types: "float32"},
 			"BCCS":      {long_name: "BACTERIA NUMBER SEDIMENT", units: "10+9 cell/dm3", valid_min: 0, valid_max: 9999.9, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
 			"LGH3":      {long_name: "LIGHT IRRADIANCE CORRECTED PAR", units: "micromole photon/(m2.s)", valid_min: 0, valid_max: 3000, format: "%8.3f", _FillValue: 1e+36, types: "float32"},
 			"CICW":      {long_name: "NUMBER OF SW CILIATES", units: "10+3 cell/m3", valid_min: 0, valid_max: 90000, format: "%5.0f", _FillValue: 1e+36, types: "float32"},
@@ -176,7 +176,7 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"MSDP":      {long_name: "MEAN SPHERIC DIAM. OF PARTICLE", units: "millimeter", valid_min: 0, valid_max: 99, format: "%5.2f", _FillValue: 1e+36, types: "float32"},
 			"MNTH":      {long_name: "MONTH", units: "mm", valid_min: 1, valid_max: 12, format: "%2.2d", _FillValue: 1e+36, types: "float32"},
 			"PCEW":      {long_name: "NUMBER OF SW PICOEUCARYOTES", units: "10+6 cell/m3", valid_min: 0, valid_max: 90000, format: "%5.0f", _FillValue: 1e+36, types: "float32"},
-			"SSPS":      {long_name: "SEA SURFACE PRACTICAL SALINITY", units: "P.S.S.78", valid_min: 0, valid_max: 40, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
+			"SSPS":      {long_name: "SEA SURFACE PRACTICAL SALINITY", units: "1", valid_min: 0, valid_max: 40, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"MZNF":      {long_name: "ZN FLUX IN SETTLING PARTICLES", units: "microgram/(m2.day)", valid_min: 0, valid_max: 7600, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"DOV1":      {long_name: "DISSOLVED OXYGEN PRIMARY SENSOR VOLTAGE", units: "V", valid_min: 0, valid_max: 10, format: "%6.4f", _FillValue: 1e+36, types: "float32"},
 			"CODW":      {long_name: "CHEMICAL OXYGEN DEMAND", units: "millimole/m3", valid_min: 0, valid_max: 650, format: "%7.3f", _FillValue: 1e+36, types: "float32"},
@@ -215,10 +215,10 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"TINW":      {long_name: "DISSOLVED INORGANIC NITROGEN", units: "millimole/m3", valid_min: 0, valid_max: 100, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"TCCF":      {long_name: "PART. TOTAL CARBON FLUX", units: "milligram/(m2.day)", valid_min: 0, valid_max: 999, format: "%7.3f", _FillValue: 1e+36, types: "float32"},
 			"FLPF":      {long_name: "FLAGELLATES PPC FLUX", units: "milligram C/(m2.day)", valid_min: 0, valid_max: 99.999, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
-			"CHC3":      {long_name: "CHLOROPHYLL-C3", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
+			"CHC3":      {long_name: "CHLOROPHYLL-C3", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: -99.9999, types: "float32"},
 			"NTIW":      {long_name: "NITRITE (NO2-N) CONTENT", units: "micromole/kg", valid_min: 0, valid_max: 100, format: "%7.3f", _FillValue: 1e+36, types: "float32"},
 			"SLCP":      {long_name: "PARTICULATE ORGANIC SILICA(SI)", units: "millimole/m3", valid_min: 0, valid_max: 1, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
-			"TIME":      {long_name: "TIME", units: "days since 1950-01-01T00:00:00Z", valid_min: 0, valid_max: 90000, format: "%6.6d", _FillValue: 1e+36, types: "float64"},
+			"TIME":      {long_name: "time of measurement", units: "days since 1950-01-01T00:00:00Z", valid_min: 0, valid_max: 90000, format: "%6.6d", _FillValue: -1e+36, types: "float64"},
 			"BATH":      {long_name: "BATHYMETRIC DEPTH", units: "meter", valid_min: 0, valid_max: 11000, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
 			"EWCT":      {long_name: "CURRENT EAST COMPONENT", units: "meter/second", valid_min: -100, valid_max: 100, format: "%+7.3f", _FillValue: 1e+36, types: "float32"},
 			"TSMF":      {long_name: "TOTAL MASS FLUX", units: "milligram/(m2.day)", valid_min: 0, valid_max: 9999.9, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
@@ -232,7 +232,7 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"NTOT":      {long_name: "TOTAL NITROGEN (N) CONTENT", units: "millimole/m3", valid_min: 0, valid_max: 90, format: "%5.2f", _FillValue: 1e+36, types: "float32"},
 			"EWCS":      {long_name: "CURRENT EAST  STD. DEVIATION", units: "meter/second", valid_min: 0, valid_max: 20, format: "%+6.3f", _FillValue: 1e+36, types: "float32"},
 			"DVT2":      {long_name: "DISSOLVED OXYGEN SECONDARY SENSOR dV/dt", units: "dv/dt", valid_min: -1, valid_max: 1, format: "%+7.5f", _FillValue: 1e+36, types: "float32"},
-			"LONX":      {long_name: "LONGITUDE", units: "decimal degree", valid_min: -180, valid_max: 180, format: "%+9.4f", _FillValue: 1e+36, types: "float32"},
+			"LONX":      {long_name: "LONGITUDE", units: "degree_east", valid_min: -180, valid_max: 180, format: "%+9.4f", _FillValue: 1e+36, types: "float32"},
 			"SAND":      {long_name: "SAND IN THE SEDIMENT", units: "%", valid_min: 0, valid_max: 100, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"ZXAP":      {long_name: "ZEAXANTHINE", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"DOV2":      {long_name: "DISSOLVED OXYGEN SECONDARY SENSOR VOLTAGE", units: "V", valid_min: 0, valid_max: 10, format: "%6.4f", _FillValue: 1e+36, types: "float32"},
@@ -330,7 +330,7 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"MMGS":      {long_name: "Mg IN THE SEDIMENT", units: "%", valid_min: 0, valid_max: 99, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"MTIS":      {long_name: "Ti IN THE SEDIMENT", units: "%", valid_min: 0, valid_max: 99, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"MCRS":      {long_name: "Cr IN THE SEDIMENT", units: "ppm", valid_min: 0, valid_max: 900, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
-			"LATD":      {long_name: "LATITUDE DEGREES", units: "degree", valid_min: -90, valid_max: 90, format: "%+3.0f", _FillValue: 1e+36, types: "float32"},
+			"LATD":      {long_name: "latitude of measurement", units: "degrees_north", valid_min: -90, valid_max: 90, format: "%+3.0f", _FillValue: 1e+36, types: "float32"},
 			"TUR0":      {long_name: "LIGHT TRANSMISSION -  NOT USED", units: "%", valid_min: 0, valid_max: 100, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"DFCW":      {long_name: "NUMBER OF SW DINOFLAGELLATES", units: "10+3 cell/m3", valid_min: 0, valid_max: 900000, format: "%6.0f", _FillValue: 1e+36, types: "float32"},
 			"WSPE":      {long_name: "WIND SPEED EASTWARD COMPONENT", units: "meter/second", valid_min: 0, valid_max: 100, format: "%7.3f", _FillValue: 1e+36, types: "float32"},
@@ -357,16 +357,16 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"PTZF":      {long_name: "PROTOZOA PPC FLUX", units: "milligram C/(m2.day)", valid_min: 0, valid_max: 99.999, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"DO12":      {long_name: "DISSOLVED OXYGEN PRIMARY SENSOR", units: "micromole/kg", valid_min: 0, valid_max: 450, format: "%7.3f", _FillValue: 1e+36, types: "float32"},
 			"HFUP":      {long_name: "19'HEXANOYLOXYFUCOXANTHINE", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
-			"PSAL":      {long_name: "PRACTICAL SALINITY SCALE 1978", units: "P.S.S.78", valid_min: 33, valid_max: 37, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
+			"PSAL":      {long_name: "sea water salinity", units: "1", valid_min: 0, valid_max: 40, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"TACC":      {long_name: "TEMPERATURE ACCURACY", units: ".", valid_min: 0, valid_max: 4, format: "%2d", _FillValue: 1e+36, types: "float32"},
 			"GLUC":      {long_name: "GLUCIDE", units: "milligram/m3", valid_min: 0, valid_max: 200, format: "%5.0f", _FillValue: 1e+36, types: "float32"},
 			"CHBD":      {long_name: "DIVINYL-CHLOROPHYLL-B", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"DRDD":      {long_name: "DURATION (DAYS)", units: "ddd", valid_min: 0, valid_max: 999, format: "%3.0f", _FillValue: 1e+36, types: "float32"},
 			"NFHW":      {long_name: "HETEROTROPHIC NANOFLAGELLATES", units: "10+3 cell/m3", valid_min: 0, valid_max: 900000, format: "%6.0f", _FillValue: 1e+36, types: "float32"},
-			"LOND":      {long_name: "LONGITUDE DEGREES", units: "degree", valid_min: -179, valid_max: 180, format: "%+4.0f", _FillValue: 1e+36, types: "float32"},
+			"LOND":      {long_name: "latitude of measurement", units: "degree_east", valid_min: -179, valid_max: 180, format: "%+4.0f", _FillValue: 1e+36, types: "float32"},
 			"MSMP":      {long_name: "MEAN SPHERIC DIAM. MEDIAN", units: "millimeter", valid_min: 0, valid_max: 99, format: "%5.2f", _FillValue: 1e+36, types: "float32"},
 			"COCW":      {long_name: "NUMBER OF SW COCCOLITHOPHORIDS", units: "10+3 cell/m3", valid_min: 0, valid_max: 900000, format: "%6.0f", _FillValue: 1e+36, types: "float32"},
-			"PRES":      {long_name: "SEA PRESSURE sea surface=0", units: "decibar=10000 pascals", valid_min: 0, valid_max: 6500, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
+			"PRES":      {long_name: "sea water pressure", units: "decibar", valid_min: 0, valid_max: 6500, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
 			"NHUW":      {long_name: "AMMONIUM UPTAKE", units: "micromole nitrogen/(m3.day)", valid_min: 0, valid_max: 900, format: "%5.0f", _FillValue: 1e+36, types: "float32"},
 			"POTT":      {long_name: "TOTAL ORGANIC PHOSPHORUS (D+P)", units: "micromole/kg", valid_min: 0, valid_max: 5, format: "%5.2f", _FillValue: 1e+36, types: "float32"},
 			"CHTF":      {long_name: "PART. TOTAL CARBOHYDRATES FLUX", units: "milligram/(m2.day)", valid_min: 0, valid_max: 99, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
@@ -376,7 +376,7 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"CE3W":      {long_name: "DISSOLVED CFC113 ERROR", units: "picomole/kg", valid_min: 0, valid_max: 0.5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"PODW":      {long_name: "DISSOLVED ORGANIC PHOSPHORUS", units: "micromole/kg", valid_min: 0, valid_max: 5, format: "%5.2f", _FillValue: 1e+36, types: "float32"},
 			"FUCP":      {long_name: "FUCOXANTHINE", units: "milligram/m3", valid_min: 0, valid_max: 5, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
-			"LATX":      {long_name: "LATITUDE", units: "decimal degree", valid_min: -90, valid_max: 90, format: "%+8.4f", _FillValue: 1e+36, types: "float32"},
+			"LATX":      {long_name: "LATITUDE", units: "degree_north", valid_min: -90, valid_max: 90, format: "%+8.4f", _FillValue: 1e+36, types: "float32"},
 			"VERR":      {long_name: "VELOCITY ERROR", units: "meter/second", valid_min: 0, valid_max: 90, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"SSTP":      {long_name: "SEA SURFACE TEMPERATURE", units: "Celsius degree", valid_min: -1.5, valid_max: 38, format: "%6.3f", _FillValue: 1e+36, types: "float32"},
 			"DAYD":      {long_name: "DECIMAL JULIAN DAY TIME ORIGIN 0", units: "decimal day", valid_min: 0, valid_max: 3660, format: "%9.5f", _FillValue: 1e+36, types: "float64"},
@@ -429,12 +429,14 @@ func codeRoscopFromCsv(filename string) map[string]RoscopAttribute {
 			"MLAS":      {long_name: "La IN THE SEDIMENT", units: "ppm", valid_min: 0, valid_max: 900, format: "%6.2f", _FillValue: 1e+36, types: "float32"},
 			"DO11":      {long_name: "DISSOLVED OXYGEN PRIMARY SENSOR", units: "ml/l", valid_min: 0, valid_max: 10, format: "%5.2f", _FillValue: 1e+36, types: "float32"},
 			"MCUF":      {long_name: "CU FLUX IN SETTLING PARTICLES", units: "microgram/(m2.day)", valid_min: 0, valid_max: 120, format: "%6.2f", _FillValue: 1e+36},
-			"DEPTH":     {long_name: "DEPTH BELOW SEA SURFACE", units: "meter", valid_min: 0, valid_max: 6000, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
+			"DEPTH":     {long_name: "Depth of measurement", units: "meters", valid_min: 0, valid_max: 6000, format: "%6.1f", _FillValue: 1e+36, types: "float32"},
 			"TYPECAST":  {long_name: "TYPE OF CAST: UNKNOW=0, PHY=1, BIO=2, GEO=3", units: "N/A", valid_min: 0, valid_max: 9, format: "%1d", _FillValue: 255, types: "uint8"},
 			"PROFILE":   {long_name: "PROFILE NUMBER", units: "N/A", valid_min: 1, valid_max: 99999, format: "%5d", _FillValue: 9999999, types: "int32"},
-			"LATITUDE":  {long_name: "LATITUDE", units: "decimal degree", valid_min: -90, valid_max: 90, format: "%+8.4f", _FillValue: 1e+36, types: "float32"},
-			"LONGITUDE": {long_name: "LONGITUDE", units: "decimal degree", valid_min: -180, valid_max: 180, format: "%+9.4f", _FillValue: 1e+36, types: "float32"}}
+			"LATITUDE":  {long_name: "LATITUDE", units: "degree_north", valid_min: -90, valid_max: 90, format: "%+8.4f", _FillValue: 1e+36, types: "float32"},
+			"LONGITUDE": {long_name: "LONGITUDE", units: "degree_east", valid_min: -180, valid_max: 180, format: "%+9.4f", _FillValue: 1e+36, types: "float32"}}
 
 		//f("%#v", roscop)
+		//f("Code roscop: %v\n", roscop["TIME"])
+		return roscop
 	}
 }

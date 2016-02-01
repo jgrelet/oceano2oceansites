@@ -75,7 +75,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	// Add the variable to the dataset that will store our data
 	map_1D := make(map[string]netcdf.Var)
 
-	// create netcdf variables with thier attributes
+	// create netcdf variables with attributes
 	for key, _ := range nc.Variables_1D {
 
 		// convert types from code_roscop structure to native netcdf types
@@ -90,13 +90,14 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		default:
 			log.Fatal(err) // wrong type, check code_roscop file
 		}
+		// add variables
 		v, err := ds.AddVar(key, netcdfType, dim_1D)
 		if err != nil {
 			log.Fatal(err)
 		}
 		map_1D[key] = v
 
-		// define variables attributes, get values from roscop map
+		// define variable attributes, get values from roscop map
 		// todos !!! for each type
 		a := v.Attr("long_name")
 		a.WriteBytes([]byte(roscop[key].long_name))
@@ -125,14 +126,19 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			a.WriteFloat64s([]float64{roscop[key].valid_min})
 			a = v.Attr("valid_max")
 			a.WriteFloat64s([]float64{roscop[key].valid_max})
-			a = v.Attr("_FillValue")
-			a.WriteFloat64s([]float64{roscop[key]._FillValue})
+
+			if roscop[key]._FillValue != -1e36 {
+				a = v.Attr("_FillValue")
+				a.WriteFloat64s([]float64{roscop[key]._FillValue})
+			}
+
 		default:
 			log.Fatal(err) // wrong type, check code_roscop file
 		}
 
 	}
 
+	// Add the variable to the dataset that will store our data
 	map_2D := make(map[string]netcdf.Var)
 
 	// use the order list gave by split or splitAll (config file) because
@@ -208,7 +214,8 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	// leave define mode in NetCDF3
 	ds.EndDef()
 
-	// Create the data with the above dimensions and write it to the file.
+	// Create the data with the above dimensions and type,
+	// write them to the file.
 	for key, value := range nc.Variables_1D {
 
 		// convert types from code_roscop structure to native netcdf types
