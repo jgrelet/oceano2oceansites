@@ -17,11 +17,15 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 	// define 2 files, profiles header and data
 	var asciiFilename string
 
+	//	if _, err := os.Stat("/path/to/whatever"); err == nil {
+	//		// path/to/whatever exists
+	//	}
+
 	// build filenames
 	str := nc.Attributes["cycle_mesure"]
 	str = strings.Replace(str, "\r", "", -1)
-	headerFilename := fmt.Sprintf("%s.ctd", strings.ToLower(str))
-	asciiFilename = fmt.Sprintf("%s%s_ctd", strings.ToLower(str), prefixAll)
+	headerFilename := fmt.Sprintf("ascii/%s.ctd", strings.ToLower(str))
+	asciiFilename = fmt.Sprintf("ascii/%s%s_ctd", strings.ToLower(str), prefixAll)
 	//fmt.Println(headerFilename)
 	//fmt.Println(asciiFilename)
 

@@ -100,6 +100,9 @@ func main() {
 	// and configuration file name
 	files, optCfgfile := GetOptions()
 
+	// test if output directories exists and create them if not
+	mkdir()
+
 	// read the first file and try to find the instrument type, return a bit mask
 	typeInstrument = AnalyseFirstFile(files)
 

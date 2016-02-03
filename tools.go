@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -189,4 +191,16 @@ func round(num float64) int {
 func toFixed(num float64, precision int) float64 {
 	output := math.Pow(10, float64(precision))
 	return float64(round(num*output)) / output
+}
+
+func mkdir() {
+	if _, err := os.Stat("ascii"); os.IsNotExist(err) {
+		os.Mkdir("."+string(filepath.Separator)+"ascii", 0777)
+	}
+	if _, err := os.Stat("netcdf"); os.IsNotExist(err) {
+		os.Mkdir("."+string(filepath.Separator)+"netcdf", 0777)
+	}
+	if _, err := os.Stat("odv"); os.IsNotExist(err) {
+		os.Mkdir("."+string(filepath.Separator)+"odv", 0777)
+	}
 }
