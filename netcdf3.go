@@ -100,6 +100,8 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 		map_1D[key] = v
 
+		// var err error
+
 		// define variable attributes with the right type
 		// for an physical parameter, get a slice of attributes name
 		for _, name := range roscop.GetAttributes(key) {
@@ -110,15 +112,18 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			// value is an interface{}, need type assertion
 			switch value.(type) {
 			case string:
-				a.WriteBytes([]byte(value.(string)))
+				err = a.WriteBytes([]byte(value.(string)))
 			case int32:
-				a.WriteInt32s([]int32{value.(int32)})
+				err = a.WriteInt32s([]int32{value.(int32)})
 			case float32:
-				a.WriteFloat32s([]float32{value.(float32)})
+				err = a.WriteFloat32s([]float32{value.(float32)})
 			case float64:
-				a.WriteFloat64s([]float64{value.(float64)})
+				err = a.WriteFloat64s([]float64{value.(float64)})
 			default:
-				log.Fatal("netcdf: create 1D attribute error") // wrong type, check code_roscop file
+				log.Fatal(fmt.Sprintf("netcdf: create 1D attribute error, %v [%v]", name, value)) // wrong type, check code_roscop file
+			}
+			if err != nil {
+				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		}
 	}
@@ -165,15 +170,19 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			// value is an interface{}, need type assertion
 			switch value.(type) {
 			case string:
-				a.WriteBytes([]byte(value.(string)))
+				f("%s: %s=%v (%T)\n", key, name, value, value)
+				err = a.WriteBytes([]byte(value.(string)))
 			case int32:
-				a.WriteInt32s([]int32{value.(int32)})
+				err = a.WriteInt32s([]int32{value.(int32)})
 			case float32:
-				a.WriteFloat32s([]float32{value.(float32)})
+				err = a.WriteFloat32s([]float32{value.(float32)})
 			case float64:
-				a.WriteFloat64s([]float64{value.(float64)})
+				err = a.WriteFloat64s([]float64{value.(float64)})
 			default:
 				log.Fatal(fmt.Sprintf("netcdf: create 1D attribute error: key: %s, Value: [%s], \n", key, value))
+			}
+			if err != nil {
+				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		}
 	}
@@ -181,11 +190,15 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	// defines global attributes
 	for key, value := range nc.Attributes {
 		a := ds.Attr(key)
-		a.WriteBytes([]byte(value))
+		err = a.WriteBytes([]byte(value))
+		if err != nil {
+			log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, value, value))
+		}
 	}
 
 	// leave define mode in NetCDF3
 	ds.EndDef()
+	// os.Exit(0)
 
 	// Create the data with the above dimensions and type,
 	// write them to the file.
@@ -203,7 +216,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			err = map_1D[key].WriteInt32s(v)
 			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		case "float32":
 			//v := value.([]float32)
@@ -215,7 +228,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			err = map_1D[key].WriteFloat32s(v)
 			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		case "float64":
 			//v := value.([]float64)
@@ -227,7 +240,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			err = map_1D[key].WriteFloat64s(v)
 			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		default:
 			log.Fatal(err) // wrong type, check code_roscop file

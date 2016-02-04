@@ -99,7 +99,7 @@ func NewRoscop(filename string) roscop {
 		// the iteration order is not specified and is not guaranteed to be
 		// the same from one iteration to the next in golang
 		r.physicalParametersOrderedList = append(r.physicalParametersOrderedList, key)
-		//fmt.Printf("%s: %v\n", record[0], mfields)
+		fmt.Printf("%s: %v\n", record[0], mfields)
 	}
 	//f("%#v", r)
 	return r
