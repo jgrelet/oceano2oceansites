@@ -62,7 +62,7 @@ func NewRoscop(filename string) roscop {
 	for i := 0; i < len(fields); i++ {
 		r.attributesType[fields[i]] = types[i]
 	}
-	fmt.Println(r.attributesType)
+	//fmt.Println(r.attributesType)
 
 	// read next lines
 	for {
