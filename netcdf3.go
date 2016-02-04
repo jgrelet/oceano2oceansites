@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	//	"strconv"
 	"strings"
 
 	"github.com/fhs/go-netcdf/netcdf"
@@ -80,7 +81,9 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 
 		// convert types from code_roscop structure to native netcdf types
 		var netcdfType netcdf.Type
-		switch roscop[key].types {
+
+		pa := roscop.GetAttributesStringValue(key, "types")
+		switch pa {
 		case "int32":
 			netcdfType = netcdf.INT
 		case "float32":
@@ -88,7 +91,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		case "float64":
 			netcdfType = netcdf.DOUBLE
 		default:
-			log.Fatal(err) // wrong type, check code_roscop file
+			log.Fatal(fmt.Sprintf("Error: key: %s, Value: [%s], check roscop file\n", key, pa)) // wrong type, check code_roscop file
 		}
 		// add variables
 		v, err := ds.AddVar(key, netcdfType, dim_1D)
@@ -97,45 +100,27 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 		map_1D[key] = v
 
-		// define variable attributes, get values from roscop map
-		// todos !!! for each type
-		a := v.Attr("long_name")
-		a.WriteBytes([]byte(roscop[key].long_name))
-		a = v.Attr("units")
-		a.WriteBytes([]byte(roscop[key].units))
-		a = v.Attr("format")
-		a.WriteBytes([]byte(roscop[key].format))
-
-		switch roscop[key].types {
-		case "int32":
-			a = v.Attr("valid_min")
-			a.WriteInt32s([]int32{int32(roscop[key].valid_min)})
-			a = v.Attr("valid_max")
-			a.WriteInt32s([]int32{int32(roscop[key].valid_max)})
-			a = v.Attr("_FillValue")
-			a.WriteInt32s([]int32{int32(roscop[key]._FillValue)})
-		case "float32":
-			a = v.Attr("valid_min")
-			a.WriteFloat32s([]float32{float32(roscop[key].valid_min)})
-			a = v.Attr("valid_max")
-			a.WriteFloat32s([]float32{float32(roscop[key].valid_max)})
-			a = v.Attr("_FillValue")
-			a.WriteFloat32s([]float32{float32(roscop[key]._FillValue)})
-		case "float64":
-			a = v.Attr("valid_min")
-			a.WriteFloat64s([]float64{roscop[key].valid_min})
-			a = v.Attr("valid_max")
-			a.WriteFloat64s([]float64{roscop[key].valid_max})
-
-			if roscop[key]._FillValue != -1e36 {
-				a = v.Attr("_FillValue")
-				a.WriteFloat64s([]float64{roscop[key]._FillValue})
+		// define variable attributes with the right type
+		// for an physical parameter, get a slice of attributes name
+		for _, name := range roscop.GetAttributes(key) {
+			// for each attribute, get the value
+			value := roscop.GetAttributesValue(key, name)
+			// add new attribute to the variable v
+			a := v.Attr(name)
+			// value is an interface{}, need type assertion
+			switch value.(type) {
+			case string:
+				a.WriteBytes([]byte(value.(string)))
+			case int32:
+				a.WriteInt32s([]int32{value.(int32)})
+			case float32:
+				a.WriteFloat32s([]float32{value.(float32)})
+			case float64:
+				a.WriteFloat64s([]float64{value.(float64)})
+			default:
+				log.Fatal("netcdf: create 1D attribute error") // wrong type, check code_roscop file
 			}
-
-		default:
-			log.Fatal(err) // wrong type, check code_roscop file
 		}
-
 	}
 
 	// Add the variable to the dataset that will store our data
@@ -152,7 +137,9 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 		// convert types from code_roscop structure to native netcdf types
 		var netcdfType netcdf.Type
-		switch roscop[key].types {
+
+		pa := roscop.GetAttributesStringValue(key, "types")
+		switch pa {
 		case "int32":
 			netcdfType = netcdf.INT
 		case "float32":
@@ -160,7 +147,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		case "float64":
 			netcdfType = netcdf.DOUBLE
 		default:
-			log.Fatal(err) // wrong type, check code_roscop file
+			log.Fatal(fmt.Sprintf("Error: key: %s, Value: [%s], check roscop file\n", key, pa)) // wrong type, check code_roscop file
 		}
 		v, err := ds.AddVar(key, netcdfType, dim_2D)
 		if err != nil {
@@ -168,40 +155,26 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 		map_2D[key] = v
 
-		// define variables attributes, get values from roscop map
-		// todos !!! for each type
-		a := v.Attr("long_name")
-		a.WriteBytes([]byte(roscop[key].long_name))
-		a = v.Attr("units")
-		a.WriteBytes([]byte(roscop[key].units))
-		a = v.Attr("format")
-		a.WriteBytes([]byte(roscop[key].format))
-		a = v.Attr("format")
-		a.WriteBytes([]byte(roscop[key].format))
-		switch roscop[key].types {
-		case "int32":
-			a = v.Attr("valid_min")
-			a.WriteInt32s([]int32{int32(roscop[key].valid_min)})
-			a = v.Attr("valid_max")
-			a.WriteInt32s([]int32{int32(roscop[key].valid_max)})
-			a = v.Attr("_FillValue")
-			a.WriteInt32s([]int32{int32(roscop[key]._FillValue)})
-		case "float32":
-			a = v.Attr("valid_min")
-			a.WriteFloat32s([]float32{float32(roscop[key].valid_min)})
-			a = v.Attr("valid_max")
-			a.WriteFloat32s([]float32{float32(roscop[key].valid_max)})
-			a = v.Attr("_FillValue")
-			a.WriteFloat32s([]float32{float32(roscop[key]._FillValue)})
-		case "float64":
-			a = v.Attr("valid_min")
-			a.WriteFloat64s([]float64{roscop[key].valid_min})
-			a = v.Attr("valid_max")
-			a.WriteFloat64s([]float64{roscop[key].valid_max})
-			a = v.Attr("_FillValue")
-			a.WriteFloat64s([]float64{roscop[key]._FillValue})
-		default:
-			log.Fatal(err) // wrong type, check code_roscop file
+		// define variable attributes with the right type
+		// for an physical parameter, get a slice of attributes name
+		for _, name := range roscop.GetAttributes(key) {
+			// for each attribute, get the value
+			value := roscop.GetAttributesValue(key, name)
+			// add new attribute to the variable v
+			a := v.Attr(name)
+			// value is an interface{}, need type assertion
+			switch value.(type) {
+			case string:
+				a.WriteBytes([]byte(value.(string)))
+			case int32:
+				a.WriteInt32s([]int32{value.(int32)})
+			case float32:
+				a.WriteFloat32s([]float32{value.(float32)})
+			case float64:
+				a.WriteFloat64s([]float64{value.(float64)})
+			default:
+				log.Fatal(fmt.Sprintf("netcdf: create 1D attribute error: key: %s, Value: [%s], \n", key, value))
+			}
 		}
 	}
 
@@ -219,7 +192,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	for key, value := range nc.Variables_1D {
 
 		// convert types from code_roscop structure to native netcdf types
-		switch roscop[key].types {
+		switch roscop.GetAttributesStringValue(key, "types") {
 		case "int32":
 			//tmp := value.([]int32)
 			length := len(value.([]float64))
@@ -283,7 +256,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 				i++
 			}
 		}
-		switch roscop[key].types {
+		switch roscop.GetAttributesStringValue(key, "types") {
 		case "int32":
 			v := make([]int32, ht*wd)
 			for i := 0; i < ht*wd; i++ {

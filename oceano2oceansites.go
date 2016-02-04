@@ -28,7 +28,7 @@ var f = fmt.Printf
 var cfgname string = "oceano2oceansites.ini"
 
 // default physical parameters file definition is embeded in code_roscop.go
-var code_roscop string = ""
+var code_roscop string = "roscop/code_roscop.csv"
 
 // file prefix for --all option: "-all" for all parameters, "" empty by default
 var prefixAll = ""
@@ -60,7 +60,7 @@ type Nc struct {
 	Attributes   map[string]string
 	Extras_f     map[string]float64 // used to store max of profiles value
 	Extras_s     map[string]string  // used to store max of profiles type
-	Roscop       map[string]RoscopAttribute
+	Roscop       roscop
 }
 
 // interface common for all data sets (profile, trajectory and time-series

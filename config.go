@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/gcfg.v1"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+
+	"gopkg.in/gcfg.v1"
 )
 
 type Config struct {
@@ -66,7 +67,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	nc.Variables_1D["LONGITUDE"] = []float64{}
 	nc.Variables_1D["BATH"] = []float64{}
 	//	nc.Variables_1D["TYPECAST"] = []float64{}
-	nc.Roscop = codeRoscopFromCsv(code_roscop)
+	nc.Roscop = NewRoscop(code_roscop)
 
 	// add some global attributes for profile, change in future
 	nc.Attributes["data_type"] = "OceanSITES profile data"
@@ -139,7 +140,8 @@ func (nc *Nc) GetConfig(configFile string) {
 
 	// fill map_format from code_roscop
 	for _, key := range hdr {
-		map_format[key] = nc.Roscop[key].format
+		// Change this call in next version !!!!
+		map_format[key] = nc.Roscop.m[key]["format"]
 	}
 	//return nc
 }
