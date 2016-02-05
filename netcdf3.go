@@ -34,16 +34,10 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		strings.ToUpper(nc.Attributes["cycle_mesure"]),
 		strings.ToUpper(prefixAll),
 		ncType)
-	//fmt.Println(filename)
+	fmt.Println(debug, filename)
 
 	// get roscop definition file for variables attributes
 	var roscop = nc.Roscop
-	//	for k, v := range roscop {
-	//		fmt.Printf("%s: ", k)
-	//		fmt.Println(v)
-	//	}
-	//	os.Exit(0)
-
 	fmt.Fprintf(echo, "writing netCDF: %s\n", filename)
 
 	// get variables_1D size
@@ -99,8 +93,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			log.Fatal(err)
 		}
 		map_1D[key] = v
-
-		// var err error
 
 		// define variable attributes with the right type
 		// for an physical parameter, get a slice of attributes name
@@ -200,7 +192,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 
 	// leave define mode in NetCDF3
 	ds.EndDef()
-	// os.Exit(0)
 
 	// Create the data with the above dimensions and type,
 	// write them to the file.
@@ -211,38 +202,38 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		case "int32":
 			length := len(value.([]float64))
 			v := make([]int32, length)
+			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
+			fmt.Fprintf(debug, "writing %s: %d\n", key, len(v))
 			for i := 0; i < length; i++ {
 				v[i] = int32(value.([]float64)[i])
 			}
-			err = map_1D[key].WriteInt32s(v)
-			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
-			if err != nil {
+			if err := map_1D[key].WriteInt32s(v); err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		case "float32":
 			length := len(value.([]float64))
 			v := make([]float32, length)
+			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
+			fmt.Fprintf(debug, "writing %s: %d\n", key, len(v))
 			for i := 0; i < length; i++ {
 				v[i] = float32(value.([]float64)[i])
 			}
-			err = map_1D[key].WriteFloat32s(v)
-			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
-			if err != nil {
+			if err := map_1D[key].WriteFloat32s(v); err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		case "float64":
 			length := len(value.([]float64))
 			v := make([]float64, length)
+			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
+			fmt.Fprintf(debug, "writing %s: %d\n", key, len(v))
 			for i := 0; i < length; i++ {
 				v[i] = float64(value.([]float64)[i])
 			}
-			err = map_1D[key].WriteFloat64s(v)
-			fmt.Fprintf(echo, "writing %s: %d\n", key, len(v))
-			if err != nil {
+			if err := map_1D[key].WriteFloat64s(v); err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		default:
-			log.Fatal(err) // wrong type, check code_roscop file
+			log.Fatal(fmt.Sprintf("%s, %v", err, key))
 		}
 
 	}
@@ -260,6 +251,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		wd := len(value.data[0])
 		fmt.Fprintf(echo, "writing %s: %d x %d\n", key, ht, wd)
 		fmt.Fprintf(debug, "writing %s: %d x %d\n", key, ht, wd)
+
 		// Write<type> netcdf methods need []<type>, [][]data will be flatten
 		gopher := make([]float64, ht*wd)
 		for x := 0; x < ht; x++ {
@@ -274,28 +266,24 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			for i := 0; i < ht*wd; i++ {
 				v[i] = int32(gopher[i])
 			}
-			err = map_2D[key].WriteInt32s(v)
-			if err != nil {
-				log.Fatal(err)
+			if err := map_2D[key].WriteInt32s(v); err != nil {
+				log.Fatal(fmt.Sprintf("%s, %v: (%T)", err, key, v))
 			}
 		case "float32":
 			v := make([]float32, ht*wd)
 			for i := 0; i < ht*wd; i++ {
 				v[i] = float32(gopher[i])
 			}
-			err = map_2D[key].WriteFloat32s(v)
-			if err != nil {
-				log.Fatal(err)
+			if err := map_2D[key].WriteFloat32s(v); err != nil {
+				log.Fatal(fmt.Sprintf("%s, %v: (%T)", err, key, v))
 			}
 		case "float64":
-			err = map_2D[key].WriteFloat64s(gopher)
-			if err != nil {
-				log.Fatal(err)
+			if err := map_2D[key].WriteFloat64s(gopher); err != nil {
+				log.Fatal(fmt.Sprintf("%s, %v: (%T)", err, key, gopher))
 			}
 		default:
-			log.Fatal(err) // wrong type, check code_roscop file
+			log.Fatal(fmt.Sprintf("%s, %v", err, key))
 		}
 	}
 	fmt.Fprintf(echo, "writing %s done ...\n", filename)
-	//return nil
 }
