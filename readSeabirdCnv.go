@@ -171,11 +171,11 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 			// get profile name, eg: csp00101
 			nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(value))] = t[1]
 		} else {
-			log.Fatal(err)
+			log.Fatal(fmt.Sprintf("Error func GetProfileNumber: ", err))
 		}
 
 	} else {
-		log.Fatal("func GetProfileNumber", err)
+		log.Fatal(fmt.Sprintf("Error func GetProfileNumber:  %s -> %s\n", reg, str))
 	}
 	return value
 

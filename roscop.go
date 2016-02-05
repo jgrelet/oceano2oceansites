@@ -12,6 +12,7 @@ import (
 
 type m map[string]map[string]string
 
+// roscop represents the attributes associated with each netCDF variable
 type roscop struct {
 	m
 	physicalParametersOrderedList []string
@@ -58,17 +59,17 @@ func NewRoscop(filename string) roscop {
 	types, err := reader.Read()
 	//fmt.Println(types)
 
-	// fill map of attribute type
+	// fill map of attribute type: string or numeric
 	for i := 0; i < len(fields); i++ {
 		r.attributesType[fields[i]] = types[i]
 	}
 	//fmt.Println(r.attributesType)
 
-	// read next lines
+	// read next lines and fill roscop object
 	for {
 
-		// initialize a new empty map to store variable attributes
-		// name and the value
+		// initialize a new empty map to store attributes variable
+		// with pair of name and value
 		mfields := map[string]string{}
 
 		// read just one record, but we could ReadAll() as well
@@ -99,7 +100,7 @@ func NewRoscop(filename string) roscop {
 		// the iteration order is not specified and is not guaranteed to be
 		// the same from one iteration to the next in golang
 		r.physicalParametersOrderedList = append(r.physicalParametersOrderedList, key)
-		fmt.Printf("%s: %v\n", record[0], mfields)
+		fmt.Fprintf(debug, "%s: %v\n", record[0], mfields)
 	}
 	//f("%#v", r)
 	return r
@@ -126,20 +127,27 @@ func (r roscop) GetAttributesValue(physicalParameter string, attributeName strin
 	switch r.attributesType[attributeName] {
 	case "string":
 		return r.m[physicalParameter][attributeName]
-	case "char", "byte":
-		return byte(r.m[physicalParameter][attributeName][0])
-	case "int", "int32":
-		value, _ := strconv.ParseInt(r.m[physicalParameter][attributeName], 32, 32)
-		return value
-	case "float32", "float":
-		value, _ := strconv.ParseFloat(r.m[physicalParameter][attributeName], 32)
-		return value
-	case "float64", "double":
-		value, _ := strconv.ParseFloat(r.m[physicalParameter][attributeName], 64)
-		return value
+	case "numeric":
+		// convert generic numeric type with the rigth type of physical parameter
+		switch r.m[physicalParameter]["types"] {
+		case "char", "byte":
+			return byte(r.m[physicalParameter][attributeName][0])
+		case "int", "int32":
+			value, _ := strconv.ParseInt(r.m[physicalParameter][attributeName], 10, 32)
+			return int32(value)
+		case "float32", "float":
+			value, _ := strconv.ParseFloat(r.m[physicalParameter][attributeName], 32)
+			return float32(value)
+		case "float64", "double":
+			value, _ := strconv.ParseFloat(r.m[physicalParameter][attributeName], 64)
+			return value
+		default:
+			log.Fatal("Error: check the column types  of your roscop file," +
+				" valid values are: char, byte, int, int32, float, float32, double and float64")
+		}
 	default:
-		log.Fatal("bad type")
-
+		log.Fatal("Error: check the second line of your roscop file," +
+			" values sould be string or numeric")
 	}
 
 	return r.m[physicalParameter][attributeName]

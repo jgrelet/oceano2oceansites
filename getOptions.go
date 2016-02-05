@@ -54,7 +54,8 @@ func GetOptions() ([]string, string) {
 	} else {
 		files, err = filepath.Glob(*optFiles)
 	}
-	p(files)
+	fmt.Fprintln(debug, files)
+
 	if err != nil {
 		p(err)
 	}

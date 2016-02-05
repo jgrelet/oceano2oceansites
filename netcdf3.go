@@ -120,11 +120,13 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			case float64:
 				err = a.WriteFloat64s([]float64{value.(float64)})
 			default:
-				log.Fatal(fmt.Sprintf("netcdf: create 1D attribute error, %v [%v]", name, value)) // wrong type, check code_roscop file
+				log.Fatal(fmt.Sprintf("netcdf: create 1D attribute error, %v=%v:%v (%T)",
+					key, name, value, value)) // wrong type, check code_roscop file
 			}
 			if err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
+			fmt.Fprintf(debug, "%s: %s=%v (%T)\n", key, name, value, value)
 		}
 	}
 
@@ -170,7 +172,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			// value is an interface{}, need type assertion
 			switch value.(type) {
 			case string:
-				f("%s: %s=%v (%T)\n", key, name, value, value)
 				err = a.WriteBytes([]byte(value.(string)))
 			case int32:
 				err = a.WriteInt32s([]int32{value.(int32)})
@@ -184,6 +185,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 			if err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
+			fmt.Fprintf(debug, "%s: %s=%v (%T)\n", key, name, value, value)
 		}
 	}
 
@@ -207,7 +209,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		// convert types from code_roscop structure to native netcdf types
 		switch roscop.GetAttributesStringValue(key, "types") {
 		case "int32":
-			//tmp := value.([]int32)
 			length := len(value.([]float64))
 			v := make([]int32, length)
 			for i := 0; i < length; i++ {
@@ -219,7 +220,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		case "float32":
-			//v := value.([]float32)
 			length := len(value.([]float64))
 			v := make([]float32, length)
 			for i := 0; i < length; i++ {
@@ -231,7 +231,6 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 				log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 			}
 		case "float64":
-			//v := value.([]float64)
 			length := len(value.([]float64))
 			v := make([]float64, length)
 			for i := 0; i < length; i++ {
