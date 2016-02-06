@@ -145,3 +145,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	}
 	//return nc
 }
+
+func (nc *Nc) GetPhysicalParametersList() []string {
+	return hdr
+}

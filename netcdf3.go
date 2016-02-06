@@ -129,7 +129,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	// the iteration order is not specified and is not guaranteed to be
 	// the same from one iteration to the next in golang
 	// for key, _ := range nc.Variables_2D {
-	for _, key := range hdr {
+	for _, key := range nc.GetPhysicalParametersList() {
 		// remove PRFL from the key list
 		if key == "PRFL" {
 			continue
@@ -240,7 +240,7 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 
 	// write data 2D (value.data) to netcdf variables
 	// for key, value := range nc.Variables_2D {
-	for _, key := range hdr {
+	for _, key := range nc.GetPhysicalParametersList() {
 		// remove PRFL from the key list
 		if key == "PRFL" {
 			continue
