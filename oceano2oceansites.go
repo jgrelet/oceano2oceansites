@@ -80,6 +80,9 @@ var nc Process
 type Ctd struct{ Nc }
 type Btl struct{ Nc }
 
+func NewCtd() *Ctd { return &Ctd{} }
+func NewBtl() *Btl { return &Btl{} }
+
 // main body
 func main() {
 
@@ -110,9 +113,11 @@ func main() {
 	// Process interface
 	switch typeInstrument {
 	case CTD:
-		nc = &Ctd{}
+		//nc = &Ctd{}
+		nc = NewCtd()
 	case BTL:
-		nc = &Btl{}
+		//nc = &Btl{}
+		nc = NewBtl()
 	default:
 		f("main: invalide option typeInstrument -> %d\n", typeInstrument)
 		p("Exiting...")
