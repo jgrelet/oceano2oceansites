@@ -344,8 +344,8 @@ func (nc *Ctd) secondPass(files []string) {
 	fmt.Fprintln(debug, nc.Variables_1D["PROFILE"])
 }
 
-// read cnv files in two pass, the first to get dimensions
-// second to get data
+// read cnv files in two pass, the first pass to get dimensions
+// the second pass to get data and fill slice
 func (nc *Ctd) Read(files []string) {
 
 	// first pass, return dimensions fron cnv files

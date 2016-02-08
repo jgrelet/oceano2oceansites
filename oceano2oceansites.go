@@ -40,6 +40,7 @@ var outputDir = "out"
 var map_var = map[string]int{}
 var map_format = map[string]string{}
 var data = make(map[string]interface{})
+
 var hdr []string
 var cfg Config
 
@@ -54,13 +55,25 @@ type AllData_2D map[string]Data_2D
 // the representation in memory of a data set is similar to
 // that of a netcdf file
 type Nc struct {
-	Dimensions   map[string]int
+	// store dimensions
+	Dimensions map[string]int
+
+	// store one dimension variables (eg: TIME, LATITUDE, ...)
 	Variables_1D map[string]interface{}
+	// store two dimensions variables (eg: PRES, DEPTH, TEMP, ...)
 	Variables_2D AllData_2D
-	Attributes   map[string]string
-	Extras_f     map[string]float64 // used to store max of profiles value
-	Extras_s     map[string]string  // used to store max of profiles type
-	Roscop       roscop
+	// store global attributes
+	Attributes map[string]string
+
+	// used to store max of profiles value
+	Extras_f map[string]float64
+	// used to store max of profiles type
+	Extras_s map[string]string
+	// give access to physical parameters
+	Roscop roscop
+
+	// store header
+	//hdr []string
 }
 
 // interface common for all data sets (profile, trajectory and time-series
