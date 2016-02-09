@@ -34,7 +34,8 @@ var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s
 // use regular expression
 // to parse time with non standard format, see:
 // http://golang.org/src/time/format.go
-func (nc *Nc) DecodeHeader(str string, profile float64) {
+func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
+
 	// decode Systeme Upload Time
 	match := regSystemTime.MatchString(str)
 	if match {
@@ -44,22 +45,18 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 		// create new Time object, see tools.go
 		var t = NewTimeFromString("Jan 02 2006 15:04:05", value)
 		v := t.Time2JulianDec()
-		nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"].([]float64), v)
+		nc.Variables_1D["TIME"].([]float64)[nbProfile] = v
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
 		if v, err := Position2Decimal(str); err == nil {
-			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"].([]float64), v)
-		} else {
-			nc.Variables_1D["LATITUDE"] = append(nc.Variables_1D["LATITUDE"].([]float64), 1e36)
+			nc.Variables_1D["LATITUDE"].([]float64)[nbProfile] = v
 		}
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
 		if v, err := Position2Decimal(str); err == nil {
-			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"].([]float64), v)
-		} else {
-			nc.Variables_1D["LONGITUDE"] = append(nc.Variables_1D["LONGITUDE"].([]float64), 1e36)
+			nc.Variables_1D["LONGITUDE"].([]float64)[nbProfile] = v
 		}
 	}
 	match = regCruise.MatchString(str)
@@ -91,9 +88,7 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 			//			if p != v {
 			//				fmt.Printf("Warning: profile for header differ from file name: %s <=> %s\n", p, v)
 			//			}
-			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"].([]float64), profile)
-		} else {
-			nc.Variables_1D["PROFILE"] = append(nc.Variables_1D["PROFILE"].([]float64), 1e36)
+			nc.Variables_1D["PROFILE"].([]float64)[nbProfile] = profile
 		}
 	}
 	match = regBottomDepth.MatchString(str)
@@ -102,16 +97,8 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
 			fmt.Fprintf(debug, "Bath: %f\n", v)
-			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"].([]float64), v)
-		} else {
-			fmt.Fprintf(debug, "Bath: %f\n", v)
-			nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"].([]float64), 1e36)
+			nc.Variables_1D["BATH"].([]float64)[nbProfile] = v
 		}
-	}
-	match = regDummyBottomDepth.MatchString(str)
-	if match {
-		nc.Variables_1D["BATH"] = append(nc.Variables_1D["BATH"].([]float64), 1e36)
-		fmt.Fprintf(debug, "Bath: %g\n", 1e36)
 	}
 	match = regOperator.MatchString(str)
 	if match {
@@ -122,29 +109,29 @@ func (nc *Nc) DecodeHeader(str string, profile float64) {
 		}
 	}
 	// TODOS: uncomment, add optionnal value from seabird header
-	//	match = regType.MatchString(str)
-	//	if match {
-	//		res := regType.FindStringSubmatch(str)
-	//		value := strings.ToUpper(res[1]) // convert to upper case
-	//		var v float64
-	//		switch value {
-	//		case "PHY":
-	//			v = float64(PHY)
-	//		case "GEO":
-	//			v = float64(GEO)
-	//		case "BIO":
-	//			v = float64(BIO)
-	//		default:
-	//			v = float64(UNKNOW)
-	//		}
-	//		//f("Type: %f\n", v)
-	//		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
+	match = regType.MatchString(str)
+	if match {
+		res := regType.FindStringSubmatch(str)
+		value := strings.ToUpper(res[1]) // convert to upper case
+		var v float64
+		switch value {
+		case "PHY":
+			v = float64(PHY)
+		case "GEO":
+			v = float64(GEO)
+		case "BIO":
+			v = float64(BIO)
+		default:
+			v = float64(UNKNOW)
+		}
+		//f("Type: %f\n", v)
+		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
 
-	//		if *optDebug {
-	//			fmt.Println(value)
-	//		}
-	//		nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile))] = value
-	//	}
+		if *optDebug {
+			fmt.Println(value)
+		}
+		nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile))] = value
+	}
 
 	// add some global attributes, change code location in future
 	nc.Attributes["format_version"] = "1.3"
@@ -161,6 +148,7 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 	var value float64
 	var err error
 
+	fmt.Fprintln(debug, "GetProfileNumber():\n--------------")
 	reg := fmt.Sprintf("%s(\\d{%d})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
 	res := regexp.MustCompile(reg)
 	match := res.MatchString(str)
@@ -305,7 +293,7 @@ func (nc *Ctd) secondPass(files []string) {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
 			if match {
-				nc.DecodeHeader(str, profile)
+				nc.DecodeHeader(str, profile, nbProfile)
 			} else {
 				// fill map data with information contain in read line str
 				nc.DecodeData(str, profile, file, line)
@@ -349,13 +337,12 @@ func (nc *Ctd) secondPass(files []string) {
 func (nc *Ctd) Read(files []string) {
 
 	// first pass, return dimensions fron cnv files
-	nc.Dimensions["TIME"], nc.Dimensions["DEPTH"] = nc.firstPass(files)
+	dimx, dimy := nc.firstPass(files)
+	nc.Dimensions["TIME"] = dimx
+	nc.Dimensions["DEPTH"] = dimy
 
-	// initialize 2D data
-	nc.Variables_2D = make(AllData_2D)
-	for i, _ := range map_var {
-		nc.Variables_2D.NewData_2D(i, nc.Dimensions["TIME"], nc.Dimensions["DEPTH"])
-	}
+	//
+	nc.InitVariables(dimx, dimy)
 
 	// second pass, read files again, extract data and fill slices
 	nc.secondPass(files)

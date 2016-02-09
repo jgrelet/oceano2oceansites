@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -60,13 +61,6 @@ func (nc *Nc) GetConfig(configFile string) {
 	nc.Extras_s = make(map[string]string)
 	nc.Variables_1D = make(map[string]interface{})
 
-	// initialize map entry from nil interface to empty slice of float64
-	nc.Variables_1D["PROFILE"] = []float64{}
-	nc.Variables_1D["TIME"] = []float64{}
-	nc.Variables_1D["LATITUDE"] = []float64{}
-	nc.Variables_1D["LONGITUDE"] = []float64{}
-	nc.Variables_1D["BATH"] = []float64{}
-	//	nc.Variables_1D["TYPECAST"] = []float64{}
 	nc.Roscop = NewRoscop(code_roscop)
 
 	// add some global attributes for profile, change in future
@@ -144,6 +138,38 @@ func (nc *Nc) GetConfig(configFile string) {
 		map_format[key] = nc.Roscop.m[key]["format"]
 	}
 	//return nc
+}
+
+func (nc *Nc) InitVariables(dimx int, dimy int) {
+
+	// initialize map entry from nil interface with _FillValue
+	v := nc.Roscop.GetAttributesValue("PROFILE", "_FillValue").(int32)
+	fmt.Fprintln(debug, "\nInitVariables():\n--------------")
+	fmt.Fprintf(debug, "PROFILE with: %v (%T)\n", reflect.ValueOf(v), v)
+	nc.Variables_1D["PROFILE"] = fillSliceInt32(dimx, v)
+
+	y := nc.Roscop.GetAttributesValue("TIME", "valid_min").(float64)
+	fmt.Fprintf(debug, "TIME with: %v (%T)\n", reflect.ValueOf(y), y)
+	nc.Variables_1D["TIME"] = fillSlice(dimx, y)
+
+	fmt.Fprintf(debug, "LATITUDE with: %v (%T)\n", 0, 0)
+	nc.Variables_1D["LATITUDE"] = fillSlice(dimx, 0) // need to be verify
+	fmt.Fprintf(debug, "LONGITUDE with: %v (%T)\n", 0, 0)
+	nc.Variables_1D["LONGITUDE"] = fillSlice(dimx, 0)
+
+	x := nc.Roscop.GetAttributesValue("BATH", "_FillValue").(float32)
+	fmt.Fprintf(debug, "BATH with: %v (%T)\n", reflect.ValueOf(x), x)
+	nc.Variables_1D["BATH"] = fillSlice(dimx, float64(x))
+
+	v = nc.Roscop.GetAttributesValue("TYPECAST", "_FillValue").(int32)
+	fmt.Fprintf(debug, "TYPECAST with: %v (%T)\n", reflect.ValueOf(v), v)
+	nc.Variables_1D["TYPECAST"] = fillSliceInt32(dimx, v)
+
+	// initialize 2D data
+	nc.Variables_2D = make(AllData_2D)
+	for i, _ := range map_var {
+		nc.Variables_2D.NewData_2D(i, dimx, dimy)
+	}
 }
 
 func (nc *Nc) GetPhysicalParametersList() []string {

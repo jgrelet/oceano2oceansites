@@ -92,9 +92,10 @@ func (t *Time) Time2JulianDec() float64 {
 	m := int(t.Month()) + 12*a - 3
 	julianDay := int(t.Day()) + (153*m+2)/5 + 365*y + y/4
 	julianDay = julianDay - y/100 + y/400 - 32045.0 - DIFF_ORIGIN
-	//fmt.Println("Julian day:", julianDay)
-	return float64(julianDay) + float64(t.Hour())/24 +
+	d := float64(julianDay) + float64(t.Hour())/24 +
 		float64(t.Minute())/1440 + float64(t.Second())/86400
+	fmt.Fprintf(debug, "Julian day: %v ", d)
+	return d
 }
 
 // compute from time object a decimal julian day from the current year
@@ -169,6 +170,31 @@ func isArray(a interface{}) bool {
 		return true
 	}
 	return false
+}
+
+func zeros(size int) []float64 {
+	return make([]float64, size)
+}
+func ones(size int) []float64 {
+	m := make([]float64, size)
+	for i, _ := range m {
+		m[i] = 1
+	}
+	return m
+}
+func fillSlice(size int, value float64) []float64 {
+	m := make([]float64, size)
+	for i, _ := range m {
+		m[i] = value
+	}
+	return m
+}
+func fillSliceInt32(size int, value int32) []float64 {
+	m := make([]float64, size)
+	for i, _ := range m {
+		m[i] = float64(value)
+	}
+	return m
 }
 
 // I'm just starting in Go and found it surprising that it has neither a

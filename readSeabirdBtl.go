@@ -87,6 +87,10 @@ func (nc *Btl) secondPass(files []string) {
 	var month, day, year string
 
 	fmt.Fprintf(echo, "Second pass ...\n")
+
+	// initialize profile and pressure max
+	var nbProfile int = 0
+
 	// loop over each files passed throw command line
 	for _, file := range files {
 		var line int = 0
@@ -104,7 +108,7 @@ func (nc *Btl) secondPass(files []string) {
 			str := scanner.Text()
 			match := regIsHeader.MatchString(str)
 			if match {
-				nc.DecodeHeader(str, profile)
+				nc.DecodeHeader(str, profile, nbProfile)
 			} else {
 				match = regIsMontDayYear.MatchString(str)
 				if match {
@@ -135,6 +139,8 @@ func (nc *Btl) secondPass(files []string) {
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
+		// increment sclice index
+		nbProfile += 1
 	}
 }
 
