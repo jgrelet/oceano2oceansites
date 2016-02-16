@@ -34,11 +34,11 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		strings.ToUpper(nc.Attributes["cycle_mesure"]),
 		strings.ToUpper(prefixAll),
 		ncType)
-	fmt.Println(debug, filename)
 
 	// get roscop definition file for variables attributes
 	var roscop = nc.Roscop
-	fmt.Fprintf(echo, "writing netCDF: %s\n", filename)
+	fmt.Fprintf(echo, "writing file: %s\n", filename)
+	fmt.Fprintf(debug, "writing file: %s\n", filename)
 
 	// get variables_1D size
 	len_1D := nc.Dimensions["TIME"]

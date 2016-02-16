@@ -167,8 +167,8 @@ func (nc *Nc) InitVariables(dimx int, dimy int) {
 
 	// initialize 2D data
 	nc.Variables_2D = make(AllData_2D)
-	for i, _ := range map_var {
-		nc.Variables_2D.NewData_2D(i, dimx, dimy)
+	for physicalParameter, _ := range map_var {
+		nc.Variables_2D.NewData_2D(physicalParameter, dimx, dimy)
 	}
 }
 

@@ -261,9 +261,9 @@ func (nc *Ctd) firstPass(files []string) (int, int) {
 		line = 0
 	}
 
-	fmt.Fprintf(echo, "First pass: %d files read, maximum pressure found: %4.0f db\n", len(files), maxPresAll)
-	fmt.Fprintf(debug, "First pass: %d files read, maximum pressure found: %4.0f db\n", len(files), maxPresAll)
-	fmt.Fprintf(debug, "First pass: size %d x %d\n", len(files), maxLine)
+	fmt.Fprintf(echo, "%d files read, maximum pressure found: %4.0f db\n", len(files), maxPresAll)
+	fmt.Fprintf(debug, "%d files read, maximum pressure found: %4.0f db\n", len(files), maxPresAll)
+	fmt.Fprintf(debug, "size %d x %d\n", len(files), maxLine)
 	return len(files), maxLine
 }
 

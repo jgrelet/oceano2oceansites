@@ -25,10 +25,10 @@ func GetOptions() ([]string, string) {
 	optHelp := getopt.Bool('h', "help", "Help")
 	optAll = getopt.Bool('a', "all", "Process all parameters")
 	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
-	optCfgfile := getopt.StringLong("config", 'c', cfgname, "use specific description file for physical parameter ", "oceano2oceansites.ini")
+	optCfgfile := getopt.StringLong("config", 'c', cfgname, "use specific configuration .ini file", "oceano2oceansites.ini")
 	//	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
 	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv", "files")
-	optRoscop := getopt.StringLong("roscop", 'r', code_roscop, "use a specific config.ini file", "code_roscop.csv")
+	optRoscop := getopt.StringLong("roscop", 'r', code_roscop, "use a specific .csv file for physical parameter ", "code_roscop.csv")
 
 	// parse options line argument
 	getopt.Parse()
