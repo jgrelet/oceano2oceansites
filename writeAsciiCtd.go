@@ -10,7 +10,10 @@ import (
 )
 
 const (
-	codeForProfile = -1
+	codeForProfile   = -1
+	latitude         = 0
+	longitude        = 1
+	validHeaderField = 6
 )
 
 func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
@@ -110,8 +113,8 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 			profile[x],
 			t1.Format("02/01/2006 15:04:05"),
 			t2.Format("02/01/2006 15:04:05"),
-			DecimalPosition2String(lat[x], 0),
-			DecimalPosition2String(lon[x], 0),
+			DecimalPosition2String(lat[x], latitude),
+			DecimalPosition2String(lon[x], longitude),
 			nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile[x]))],
 			bath[x],
 			nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile[x]))],
@@ -124,7 +127,7 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 		fmt.Printf("%s", str)
 
 		// fill last header columns with 1e36
-		for i := 0; i < len(hdr)-6; i++ {
+		for i := 0; i < len(hdr)-validHeaderField; i++ {
 			fmt.Fprintf(fbuf_ascii, " %g", 1e36)
 		}
 		fmt.Fprintln(fbuf_ascii) // add newline
@@ -148,10 +151,12 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 						fmt.Fprintf(fbuf_ascii, "%g ", data)
 					} else {
 						fmt.Fprintf(fbuf_ascii, map_format[key]+" ", data)
+						fmt.Fprintf(debug, "%s: %f", map_format[key], data)
 					}
 				}
 			}
 			fmt.Fprintf(fbuf_ascii, "\n")
+			fmt.Fprintf(debug, "\n")
 
 		}
 		fbuf_ascii.Flush()
