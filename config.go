@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/gcfg.v1"
+	"github.com/BurntSushi/toml"
+	_ "gopkg.in/gcfg.v1"
 )
 
 type Config struct {
@@ -66,41 +67,41 @@ func (nc *Nc) GetConfig(configFile string) {
 	// add some global attributes for profile, change in future
 	nc.Attributes["data_type"] = "OceanSITES profile data"
 
-	err := gcfg.ReadFileInto(&cfg, configFile)
-	if err == nil {
-		switch typeInstrument {
-		case CTD:
-			split = cfg.Ctd.Split
-			splitAll = cfg.Ctd.SplitAll
-		case BTL:
-			split = cfg.Btl.Split
-		default:
-			fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
-			fmt.Println("Exiting...")
-			os.Exit(0)
-
-		}
-
-		//		cruisePrefix = cfg.Ctd.CruisePrefix
-		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
-		// TODOS: complete
-		nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
-		nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
-		nc.Attributes["callsign"] = cfg.Cruise.Callsign
-		nc.Attributes["institute"] = cfg.Cruise.Institute
-		nc.Attributes["pi"] = cfg.Cruise.Pi
-		nc.Attributes["timezone"] = cfg.Cruise.Timezone
-		nc.Attributes["begin_date"] = cfg.Cruise.BeginDate
-		nc.Attributes["end_date"] = cfg.Cruise.EndDate
-		nc.Attributes["creator"] = cfg.Cruise.Creator
-		nc.Attributes["type_instrument"] = cfg.Ctd.TypeInstrument
-		nc.Attributes["instrument_number"] = cfg.Ctd.InstrumentNumber
-
-	} else {
-		fmt.Println("function GetConfig error:")
-		fmt.Printf("Please, check location for %s file\n", configFile)
+	// err := gcfg.ReadFileInto(&cfg, configFile)
+	if _, err := toml.DecodeFile(configFile, &cfg); err != nil {
+		p("function GetConfig error:")
+		f("Please, check location or content of configuration toml file %s\n", configFile)
 		log.Fatal(err)
+		return
 	}
+
+	switch typeInstrument {
+	case CTD:
+		split = cfg.Ctd.Split
+		splitAll = cfg.Ctd.SplitAll
+	case BTL:
+		split = cfg.Btl.Split
+	default:
+		fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
+		fmt.Println("Exiting...")
+		os.Exit(0)
+
+	}
+
+	//		cruisePrefix = cfg.Ctd.CruisePrefix
+	//		stationPrefixLength = cfg.Ctd.StationPrefixLength
+	// TODOS: complete
+	nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
+	nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
+	nc.Attributes["callsign"] = cfg.Cruise.Callsign
+	nc.Attributes["institute"] = cfg.Cruise.Institute
+	nc.Attributes["pi"] = cfg.Cruise.Pi
+	nc.Attributes["timezone"] = cfg.Cruise.Timezone
+	nc.Attributes["begin_date"] = cfg.Cruise.BeginDate
+	nc.Attributes["end_date"] = cfg.Cruise.EndDate
+	nc.Attributes["creator"] = cfg.Cruise.Creator
+	nc.Attributes["type_instrument"] = cfg.Ctd.TypeInstrument
+	nc.Attributes["instrument_number"] = cfg.Ctd.InstrumentNumber
 
 	// add specific column(s) to the first header line in ascii file
 	switch typeInstrument {

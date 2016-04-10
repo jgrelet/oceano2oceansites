@@ -134,8 +134,8 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 	}
 
 	// add some global attributes, change code location in future
-	nc.Attributes["format_version"] = "1.3"
-	nc.Attributes["Conventions"] = "CF-1.6, OceanSITES-1.3, ACDD-1.2"
+	nc.Attributes["format_version"] = "1.2"
+	nc.Attributes["Conventions"] = "CF-1.6, OceanSITES-1.2, ACDD-1.2"
 	nc.Attributes["netcdf_version"] = "3.6"
 	//nc.Attributes[""] = ""
 	// nc.Attributes[""] = ""
