@@ -69,8 +69,8 @@ func (nc *Nc) GetConfig(configFile string) {
 
 	// err := gcfg.ReadFileInto(&cfg, configFile)
 	if _, err := toml.DecodeFile(configFile, &cfg); err != nil {
-		p("function GetConfig error:")
-		f("Please, check location or content of configuration toml file %s\n", configFile)
+		p("function GetConfig error.")
+		f("Unable to parse TOML file %s\n", configFile)
 		log.Fatal(err)
 		return
 	}
