@@ -181,7 +181,12 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 	}
 
-	// defines global attributes
+	// add some global attributes
+	nc.Attributes["format_version"] = "1.2"
+	nc.Attributes["Conventions"] = "CF-1.4, OceanSITES-1.2"
+	nc.Attributes["netcdf_version"] = "3.6"
+
+	// write global attributes
 	for key, value := range nc.Attributes {
 		a := ds.Attr(key)
 		err = a.WriteBytes([]byte(value))
