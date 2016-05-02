@@ -68,8 +68,8 @@ func GetOptions() ([]string, string) {
 	// show version and env
 	if *optVersion {
 		fmt.Println(PROGNAME + ": v" + PROGVERSION)
-		fmt.Printf("Environnement variable OCEANO2OCEANSITES: %s\n", os.Getenv("OCEANO2OCEANSITES"))
-		fmt.Printf("Environnement variable ROSCOP: %s\n", os.Getenv("ROSCOP"))
+		fmt.Printf("Environnement variable OCEANO2OCEANSITES_INI: %s\n", os.Getenv("OCEANO2OCEANSITES_INI"))
+		fmt.Printf("Environnement variable ROSCOP_CSV: %s\n", os.Getenv("ROSCOP_CSV"))
 		fmt.Printf("Configuration file: %s\n", cfgname)
 		fmt.Printf("Code ROSCOP file: %s\n", code_roscop)
 		fmt.Printf("GOPATH: %s\n", os.Getenv("GOPATH"))

@@ -90,8 +90,9 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		// add variables
 		v, err := ds.AddVar(key, netcdfType, dim_1D)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 		}
+		fmt.Fprintf(debug, "AddVar: %s\n", key)
 		map_1D[key] = v
 
 		// define variable attributes with the right type
@@ -150,8 +151,9 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		}
 		v, err := ds.AddVar(key, netcdfType, dim_2D)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 		}
+		fmt.Fprintf(debug, "AddVar: %s\n", key)
 		map_2D[key] = v
 
 		// define variable attributes with the right type

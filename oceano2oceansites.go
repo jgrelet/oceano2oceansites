@@ -9,7 +9,7 @@ import (
 )
 
 const PROGNAME string = "oceano2oceansites"
-const PROGVERSION string = "0.2.0"
+const PROGVERSION string = "0.2.1"
 
 // use for echo mode
 // Discard is an io.Writer on which all Write calls succeed
@@ -105,11 +105,11 @@ func main() {
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	if os.Getenv("OCEANO2OCEANSITES") != "" {
-		cfgname = os.Getenv("OCEANO2OCEANSITES")
+	if os.Getenv("OCEANO2OCEANSITES_INI") != "" {
+		cfgname = os.Getenv("OCEANO2OCEANSITES_INI")
 	}
-	if os.Getenv("ROSCOP") != "" {
-		code_roscop = os.Getenv("ROSCOP")
+	if os.Getenv("ROSCOP_CSV") != "" {
+		code_roscop = os.Getenv("ROSCOP_CSV")
 	}
 
 	// get options parse args list and return all given files to read
