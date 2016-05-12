@@ -2,11 +2,11 @@
 
 _This application read Seabird CTD cnv files, extract data from header files and write result into one ASCII file and NetCDF OceanSITES file._
 
-Binary programs under Windows and Linux are available from the depot under release:
+Binary programs under Windows and Linux and Mac OSX are available from the depot under release:
 
 https://github.com/jgrelet/oceano2oceansites/releases
 
-See installation for OS:
+See installation from sources for OS:
 
 * [Windows](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md)
 * [Linux](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md)
