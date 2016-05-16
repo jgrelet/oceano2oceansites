@@ -6,7 +6,7 @@ Binary programs under Windows, Linux and Mac OSX are available from the depot un
 
 https://github.com/jgrelet/oceano2oceansites/releases
 
-See installation from sources for OS:
+You can get the latest version by compiling it from the sources for the following OS:
 
 * [Windows](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md)
 * [Linux](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md)
