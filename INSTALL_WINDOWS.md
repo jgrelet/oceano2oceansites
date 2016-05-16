@@ -66,7 +66,7 @@ gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
 ````
 $ go get github.com/fhs/go-netcdf/netcdf
 ````
-_Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html_
+_Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html#pkg-config
 
 A faster implementation is to change these cgo directives in `dataset.go` and `attribute.go` files before compilation
 
