@@ -2,16 +2,20 @@ TODOS for oceano2oceansites project:
 
 - add env var OCEANO2OCEANSITES for config file .ini  done 22/07/2015
 - rename OCEANO2OCEANSITES to OCEANO2OCEANSITES_INI
+- use toml instead of .ini for configuration file
 - add env var ROSCOP for code_roscop.csv, if not enc var, this file should be
   in GOBIN dir or current dir
 - rename ROSCOP to ROSCOP_CSV
 - check variable in config file (eg DEPTH)
-- add option --all  done 23/07/2015
 - add option --top
-- order parameters in netcdf file  done 24/07/2015
 - extract only station number from seabird header file
 - add filter for PAR, in config file ?
 - display header on console during processing with begin and end date
 - process btl files
 - process all data, one line is one entry in array
+- variable ETDD is needed, panic of not selected in split
+
+DONE:
+- add option --all  done 23/07/2015
+- ordered parameters in netcdf file  done 24/07/2015
 
