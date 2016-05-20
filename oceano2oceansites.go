@@ -8,8 +8,9 @@ import (
 	"os"
 )
 
-const PROGNAME string = "oceano2oceansites"
-const PROGVERSION string = "0.2.1"
+const PROG_NAME string = "oceano2oceansites"
+const PROG_VERSION string = "0.2.2"
+const PROG_DATE string = "05/20/2016"
 
 // use for echo mode
 // Discard is an io.Writer on which all Write calls succeed
@@ -117,7 +118,7 @@ func main() {
 	files, optCfgfile := GetOptions()
 
 	// test if output directories exists and create them if not
-	mkdir()
+	mkOutputDir()
 
 	// read the first file and try to find the instrument type, return a bit mask
 	typeInstrument = AnalyseFirstFile(files)

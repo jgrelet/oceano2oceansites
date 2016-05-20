@@ -168,7 +168,9 @@ func (nc *Nc) InitVariables(dimx int, dimy int) {
 	// initialize 2D data
 	nc.Variables_2D = make(AllData_2D)
 	for physicalParameter, _ := range map_var {
-		nc.Variables_2D.NewData_2D(physicalParameter, dimx, dimy)
+		fmt.Printf("Initialize 2D var: %v\n", physicalParameter)
+		fillValue := nc.Roscop.GetAttributesValue(physicalParameter, "_FillValue")
+		nc.Variables_2D.NewData_2D(physicalParameter, fillValue, dimx, dimy)
 	}
 }
 

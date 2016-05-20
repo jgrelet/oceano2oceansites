@@ -14,6 +14,8 @@ TODOS for oceano2oceansites project:
 - process btl files
 - process all data, one line is one entry in array
 - variable ETDD is needed, panic of not selected in split
+- add roscop_test
+- add default code_roscop.go file
 
 DONE:
 - add option --all  done 23/07/2015

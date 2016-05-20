@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -46,13 +47,27 @@ type Time struct {
 // initialize a slice with 2 dimensions to store data
 // It should be notice that this table has two dimensions allows to write
 // data straightforward, it will then be flatten to write netcdf file
-func (mp AllData_2D) NewData_2D(name string, width, height int) *AllData_2D {
+func (mp AllData_2D) NewData_2D(name string, fillValue interface{}, width, height int) *AllData_2D {
+	var fv float64
 	mt := new(Data_2D)
 	mt.data = make([][]float64, width)
+
+	// convert fillValue interface to float64
+	switch fillValue.(type) {
+	case int32:
+		fv = float64(fillValue.(int32))
+	case float32:
+		fv = float64(fillValue.(float32))
+	case float64:
+		fv = float64(fillValue.(float64))
+	default:
+		log.Fatal(fmt.Sprintf("netcdf: create 2D slice error filled %s with fillValue: %v\n", name, fillValue))
+	}
+
 	for i := range mt.data {
 		mt.data[i] = make([]float64, height)
 		for j := range mt.data[i] {
-			mt.data[i][j] = 1e36
+			mt.data[i][j] = fv
 		}
 	}
 	mp[name] = *mt
@@ -219,7 +234,7 @@ func toFixed(num float64, precision int) float64 {
 	return float64(round(num*output)) / output
 }
 
-func mkdir() {
+func mkOutputDir() {
 	if _, err := os.Stat("ascii"); os.IsNotExist(err) {
 		os.Mkdir("."+string(filepath.Separator)+"ascii", 0777)
 	}
