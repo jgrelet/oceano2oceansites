@@ -44,6 +44,14 @@ type Time struct {
 	nsec int64 // the number of seconds elapsed since January 1, 1970 UTC
 }
 
+// matrix used to store profils
+type Data_2D struct {
+	data [][]float64
+}
+
+// map used a matrix for each parameters
+type AllData_2D map[string]Data_2D
+
 // initialize a slice with 2 dimensions to store data
 // It should be notice that this table has two dimensions allows to write
 // data straightforward, it will then be flatten to write netcdf file

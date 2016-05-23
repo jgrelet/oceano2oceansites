@@ -45,14 +45,6 @@ var data = make(map[string]interface{})
 var hdr []string
 var cfg Config
 
-// matrix used to store profils
-type Data_2D struct {
-	data [][]float64
-}
-
-// map used a matrix for each parameters
-type AllData_2D map[string]Data_2D
-
 // the representation in memory of a data set is similar to
 // that of a netcdf file
 type Nc struct {
