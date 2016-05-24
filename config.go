@@ -190,6 +190,6 @@ func (nc *Nc) InitVariables(dimx int, dimy int) {
 
 // return an ordered list of parameters
 func (nc *Nc) GetPhysicalParametersList() []string {
-	hdr = append([]string{"PROFILE", "TIME", "LATITUDE", "LONGITUDE", "BATH", "TYPECAST"}, hdr...)
-	return hdr
+	r := append([]string{"PROFILE", "TIME", "LATITUDE", "LONGITUDE", "BATH", "TYPECAST"}, hdr...)
+	return r
 }
