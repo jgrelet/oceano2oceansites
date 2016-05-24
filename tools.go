@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
+	_ "log"
 	"math"
 	"os"
 	"path/filepath"
@@ -44,6 +44,7 @@ type Time struct {
 	nsec int64 // the number of seconds elapsed since January 1, 1970 UTC
 }
 
+/*
 // matrix used to store profils
 type Data_2D struct {
 	data [][]float64
@@ -81,7 +82,7 @@ func (mp AllData_2D) NewData_2D(name string, fillValue interface{}, width, heigh
 	mp[name] = *mt
 	return &mp
 }
-
+*/
 // construct time object from a string date
 func NewTimeFromString(format, value string) *Time {
 	t, _ := time.Parse(format, value)
@@ -205,6 +206,8 @@ func ones(size int) []float64 {
 	}
 	return m
 }
+
+/*
 func fillSlice(size int, value float64) []float64 {
 	m := make([]float64, size)
 	for i, _ := range m {
@@ -219,6 +222,7 @@ func fillSliceInt32(size int, value int32) []float64 {
 	}
 	return m
 }
+*/
 
 // I'm just starting in Go and found it surprising that it has neither a
 // "toFixed" function (as in JavaScript), which would accomplish what you want,

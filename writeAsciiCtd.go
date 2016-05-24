@@ -83,11 +83,11 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 	// get data (slices) from nc struct
 	len_1D := nc.Dimensions["TIME"]
 	len_2D := nc.Dimensions["DEPTH"]
-	time := nc.Variables_1D["TIME"].([]float64)
-	lat := nc.Variables_1D["LATITUDE"].([]float64)
-	lon := nc.Variables_1D["LONGITUDE"].([]float64)
-	profile := nc.Variables_1D["PROFILE"].([]float64)
-	bath := nc.Variables_1D["BATH"].([]float64)
+	time := nc.Variables.flatten("TIME")
+	lat := nc.Variables.flatten("LATITUDE")
+	lon := nc.Variables.flatten("LONGITUDE")
+	profile := nc.Variables.flatten("PROFILE")
+	bath := nc.Variables.flatten("BATH")
 
 	// loop over each profile
 	for x := 0; x < len_1D; x++ {
@@ -132,7 +132,7 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 		// loop over each level
 		for y := 0; y < len_2D; y++ {
 			// goto next profile when max depth reach
-			if nc.Variables_2D["PRES"].data[x][y] >=
+			if nc.Variables.get("PRES", x, y).(float64) >=
 				nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile[x]))] {
 				continue
 			}
@@ -140,9 +140,9 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 			// loop over each physical parameter (key) in the rigth order
 			for _, key := range hdr {
 				// if key not in map, goto next key
-				if _, ok := nc.Variables_2D[key]; ok {
+				if _, ok := nc.Variables[key]; ok {
 					// fill 2D slice
-					data := nc.Variables_2D[key].data[x][y]
+					data := nc.Variables.get(key, x, y)
 					// print data with it's format, change format for FillValue
 					if data == 1e36 {
 						fmt.Fprintf(fbuf_ascii, "%g ", data)

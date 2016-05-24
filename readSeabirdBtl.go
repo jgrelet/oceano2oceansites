@@ -129,7 +129,7 @@ func (nc *Btl) secondPass(files []string) {
 					//					t1 := NewTimeFromJulian(v)
 					y, _ := strconv.ParseFloat(year, 64)
 					t2 := NewTimeFromJulianDay(y, t)
-					nc.Variables_1D["TIME"] = append(nc.Variables_1D["TIME"].([]float64),
+					nc.Variables["TIME"] = append(nc.Variables["TIME"].([]float64),
 						t2.JulianDayOfYear())
 					//p(t2.JulianDayOfYear())
 				}

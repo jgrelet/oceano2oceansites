@@ -52,9 +52,10 @@ type Nc struct {
 	Dimensions map[string]int
 
 	// store one dimension variables (eg: TIME, LATITUDE, ...)
-	Variables_1D map[string]interface{}
+	//Variables_1D map[string]interface{}
 	// store two dimensions variables (eg: PRES, DEPTH, TEMP, ...)
-	Variables_2D AllData_2D
+	//Variables_2D AllData_2D
+	Variables Matrix
 	// store global attributes
 	Attributes map[string]string
 

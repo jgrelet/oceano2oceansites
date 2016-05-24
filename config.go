@@ -57,14 +57,11 @@ func (nc *Nc) GetConfig(configFile string) {
 	// define map from netcdf structure
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
+	nc.Variables = make(Matrix)
 	nc.Extras_f = make(map[string]float64)
 	nc.Extras_s = make(map[string]string)
-	nc.Variables_1D = make(map[string]interface{})
 
 	nc.Roscop = NewRoscop(code_roscop)
-
-	// add some global attributes for profile, change in future
-	nc.Attributes["data_type"] = "OceanSITES profile data"
 
 	err := gcfg.ReadFileInto(&cfg, configFile)
 	if err == nil {
@@ -146,34 +143,53 @@ func (nc *Nc) InitVariables(dimx int, dimy int) {
 	v := nc.Roscop.GetAttributesValue("PROFILE", "_FillValue").(int32)
 	fmt.Fprintln(debug, "\nInitVariables():\n--------------")
 	fmt.Fprintf(debug, "PROFILE with: %v (%T)\n", reflect.ValueOf(v), v)
-	nc.Variables_1D["PROFILE"] = fillSliceInt32(dimx, v)
+	//nc.Variables_1D["PROFILE"] = fillSliceInt32(dimx, v)
+	nc.Variables.NewMatrix("PROFILE", float64(v), dimx)
 
 	y := nc.Roscop.GetAttributesValue("TIME", "valid_min").(float64)
 	fmt.Fprintf(debug, "TIME with: %v (%T)\n", reflect.ValueOf(y), y)
-	nc.Variables_1D["TIME"] = fillSlice(dimx, y)
+	//nc.Variables_1D["TIME"] = fillSlice(dimx, y)
+	nc.Variables.NewMatrix("TIME", float64(y), dimx)
 
-	fmt.Fprintf(debug, "LATITUDE with: %v (%T)\n", 0, 0)
-	nc.Variables_1D["LATITUDE"] = fillSlice(dimx, 0) // need to be verify
-	fmt.Fprintf(debug, "LONGITUDE with: %v (%T)\n", 0, 0)
-	nc.Variables_1D["LONGITUDE"] = fillSlice(dimx, 0)
+	x := nc.Roscop.GetAttributesValue("LATITUDE", "_FillValue").(float32)
+	//nc.Variables_1D["LATITUDE"] = fillSlice(dimx, 0) // need to be verify
+	nc.Variables.NewMatrix("LATITUDE", float64(y), dimx)
 
-	x := nc.Roscop.GetAttributesValue("BATH", "_FillValue").(float32)
+	x = nc.Roscop.GetAttributesValue("LONGITUDE", "_FillValue").(float32)
+	//nc.Variables_1D["LONGITUDE"] = fillSlice(dimx, 0)
+	nc.Variables.NewMatrix("LONGITUDE", float64(y), dimx)
+
+	x = nc.Roscop.GetAttributesValue("BATH", "_FillValue").(float32)
 	fmt.Fprintf(debug, "BATH with: %v (%T)\n", reflect.ValueOf(x), x)
-	nc.Variables_1D["BATH"] = fillSlice(dimx, float64(x))
+	//nc.Variables_1D["BATH"] = fillSlice(dimx, float64(x))
+	nc.Variables.NewMatrix("BATH", float64(x), dimx)
 
 	v = nc.Roscop.GetAttributesValue("TYPECAST", "_FillValue").(int32)
 	fmt.Fprintf(debug, "TYPECAST with: %v (%T)\n", reflect.ValueOf(v), v)
-	nc.Variables_1D["TYPECAST"] = fillSliceInt32(dimx, v)
+	//nc.Variables_1D["TYPECAST"] = fillSliceInt32(dimx, v)
+	nc.Variables.NewMatrix("TYPECAST", float64(v), dimx)
 
 	// initialize 2D data
-	nc.Variables_2D = make(AllData_2D)
+	//nc.Variables_2D = make(AllData_2D)
 	for physicalParameter, _ := range map_var {
-		fmt.Printf("Initialize 2D var: %v\n", physicalParameter)
-		fillValue := nc.Roscop.GetAttributesValue(physicalParameter, "_FillValue")
-		nc.Variables_2D.NewData_2D(physicalParameter, fillValue, dimx, dimy)
+		// fmt.Printf("Initialize 2D var: %v\n", physicalParameter)
+		fv := nc.Roscop.GetAttributesValue(physicalParameter, "_FillValue")
+		switch fv.(type) {
+		case int32:
+			nc.Variables.NewMatrix(physicalParameter, float64(fv.(int32)), dimx, dimy)
+		case float32:
+			nc.Variables.NewMatrix(physicalParameter, float64(fv.(float32)), dimx, dimy)
+		case float64:
+			nc.Variables.NewMatrix(physicalParameter, float64(fv.(float64)), dimx, dimy)
+		default:
+			// todos !!!
+		}
+
 	}
 }
 
+// return an ordered list of parameters
 func (nc *Nc) GetPhysicalParametersList() []string {
+	hdr = append([]string{"PROFILE", "TIME", "LATITUDE", "LONGITUDE", "BATH", "TYPECAST"}, hdr...)
 	return hdr
 }

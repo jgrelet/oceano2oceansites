@@ -45,18 +45,20 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 		// create new Time object, see tools.go
 		var t = NewTimeFromString("Jan 02 2006 15:04:05", value)
 		v := t.Time2JulianDec()
-		nc.Variables_1D["TIME"].([]float64)[nbProfile] = v
+		nc.Variables.set("TIME", v, nbProfile)
 	}
 	match = regNmeaLatitude.MatchString(str)
 	if match {
 		if v, err := Position2Decimal(str); err == nil {
-			nc.Variables_1D["LATITUDE"].([]float64)[nbProfile] = v
+			//nc.Variables_1D["LATITUDE"].([]float64)[nbProfile] = v
+			nc.Variables.set("LATITUDE", v, nbProfile)
 		}
 	}
 	match = regNmeaLongitude.MatchString(str)
 	if match {
 		if v, err := Position2Decimal(str); err == nil {
-			nc.Variables_1D["LONGITUDE"].([]float64)[nbProfile] = v
+			//nc.Variables_1D["LONGITUDE"].([]float64)[nbProfile] = v
+			nc.Variables.set("LONGITUDE", v, nbProfile)
 		}
 	}
 	match = regCruise.MatchString(str)
@@ -88,7 +90,9 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 			//			if p != v {
 			//				fmt.Printf("Warning: profile for header differ from file name: %s <=> %s\n", p, v)
 			//			}
-			nc.Variables_1D["PROFILE"].([]float64)[nbProfile] = profile
+			//nc.Variables_1D["PROFILE"].([]float64)[nbProfile] = profile
+			nc.Variables.set("PROFILE", profile, nbProfile)
+
 		}
 	}
 	match = regBottomDepth.MatchString(str)
@@ -97,7 +101,8 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
 			fmt.Fprintf(debug, "Bath: %f\n", v)
-			nc.Variables_1D["BATH"].([]float64)[nbProfile] = v
+			// nc.Variables_1D["BATH"].([]float64)[nbProfile] = v
+			nc.Variables.set("BATH", v, nbProfile)
 		}
 	}
 	match = regOperator.MatchString(str)
@@ -125,7 +130,8 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 			v = float64(UNKNOW)
 		}
 		//f("Type: %f\n", v)
-		nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
+		//nc.Variables_1D["TYPECAST"] = append(nc.Variables_1D["TYPECAST"].([]float64), v)
+		nc.Variables.set("TYPECAST", v, nbProfile)
 
 		if *optDebug {
 			fmt.Println(value)
@@ -296,7 +302,8 @@ func (nc *Ctd) secondPass(files []string) {
 					for _, key := range hdr {
 						if key != "PRFL" {
 							//fmt.Println("Line: ", line, "key: ", key, " data: ", data[key])
-							nc.Variables_2D[key].data[nbProfile][line] = data[key].(float64)
+							//nc.Variables_2D[key].data[nbProfile][line] = data[key].(float64)
+							nc.Variables.set(key, data[key].(float64), nbProfile, line)
 						}
 					}
 					// exit loop if reach maximum pressure for the profile
@@ -322,7 +329,7 @@ func (nc *Ctd) secondPass(files []string) {
 		nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
 		//fmt.Println(presMax)
 	}
-	fmt.Fprintln(debug, nc.Variables_1D["PROFILE"])
+	fmt.Fprintln(debug, nc.Variables.get("PROFILE"))
 }
 
 // read cnv files in two pass, the first pass to get dimensions
