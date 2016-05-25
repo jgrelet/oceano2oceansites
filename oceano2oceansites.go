@@ -55,7 +55,7 @@ type Nc struct {
 	//Variables_1D map[string]interface{}
 	// store two dimensions variables (eg: PRES, DEPTH, TEMP, ...)
 	//Variables_2D AllData_2D
-	Variables Matrix
+	Variables matrix
 	// store global attributes
 	Attributes map[string]string
 

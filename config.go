@@ -57,7 +57,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	// define map from netcdf structure
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
-	nc.Variables = make(Matrix)
+	nc.Variables = make(matrix)
 	nc.Extras_f = make(map[string]float64)
 	nc.Extras_s = make(map[string]string)
 

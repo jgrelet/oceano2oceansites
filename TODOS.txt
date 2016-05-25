@@ -16,8 +16,11 @@ TODOS for oceano2oceansites project:
 - variable ETDD is needed, panic of not selected in split
 - add roscop_test
 - add default code_roscop.go file
+- add test matrix
+- add map_var, map_format and hdr to a composit struct 
 
 DONE:
 - add option --all  done 23/07/2015
 - ordered parameters in netcdf file  done 24/07/2015
+- use generic matrix receiver for all variables (one or two dimension)
 
