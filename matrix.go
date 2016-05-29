@@ -101,7 +101,7 @@ func (m matrix) getDim(key string) (x int, y int) {
 		x = len(r)
 		y = len(r[0])
 	default:
-		log.Fatalf("matrix.getToArray: unknow type %T", m[key])
+		log.Fatalf("matrix.getDim: unknow type %T", m[key])
 	}
 	return int(x), int(y)
 }
@@ -117,7 +117,7 @@ func (m matrix) printInfo(key string) (s string) {
 		y := len(r[0])
 		s = fmt.Sprintf("writing %s: %d x %d\n", key, x, y)
 	default:
-		log.Fatalf("matrix.getInfo: unknow type %T", m[key])
+		log.Fatalf("matrix.printInfo: unknow type %T", m[key])
 	}
 	return s
 }
@@ -145,7 +145,7 @@ func (m matrix) flatten(key string) (value []float64) {
 		}
 		value = v
 	default:
-		log.Fatalf("matrix.getToArray: unknow type %T", m[key])
+		log.Fatalf("matrix.flatten: unknow type %T", m[key])
 	}
 	return value
 }
