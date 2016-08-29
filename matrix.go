@@ -8,6 +8,7 @@ import (
 // map used a matrix for each parameters
 type matrix map[string]interface{}
 
+// NewMatrix returns a new matrix with the given name and size.
 func (m matrix) NewMatrix(name string, fillValue float64, size ...int) *matrix {
 	switch len(size) {
 	case 1:
