@@ -1,5 +1,7 @@
 package main
 
+// build arg: -i -ldflags "-linkmode external -extldflags -Wl,-Bstatic"
+
 import (
 	"fmt"
 	"io"
