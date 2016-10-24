@@ -2,15 +2,16 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/gcfg.v1"
-	"testing"
 )
 
 func TestConfig(t *testing.T) {
 	assert := assert.New(t)
 
-	err := gcfg.ReadFileInto(&cfg, "cassiopee.ini")
+	err := gcfg.ReadFileInto(&cfg, "cassiopee.toml")
 
 	// test if file exist
 	assert.Nil(err)
