@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.7
+  - 1.7.3
   - tip
 os:
   - linux
@@ -27,13 +27,13 @@ script:
   - oceano2oceansites -v
   - oceano2oceansites -e --files=data/csp/csp*.cnv
   - ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_CASSIOPEE_CTD.nc
-  - oceano2oceansites -d --config=fr25.ini --files=data/fr25/fr2599?.cnv
+  - oceano2oceansites -d --config=fr25.toml --files=data/fr25/fr2599?.cnv
   - ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_PIRATA-FR25_CTD.nc
 
 after_success:    
   - ls -la
   - curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/
-  - curl -T "{oceano2oceansites.ini,cassiopee.ini,fr25.ini}" ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/
+  - curl -T "{oceano2oceansites.toml,cassiopee.toml,fr25.toml}" ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/
   - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T /usr/lib/libnetcdf.so.6 ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/netcdf/lib/libnetcdf.7.dylib ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/szip/lib/libsz.2.dylib  ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/US191/$TRAVIS_OS_NAME/; fi

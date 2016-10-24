@@ -28,7 +28,7 @@ var p = fmt.Println
 var f = fmt.Printf
 
 // default configuration file
-var cfgname string = "oceano2oceansites.ini"
+var cfgname string = "oceano2oceansites.toml"
 
 // default physical parameters file definition is embeded in code_roscop.go
 var code_roscop string = "roscop/code_roscop.csv"
