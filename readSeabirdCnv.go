@@ -149,6 +149,7 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 
 	fmt.Fprintln(debug, "GetProfileNumber():\n--------------")
 	reg := fmt.Sprintf("%s(\\d{%d})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
+	p(reg)
 	res := regexp.MustCompile(reg)
 	match := res.MatchString(str)
 	if match {
@@ -158,7 +159,7 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 			// get profile name, eg: csp00101
 			nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(value))] = t[1]
 		} else {
-			log.Fatal(fmt.Sprintf("Error func GetProfileNumber: ", err))
+			log.Fatal(fmt.Sprintf("Error func GetProfileNumber: %s, var: %v", err, t[1]))
 		}
 
 	} else {

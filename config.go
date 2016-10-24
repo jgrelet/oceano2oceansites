@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	_ "log"
+	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -65,8 +65,7 @@ func (nc *Nc) GetConfig(configFile string) {
 
 	//  read config file
 	if _, err := toml.DecodeFile(configFile, &cfg); err != nil {
-		p(err)
-		return
+		log.Fatal(fmt.Sprintf("Error func GetConfig: file= %s -> %s\n", configFile, err))
 	}
 	switch typeInstrument {
 	case CTD:
@@ -81,8 +80,6 @@ func (nc *Nc) GetConfig(configFile string) {
 
 	}
 
-	//		cruisePrefix = cfg.Ctd.CruisePrefix
-	//		stationPrefixLength = cfg.Ctd.StationPrefixLength
 	// TODOS: complete
 	nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
 	nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
