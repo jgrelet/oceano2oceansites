@@ -149,7 +149,6 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 
 	fmt.Fprintln(debug, "GetProfileNumber():\n--------------")
 	reg := fmt.Sprintf("%s(\\d{%d})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
-	p(reg)
 	res := regexp.MustCompile(reg)
 	match := res.MatchString(str)
 	if match {
