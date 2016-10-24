@@ -29,6 +29,6 @@ typeInstrument   = "SBE32 standard 12 Niskin bottles"
 instrumentNumber = "unknown"
 titleSummary   = "Water sample during PIRATA-FR25 cruise with 11 levels"
 comment        = "CTD bottles water sampling with temperature, salinity and oxygen from primary and secondary sensors"
-split = BOTL,1,month,2,day,3,year,4,PSA1,5,PSA2,6,DO11,7,DO21,8,DO12,9,DO22,10,Potemp090C,11,Potemp190C,12,ETDD,13,PRES,14,DEPTH,15,TE01,16,TE02,17,CND1,18,CND2,19,DOV1,20,DOV2,21,DVT1,22,DVT2,23,FLU2,24"
+split = "BOTL,1,month,2,day,3,year,4,PSA1,5,PSA2,6,DO11,7,DO21,8,DO12,9,DO22,10,Potemp090C,11,Potemp190C,12,ETDD,13,PRES,14,DEPTH,15,TE01,16,TE02,17,CND1,18,CND2,19,DOV1,20,DOV2,21,DVT1,22,DVT2,23,FLU2,24"
 
 
