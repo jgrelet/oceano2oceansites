@@ -177,9 +177,9 @@ func DecimalPosition2String(position float64, hemi int) string {
 	min := tmp
 
 	if hemi == 1 {
-		return fmt.Sprintf("%03d°%06.3f %c", deg, min, geo)
+		return fmt.Sprintf("%03d%s%06.3f %c", deg, "\u00B0", min, geo)
 	} else {
-		return fmt.Sprintf("%02d°%06.3f %c", deg, min, geo)
+		return fmt.Sprintf("%02d%s%06.3f %c", deg, "\u00B0", min, geo)
 	}
 }
 

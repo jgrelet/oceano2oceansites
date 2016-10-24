@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
+	_ "log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 
-	"gopkg.in/gcfg.v1"
+	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
@@ -63,41 +63,38 @@ func (nc *Nc) GetConfig(configFile string) {
 
 	nc.Roscop = NewRoscop(code_roscop)
 
-	err := gcfg.ReadFileInto(&cfg, configFile)
-	if err == nil {
-		switch typeInstrument {
-		case CTD:
-			split = cfg.Ctd.Split
-			splitAll = cfg.Ctd.SplitAll
-		case BTL:
-			split = cfg.Btl.Split
-		default:
-			fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
-			fmt.Println("Exiting...")
-			os.Exit(0)
-
-		}
-
-		//		cruisePrefix = cfg.Ctd.CruisePrefix
-		//		stationPrefixLength = cfg.Ctd.StationPrefixLength
-		// TODOS: complete
-		nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
-		nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
-		nc.Attributes["callsign"] = cfg.Cruise.Callsign
-		nc.Attributes["institute"] = cfg.Cruise.Institute
-		nc.Attributes["pi"] = cfg.Cruise.Pi
-		nc.Attributes["timezone"] = cfg.Cruise.Timezone
-		nc.Attributes["begin_date"] = cfg.Cruise.BeginDate
-		nc.Attributes["end_date"] = cfg.Cruise.EndDate
-		nc.Attributes["creator"] = cfg.Cruise.Creator
-		nc.Attributes["type_instrument"] = cfg.Ctd.TypeInstrument
-		nc.Attributes["instrument_number"] = cfg.Ctd.InstrumentNumber
-
-	} else {
-		fmt.Println("function GetConfig error:")
-		fmt.Printf("Please, check location for %s file\n", configFile)
-		log.Fatal(err)
+	//  read config file
+	if _, err := toml.DecodeFile(configFile, &cfg); err != nil {
+		p(err)
+		return
 	}
+	switch typeInstrument {
+	case CTD:
+		split = cfg.Ctd.Split
+		splitAll = cfg.Ctd.SplitAll
+	case BTL:
+		split = cfg.Btl.Split
+	default:
+		fmt.Printf("main: invalide option typeInstrument -> %d\n", typeInstrument)
+		fmt.Println("Exiting...")
+		os.Exit(0)
+
+	}
+
+	//		cruisePrefix = cfg.Ctd.CruisePrefix
+	//		stationPrefixLength = cfg.Ctd.StationPrefixLength
+	// TODOS: complete
+	nc.Attributes["cycle_mesure"] = cfg.Cruise.CycleMesure
+	nc.Attributes["plateforme"] = cfg.Cruise.Plateforme
+	nc.Attributes["callsign"] = cfg.Cruise.Callsign
+	nc.Attributes["institute"] = cfg.Cruise.Institute
+	nc.Attributes["pi"] = cfg.Cruise.Pi
+	nc.Attributes["timezone"] = cfg.Cruise.Timezone
+	nc.Attributes["begin_date"] = cfg.Cruise.BeginDate
+	nc.Attributes["end_date"] = cfg.Cruise.EndDate
+	nc.Attributes["creator"] = cfg.Cruise.Creator
+	nc.Attributes["type_instrument"] = cfg.Ctd.TypeInstrument
+	nc.Attributes["instrument_number"] = cfg.Ctd.InstrumentNumber
 
 	// add specific column(s) to the first header line in ascii file
 	switch typeInstrument {
