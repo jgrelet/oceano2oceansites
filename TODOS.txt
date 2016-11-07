@@ -1,11 +1,19 @@
 TODOS for oceano2oceansites project:
 
+DONE:
 - add env var OCEANO2OCEANSITES for config file .ini  done 22/07/2015
-- rename OCEANO2OCEANSITES to OCEANO2OCEANSITES_INI
-- use toml instead of .ini for configuration file
-- add env var ROSCOP for code_roscop.csv, if not enc var, this file should be
+- rename OCEANO2OCEANSITES to OCEANO2OCEANSITES_INI done
+- rename ROSCOP to ROSCOP_CSV  done
+- add option --all  done 23/07/2015
+- ordered parameters in netcdf file  done 24/07/2015
+- use generic matrix receiver for all variables (one or two dimension)
+- use toml instead of .ini for configuration file done 24/10/2016
+
+TODOS:
+- add env var ROSCOP for code_roscop.csv, if not env var, this file should be
   in GOBIN dir or current dir
-- rename ROSCOP to ROSCOP_CSV
+- add env var setting in travis file and test it
+- rename OCEANO2OCEANSITES_INI to OCEANO2OCEANSITES_CFG
 - check variable in config file (eg DEPTH)
 - add option --top
 - extract only station number from seabird header file
@@ -19,8 +27,4 @@ TODOS for oceano2oceansites project:
 - add test matrix
 - add map_var, map_format and hdr to a composit struct 
 
-DONE:
-- add option --all  done 23/07/2015
-- ordered parameters in netcdf file  done 24/07/2015
-- use generic matrix receiver for all variables (one or two dimension)
 
