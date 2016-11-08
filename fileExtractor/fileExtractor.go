@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
+// define new slice type for trajectory, profile and timeSerie
 type data map[string][]float64
-type value map[string][][]float64
+type profile map[string][][]float64
+type trajectory data
+type timeSerie data
 
 // FileExtractOptions contains configurable options used to read an ASCII file.
 type FileExtractOptions struct {
-
-	// filename to read and decode, may contain wildcards if multiple files to read
-	filename string
 
 	// map with physical parameter as key and the column number position as value
 	// the order of keys is used to defined the header
@@ -39,9 +39,8 @@ type FileExtractOptions struct {
 
 // NewFileExtractOptions will create a new FileExtractOptions type with some
 // empty default values.
-func NewFileExtractOptions(filename string) *FileExtractOptions {
+func NewFileExtractOptions() *FileExtractOptions {
 	o := &FileExtractOptions{
-		filename:     filename,
 		hdr:          []string{},
 		varsList:     map[string]int{},
 		separator:    "",
@@ -49,17 +48,6 @@ func NewFileExtractOptions(filename string) *FileExtractOptions {
 		hdrDelimiter: "",
 	}
 	return o
-}
-
-// SetFilename defines the list of files containing data to read and decode
-func (o *FileExtractOptions) SetFilename(filename string) *FileExtractOptions {
-	o.filename = filename
-	return o
-}
-
-// Filename will get the file list (getter)
-func (o *FileExtractOptions) Filename() string {
-	return o.filename
 }
 
 // SetVars will set the parameters and their columns to extract from file
@@ -109,8 +97,8 @@ func (o *FileExtractOptions) SetHdrDelimiter(delimiter string) *FileExtractOptio
 
 // display FileExtractOptions object
 func (o FileExtractOptions) String() string {
-	return fmt.Sprintf("File: %s\nFields:%s\nVars: %v\nSkipLine: %d\nHdr delimiter: %s",
-		o.filename, o.hdr, o.varsList, o.skipLine, o.hdrDelimiter)
+	return fmt.Sprintf("FileExtractOptions:\nFields:%s\nVars: %v\nSkipLine: %d\nHdr delimiter: %s",
+		o.hdr, o.varsList, o.skipLine, o.hdrDelimiter)
 }
 
 // FileExtractor contains FileExtractOptions object and map data extracted from ASCII file.
@@ -149,9 +137,9 @@ func (fe FileExtractor) Length() int {
 }
 
 // Read an ASCII file and extract data and save then to map data
-func (ext *FileExtractor) Read() (err error) {
+func (ext *FileExtractor) Read(filename string) (err error) {
 
-	fid, err := os.Open(ext.filename)
+	fid, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
@@ -218,44 +206,108 @@ func (fe *FileExtractor) Data() data {
 // print the result
 func (ext FileExtractor) String() string {
 	var s []string
+
+	s = append(s, "FileExtractor:\n")
 	for key, _ := range ext.varsList {
 		s = append(s, fmt.Sprintf("\n%s: %7.3f", key, ext.data[key]))
 	}
 	return strings.Join(s, "")
 }
 
-type FilesExtractor struct {
+type ProfilesExtractor struct {
 
 	// may contain wildcards if multiple files to read
 	fileNames []string
 
 	//FileExtractor
+	fileExtractor FileExtractor
 
-	values value
+	values profile
 }
 
-func NewFilesExtractor(files string) *FilesExtractor {
+func NewProfilesExtractor(files string, fe FileExtractor) *ProfilesExtractor {
 	fs, _ := filepath.Glob(files)
-	return &FilesExtractor{
-		fileNames: fs,
-		values:    make(map[string][][]float64),
+	return &ProfilesExtractor{
+		fileNames:     fs,
+		fileExtractor: fe,
+		values:        make(map[string][][]float64),
 	}
 }
 
 // Len returns the amount of element in the slice.
-func (fe *FilesExtractor) Len() int {
-	return len((fe.values))
+func (fse *ProfilesExtractor) Len() int {
+	return len((fse.values))
 }
 
-func (fe *FilesExtractor) String() string {
-	return fmt.Sprintf("Files: %v\nValues: %v\n", fe.fileNames, fe.values)
-}
+// Read one or multiple ASCII files and extract data
+// add return error
+func (fse *ProfilesExtractor) Read() {
 
-/*
-	for sizex, file = range ext.Files() {
-		fid, err := os.Open(file)
+	for _, fileName := range fse.fileNames {
+
+		err := fse.fileExtractor.Read(fileName)
 		if err != nil {
-			return "", err
+			log.Fatalf("ProfilesExtractor.Read(): %s", err)
 		}
-		defer fid.Close()
-*/
+		for key, data := range fse.fileExtractor.data {
+			fse.values[key] = append(fse.values[key], data)
+		}
+	}
+}
+
+func (fse *ProfilesExtractor) String() string {
+	var s []string
+
+	s = append(s, fmt.Sprintf("ProfilesExtractor:\nFiles: %v\n", fse.fileNames))
+	for key, _ := range fse.values {
+		s = append(s, fmt.Sprintf("%s:%v\n", key, fse.values[key]))
+	}
+	return strings.Join(s, "")
+}
+
+type TrajectoriesExtractor struct {
+
+	// may contain wildcards if multiple files to read
+	fileNames []string
+
+	//FileExtractor
+	fileExtractor FileExtractor
+
+	values trajectory
+}
+
+func NewTrajectoriesExtractor(files string, fe FileExtractor) *TrajectoriesExtractor {
+	fs, _ := filepath.Glob(files)
+	return &TrajectoriesExtractor{
+		fileNames:     fs,
+		fileExtractor: fe,
+		values:        make(map[string][]float64),
+	}
+}
+
+// Read one or multiple ASCII files and extract data
+// add return error
+func (fse *TrajectoriesExtractor) Read() {
+
+	for _, fileName := range fse.fileNames {
+
+		err := fse.fileExtractor.Read(fileName)
+		if err != nil {
+			log.Fatalf("TrajectoriesExtractor.Read(): %s", err)
+		}
+		for key, _ := range fse.fileExtractor.data {
+			// append a slice with the ...
+			fse.values[key] = append(fse.values[key], fse.fileExtractor.data[key]...)
+		}
+	}
+}
+
+func (fse *TrajectoriesExtractor) String() string {
+	var s []string
+
+	s = append(s, fmt.Sprintf("TrajectoriesExtractor:\nFiles: %v\n", fse.fileNames))
+	for key, _ := range fse.values {
+		s = append(s, fmt.Sprintf("%s:%v\n", key, fse.values[key]))
+	}
+	return strings.Join(s, "")
+}

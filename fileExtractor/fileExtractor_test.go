@@ -53,6 +53,7 @@ type tomlConfig struct {
 
 type instrument struct {
 	FileName        string `toml:"fileName"`
+	Type            string `toml:"type"`
 	VarList         string `toml:"varList"`
 	Separator       string `toml:"separator"`
 	PlotNames       string `toml:"plotNames,omitempty"`
@@ -80,8 +81,7 @@ func TestSomething(t *testing.T) {
 // test default empty FileExtractor object
 func TestEmptyFileExtractor(t *testing.T) {
 	assert := assert.New(t)
-	opts := NewFileExtractOptions("")
-	assert.Empty(opts.Filename())
+	opts := NewFileExtractOptions()
 	assert.Empty(opts.VarsList())
 	assert.Empty(opts.hdr)
 	assert.Equal(opts.skipLine, -1)
@@ -89,16 +89,18 @@ func TestEmptyFileExtractor(t *testing.T) {
 
 // fill and test a valid FileExtractor object
 func TestValidFileExtractor(t *testing.T) {
-	assert := assert.New(t)
-	fn := "pirata-fr23_tsg"
-	opts := NewFileExtractOptions(fn)
-	assert.Equal(opts.Filename(), fn)
-	opts.SetVarsList("LATITUDE,3,LONGITUDE,4")
-	assert.Equal(opts.VarsList(), map[string]int{"LATITUDE": 3, "LONGITUDE": 4})
-	assert.Equal(opts.hdr, []string{"LATITUDE", "LONGITUDE"})
-	assert.Len(opts.hdr, 2)
-	opts.SetSkipLine(2)
-	assert.Equal(opts.skipLine, 2)
+	/*
+		assert := assert.New(t)
+		fn := "pirata-fr23_tsg"
+		opts := NewFileExtractOptions()
+		//assert.Equal(opts.Filename(), fn)
+		opts.SetVarsList("LATITUDE,3,LONGITUDE,4")
+		assert.Equal(opts.VarsList(), map[string]int{"LATITUDE": 3, "LONGITUDE": 4})
+		assert.Equal(opts.hdr, []string{"LATITUDE", "LONGITUDE"})
+		assert.Len(opts.hdr, 2)
+		opts.SetSkipLine(2)
+		assert.Equal(opts.skipLine, 2)
+	*/
 }
 
 // read and test valid FileExtractor object from toml file
@@ -108,7 +110,9 @@ func TestFileExtractorFromConfigFile(t *testing.T) {
 	assert := assert.New(t)
 	configFile := "cruise.toml"
 
-	_, err := toml.DecodeFile(configFile, &config)
+	if _, err := toml.DecodeFile(configFile, &config); err != nil {
+		log.Fatal(err)
+	}
 	/*
 		if assert.Error(err, "An error was expected") {
 			assert.Equal(err, "test")
@@ -128,112 +132,90 @@ func TestFileExtractorFromConfigFile(t *testing.T) {
 	// display informations only for debugging
 	//p(debug, config)
 
+	opts := NewFileExtractOptions()
 	// loop over instruments table
 	for device, instrument := range config.Instruments {
-		pf("Instrument: %s (%s, %s)\n", device, instrument.FileName, instrument.VarList)
+		pf("Instrument: %s\n(%s, %s)\n", device, instrument.FileName, instrument.VarList)
 		switch device {
 		case "ctd":
-			// test first if file exist
+			// test first if files exist
 			assert.Equal(instrument.FileName, "test/CTD/dfr2600?.cnv")
+			opts.SetVarsList(instrument.VarList)
+			opts.SetSkipLine(instrument.SkipLine)
+		//opts.SetHdrDelimiter(instrument.HeaderDelimiter)
 
-			fe := NewFilesExtractor(instrument.FileName)
-			for _, fileName := range fe.fileNames {
-				opts := NewFileExtractOptions(fileName)
-				//opts.SetFilename(instrument.FileName)
-				opts.SetVarsList(instrument.VarList)
-				opts.SetSkipLine(instrument.SkipLine)
-				//opts.SetHdrDelimiter(instrument.HeaderDelimiter)
-				ext := NewFileExtractor(opts)
-				err = ext.Read()
-				if err != nil {
-					log.Fatalf("NewFileExtractor(opts).Read() for %s: %s", instrument, err)
-				}
-				//p(ext)
-				//p(i)
-				//p(ext.Data())
-				//p(fe.values["PRES"])
-				p(fe)
-				for key, data := range ext.data {
-					fe.values[key] = append(fe.values[key], data)
-					p(fe)
-				}
-			}
-			/*
-				first := 0
-				last := ext.Length() - 1
-				pres := ext.Data()["PRES"]
-				assert.Equal(2.0, pres[first]) // test the first pressure value
-				assert.Equal(7.0, pres[last])  // test the last pressure value
-				temp := ext.Data()["TEMP"]
-				assert.Equal(24.7241, temp[first])
-				assert.Equal(24.7260, temp[last])
-				psal := ext.Data()["PSAL"]
-				assert.Equal(35.7711, psal[first])
-				assert.Equal(35.7716, psal[last])
-			*/
+		/*
+			first := 0
+			last := ext.Length() - 1
+			pres := ext.Data()["PRES"]
+			assert.Equal(2.0, pres[first]) // test the first pressure value
+			assert.Equal(7.0, pres[last])  // test the last pressure value
+			temp := ext.Data()["TEMP"]
+			assert.Equal(24.7241, temp[first])
+			assert.Equal(24.7260, temp[last])
+			psal := ext.Data()["PSAL"]
+			assert.Equal(35.7711, psal[first])
+			assert.Equal(35.7716, psal[last])
+		*/
 
 		case "btl":
 			assert.Equal(instrument.FileName, "test/CTD/fr26001.btl")
-			opts := NewFileExtractOptions(instrument.FileName)
-			opts.SetFilename(instrument.FileName)
 			opts.SetVarsList(instrument.VarList)
 			opts.SetSkipLine(instrument.SkipLine)
 			/*
-				ext := NewFileExtractor(opts)
-					err = ext.Read()
-					if err != nil {
-						log.Fatalf("NewFileExtractor(opts).Read() for %s: %s", instrument, err)
-					}
-					size := ext.Size() - 1
-					btl := ext.Data()["BOTL"]
-					assert.Equal(btl[0], 1.0)     // test the first pressure value
-					assert.Equal(btl[size], 11.0) // test the last pressure value
-					temp := ext.Data()["TE01"]
-					assert.Equal(temp[0], 3.5048)
-					assert.Equal(temp[size], 3.5048)
-					psal := ext.Data()["PSA1"]
-					assert.Equal(psal[0], 34.9636)
-					assert.Equal(psal[size], 34.9637)
-					fmt.Fprintf(debug, ext)
+				size := ext.Size() - 1
+				btl := ext.Data()["BOTL"]
+				assert.Equal(btl[0], 1.0)     // test the first pressure value
+				assert.Equal(btl[size], 11.0) // test the last pressure value
+				temp := ext.Data()["TE01"]
+				assert.Equal(temp[0], 3.5048)
+				assert.Equal(temp[size], 3.5048)
+				psal := ext.Data()["PSA1"]
+				assert.Equal(psal[0], 34.9636)
+				assert.Equal(psal[size], 34.9637)
+				fmt.Fprintf(debug, ext)
 			*/
 		case "tsg":
 			assert.Equal(instrument.FileName, "test/TSG/20160308-085453-TS_COLCOR.COLCOR")
-			opts := NewFileExtractOptions(instrument.FileName)
-			opts.SetFilename(instrument.FileName)
 			opts.SetVarsList(instrument.VarList)
 			opts.SetSkipLine(instrument.SkipLine)
 			opts.SetSeparator(instrument.Separator)
-			ext := NewFileExtractor(opts)
-			err = ext.Read()
-			if err != nil {
-				log.Fatalf("NewFileExtractor(opts).Read() for %s: %s", instrument, err)
-			}
-			//fmt.Println(ext)
 
 		case "xbt":
 			assert.Equal(instrument.FileName, "test/XBT/T7_00001.EDF")
-			opts := NewFileExtractOptions(instrument.FileName)
-			opts.SetFilename(instrument.FileName)
 			opts.SetVarsList(instrument.VarList)
 			opts.SetSkipLine(instrument.SkipLine)
-			ext := NewFileExtractor(opts)
-			err = ext.Read()
-			if err != nil {
-				log.Fatalf("NewFileExtractor(opts).Read() for %s: %s", instrument, err)
-			}
-			//p(ext)
-			first := 0
-			last := ext.Length() - 1
-			pres := ext.Data()["DEPTH"]
-			assert.Equal(0.0, pres[first]) // test the first pressure value
-			assert.Equal(5.8, pres[last])  // test the last pressure value
-			temp := ext.Data()["TEMP"]
-			assert.Equal(23.32, temp[first])
-			assert.Equal(23.23, temp[last])
-			svel := ext.Data()["SVEL"]
-			assert.Equal(1530.25, svel[first])
-			assert.Equal(1530.10, svel[last])
+			/*
+				first := 0
+				last := ext.Length() - 1
+				pres := ext.Data()["DEPTH"]
+				assert.Equal(0.0, pres[first]) // test the first pressure value
+				assert.Equal(5.8, pres[last])  // test the last pressure value
+				temp := ext.Data()["TEMP"]
+				assert.Equal(23.32, temp[first])
+				assert.Equal(23.23, temp[last])
+				svel := ext.Data()["SVEL"]
+				assert.Equal(1530.25, svel[first])
+				assert.Equal(1530.10, svel[last])
+			*/
 		}
+
+		ext := NewFileExtractor(opts)
+		switch instrument.Type {
+		case "profile":
+			pf := NewProfilesExtractor(instrument.FileName, *ext)
+			pf.Read()
+			p(pf)
+		case "trajectory", "timeSerie":
+			traj := NewTrajectoriesExtractor(instrument.FileName, *ext)
+			traj.Read()
+			p(traj)
+		default:
+			pf("invalid or unknom  data type -> %s\n", instrument.Type)
+			p("Exiting...")
+			os.Exit(0)
+		}
+
 	}
 	assert.Equal(config.Kml.FileName, "pirata-fr26.kml")
 
