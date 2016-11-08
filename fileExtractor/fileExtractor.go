@@ -97,7 +97,7 @@ func (o *FileExtractOptions) SetHdrDelimiter(delimiter string) *FileExtractOptio
 
 // display FileExtractOptions object
 func (o FileExtractOptions) String() string {
-	return fmt.Sprintf("FileExtractOptions:\nFields:%s\nVars: %v\nSkipLine: %d\nHdr delimiter: %s",
+	return fmt.Sprintf("FileExtractOptions:\nFields=%s\nVars=%v\nSkipLine=%d\nHdr delimiter=%s",
 		o.hdr, o.varsList, o.skipLine, o.hdrDelimiter)
 }
 
@@ -209,7 +209,7 @@ func (ext FileExtractor) String() string {
 
 	s = append(s, "FileExtractor:\n")
 	for key, _ := range ext.varsList {
-		s = append(s, fmt.Sprintf("\n%s: %7.3f", key, ext.data[key]))
+		s = append(s, fmt.Sprintf("\n%s=%7.3f", key, ext.data[key]))
 	}
 	return strings.Join(s, "")
 }
@@ -258,9 +258,9 @@ func (fse *ProfilesExtractor) Read() {
 func (fse *ProfilesExtractor) String() string {
 	var s []string
 
-	s = append(s, fmt.Sprintf("ProfilesExtractor:\nFiles: %v\n", fse.fileNames))
+	s = append(s, fmt.Sprintf("ProfilesExtractor:\nFiles= %v\n", fse.fileNames))
 	for key, _ := range fse.values {
-		s = append(s, fmt.Sprintf("%s:%v\n", key, fse.values[key]))
+		s = append(s, fmt.Sprintf("%s=%v\n", key, fse.values[key]))
 	}
 	return strings.Join(s, "")
 }
@@ -305,9 +305,9 @@ func (fse *TrajectoriesExtractor) Read() {
 func (fse *TrajectoriesExtractor) String() string {
 	var s []string
 
-	s = append(s, fmt.Sprintf("TrajectoriesExtractor:\nFiles: %v\n", fse.fileNames))
+	s = append(s, fmt.Sprintf("TrajectoriesExtractor:\nFiles= %v\n", fse.fileNames))
 	for key, _ := range fse.values {
-		s = append(s, fmt.Sprintf("%s:%v\n", key, fse.values[key]))
+		s = append(s, fmt.Sprintf("%s=%v\n", key, fse.values[key]))
 	}
 	return strings.Join(s, "")
 }
