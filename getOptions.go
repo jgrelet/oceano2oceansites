@@ -25,7 +25,7 @@ func GetOptions() ([]string, string) {
 	optHelp := getopt.Bool('h', "help", "Help")
 	optAll = getopt.Bool('a', "all", "Process all parameters")
 	optVersion := getopt.BoolLong("version", 'v', "Show version, then exit.")
-	optCfgfile := getopt.StringLong("config", 'c', cfgname, "use specific configuration .ini file", "oceano2oceansites.ini")
+	optCfgfile := getopt.StringLong("config", 'c', cfgname, "use specific configuration .toml file", "oceano2oceansites.toml")
 	//	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
 	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv", "files")
 	optRoscop := getopt.StringLong("roscop", 'r', code_roscop, "use a specific .csv file for physical parameter ", "code_roscop.csv")
@@ -67,10 +67,18 @@ func GetOptions() ([]string, string) {
 	}
 	// show version and env
 	if *optVersion {
-		fmt.Println(PROG_NAME + ": v" + PROG_VERSION + ", date: " + PROG_DATE)
-		fmt.Printf("Environnement variable:\n")
-		fmt.Printf(" - OCEANO2OCEANSITES_INI: %s\n", os.Getenv("OCEANO2OCEANSITES_INI"))
-		fmt.Printf(" - ROSCOP_CSV: %s\n", os.Getenv("ROSCOP_CSV"))
+		fmt.Println(PROG_NAME + ": v" + PROG_VERSION + ", build date: " + PROG_DATE)
+		fmt.Printf("Environnement variables:\n")
+		v := os.Getenv("OCEANO2OCEANSITES_CFG")
+		if v == "" {
+			v = "not define"
+		}
+		fmt.Printf(" - OCEANO2OCEANSITES_CFG: %s\n", v)
+		r := os.Getenv("ROSCOP_CSV")
+		if r == "" {
+			r = "not define"
+		}
+		fmt.Printf(" - ROSCOP_CSV: %s\n", r)
 		fmt.Printf("Configuration file: %s\n", cfgname)
 		fmt.Printf("Code ROSCOP file: %s\n", code_roscop)
 		fmt.Printf("GOPATH: %s\n", os.Getenv("GOPATH"))
