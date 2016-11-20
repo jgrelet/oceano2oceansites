@@ -151,6 +151,7 @@ func (m matrix) flatten(key string) (value []float64) {
 	return value
 }
 
+// Matrix2int32 convert loat64 ar matrix to int32
 func Matrix2int32(ar []float64) []int32 {
 	newar := make([]int32, len(ar))
 	for i, v := range ar {
@@ -159,6 +160,7 @@ func Matrix2int32(ar []float64) []int32 {
 	return newar
 }
 
+// Matrix2float32 convert matrix to float32
 func Matrix2float32(ar []float64) []float32 {
 	newar := make([]float32, len(ar))
 	for i, v := range ar {

@@ -13,9 +13,10 @@ const (
 	codeForProfile = -1
 )
 
-func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
+// WriteAscii write ascii file
+func (nc *Ctd) WriteAscii(mapFormat map[string]string, hdr []string) {
 	// define 2 files, profiles header and data
-	var asciiFilename string
+	var filename string
 
 	//	if _, err := os.Stat("/path/to/whatever"); err == nil {
 	//		// path/to/whatever exists
@@ -25,29 +26,29 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 	str := nc.Attributes["cycle_mesure"]
 	str = strings.Replace(str, "\r", "", -1)
 	headerFilename := fmt.Sprintf("ascii/%s.ctd", strings.ToLower(str))
-	asciiFilename = fmt.Sprintf("ascii/%s%s_ctd", strings.ToLower(str), prefixAll)
+	filename = fmt.Sprintf("ascii/%s%s_ctd", strings.ToLower(str), prefixAll)
 	//fmt.Println(headerFilename)
-	//fmt.Println(asciiFilename)
+	//fmt.Println(filename)
 
 	// open header file for writing result
-	fid_hdr, err := os.Create(headerFilename)
+	fidHdr, err := os.Create(headerFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer fid_hdr.Close()
+	defer fidHdr.Close()
 
 	// use buffered mode for writing
-	fbuf_hdr := bufio.NewWriter(fid_hdr)
+	fbufHdr := bufio.NewWriter(fidHdr)
 
 	// open ASCII file for writing result
-	fid_ascii, err := os.Create(asciiFilename)
+	fid, err := os.Create(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer fid_ascii.Close()
+	defer fid.Close()
 
 	// use buffered mode for writing
-	fbuf_ascii := bufio.NewWriter(fid_ascii)
+	fbuf := bufio.NewWriter(fid)
 
 	// write header to string
 	str = fmt.Sprintf("%s  %s  %s  %s %s  %s\n",
@@ -59,8 +60,8 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 		nc.Attributes["pi"])
 
 	// write first line header on header file and ascii file
-	fmt.Fprintf(fbuf_hdr, str)
-	fmt.Fprintf(fbuf_ascii, str)
+	fmt.Fprintf(fbufHdr, str)
+	fmt.Fprintf(fbuf, str)
 
 	// display on screen
 	fmt.Printf("%s", str)
@@ -68,21 +69,21 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 	// write physical parameters in second line
 	str = ""
 	for _, key := range hdr {
-		fmt.Fprintf(fbuf_ascii, "%s   ", key)
+		fmt.Fprintf(fbuf, "%s   ", key)
 		fmt.Fprintf(debug, "%s   ", key)
 	}
 	// append new line
 	//fmt.Fprintln(fbuf_ascii, "\n")
 
 	// write second line header on ascii file
-	fmt.Fprintln(fbuf_ascii, str)
+	fmt.Fprintln(fbuf, str)
 
 	// display on screen
 	fmt.Printf("%s", str)
 
 	// get data (slices) from nc struct
-	len_1D := nc.Dimensions["TIME"]
-	len_2D := nc.Dimensions["DEPTH"]
+	len1D := nc.Dimensions["TIME"]
+	len2D := nc.Dimensions["DEPTH"]
 	time := nc.Variables.flatten("TIME")
 	lat := nc.Variables.flatten("LATITUDE")
 	lon := nc.Variables.flatten("LONGITUDE")
@@ -90,13 +91,13 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 	bath := nc.Variables.flatten("BATH")
 
 	// loop over each profile
-	for x := 0; x < len_1D; x++ {
+	for x := 0; x < len1D; x++ {
 		str = ""
 		// write profile informations to ASCII data file with DEPTH = -1
 		t1 := NewTimeFromJulian(time[x])
-		t2 := NewTimeFromJulianDay(nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile[x]))], t1)
+		t2 := NewTimeFromJulianDay(nc.ExtraFloat[fmt.Sprintf("ETDD:%d", int(profile[x]))], t1)
 		// TODOS: adapt profile format to stationPrefixLength
-		fmt.Fprintf(fbuf_ascii, "%05.0f %4d %f %f %f %s",
+		fmt.Fprintf(fbuf, "%05.0f %4d %f %f %f %s",
 			profile[x],
 			codeForProfile,
 			t1.JulianDayOfYear(),
@@ -112,31 +113,31 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 			t2.Format("02/01/2006 15:04:05"),
 			DecimalPosition2String(lat[x], 0),
 			DecimalPosition2String(lon[x], 0),
-			nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile[x]))],
+			nc.ExtraFloat[fmt.Sprintf("DEPTH:%d", int(profile[x]))],
 			bath[x],
-			nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile[x]))],
-			cfg.Ctd.CruisePrefix+nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(profile[x]))])
+			nc.ExtraString[fmt.Sprintf("TYPE:%d", int(profile[x]))],
+			cfg.Ctd.CruisePrefix+nc.ExtraString[fmt.Sprintf("PRFL_NAME:%d", int(profile[x]))])
 
 		// write profile information to header file
-		fmt.Fprintf(fbuf_hdr, str)
+		fmt.Fprintf(fbufHdr, str)
 
 		// display on screen
 		fmt.Printf("%s", str)
 
 		// fill last header columns with 1e36
 		for i := 0; i < len(hdr)-6; i++ {
-			fmt.Fprintf(fbuf_ascii, " %g", 1e36)
+			fmt.Fprintf(fbuf, " %g", 1e36)
 		}
-		fmt.Fprintln(fbuf_ascii) // add newline
+		fmt.Fprintln(fbuf) // add newline
 
 		// loop over each level
-		for y := 0; y < len_2D; y++ {
+		for y := 0; y < len2D; y++ {
 			// goto next profile when max depth reach
 			if nc.Variables.get("PRES", x, y).(float64) >=
-				nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile[x]))] {
+				nc.ExtraFloat[fmt.Sprintf("PRES:%d", int(profile[x]))] {
 				continue
 			}
-			fmt.Fprintf(fbuf_ascii, "%05.0f ", profile[x])
+			fmt.Fprintf(fbuf, "%05.0f ", profile[x])
 			// loop over each physical parameter (key) in the rigth order
 			for _, key := range hdr {
 				// if key not in map, goto next key
@@ -145,16 +146,16 @@ func (nc *Ctd) WriteAscii(map_format map[string]string, hdr []string) {
 					data := nc.Variables.get(key, x, y)
 					// print data with it's format, change format for FillValue
 					if data == 1e36 {
-						fmt.Fprintf(fbuf_ascii, "%g ", data)
+						fmt.Fprintf(fbuf, "%g ", data)
 					} else {
-						fmt.Fprintf(fbuf_ascii, map_format[key]+" ", data)
+						fmt.Fprintf(fbuf, mapFormat[key]+" ", data)
 					}
 				}
 			}
-			fmt.Fprintf(fbuf_ascii, "\n")
+			fmt.Fprintf(fbuf, "\n")
 
 		}
-		fbuf_ascii.Flush()
-		fbuf_hdr.Flush()
+		fbuf.Flush()
+		fbufHdr.Flush()
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// Config is the Go representation of toml file
 type Config struct {
 	Global struct {
 		Author string
@@ -49,6 +50,7 @@ type Config struct {
 	}
 }
 
+// GetConfig give the content of toml configFile
 func (nc *Nc) GetConfig(configFile string) {
 
 	//	var split, header, format string
@@ -58,10 +60,10 @@ func (nc *Nc) GetConfig(configFile string) {
 	nc.Dimensions = make(map[string]int)
 	nc.Attributes = make(map[string]string)
 	nc.Variables = make(matrix)
-	nc.Extras_f = make(map[string]float64)
-	nc.Extras_s = make(map[string]string)
+	nc.ExtraFloat = make(map[string]float64)
+	nc.ExtraString = make(map[string]string)
 
-	nc.Roscop = NewRoscop(code_roscop)
+	nc.Roscop = NewRoscop(codeRoscop)
 
 	//  read config file
 	if _, err := toml.DecodeFile(configFile, &cfg); err != nil {
@@ -117,7 +119,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	// construct header slice from split
 	for i := 0; i < len(fields); i += 2 {
 		if v, err := strconv.Atoi(fields[i+1]); err == nil {
-			map_var[fields[i]] = v - 1
+			mapVar[fields[i]] = v - 1
 			hdr = append(hdr, fields[i])
 		}
 	}
@@ -126,11 +128,12 @@ func (nc *Nc) GetConfig(configFile string) {
 	// fill map_format from code_roscop
 	for _, key := range hdr {
 		// Change this call in next version !!!!
-		map_format[key] = nc.Roscop.m[key]["format"]
+		mapFormat[key] = nc.Roscop.m[key]["format"]
 	}
 	//return nc
 }
 
+// InitVariables within dimensions x and y
 func (nc *Nc) InitVariables(dimx int, dimy int) {
 
 	// initialize map entry from nil interface with _FillValue
@@ -165,7 +168,7 @@ func (nc *Nc) InitVariables(dimx int, dimy int) {
 
 	// initialize 2D data
 	//nc.Variables_2D = make(AllData_2D)
-	for physicalParameter, _ := range map_var {
+	for physicalParameter := range mapVar {
 		// fmt.Printf("Initialize 2D var: %v\n", physicalParameter)
 		fv := nc.Roscop.GetAttributesValue(physicalParameter, "_FillValue")
 		switch fv.(type) {
@@ -182,7 +185,7 @@ func (nc *Nc) InitVariables(dimx int, dimy int) {
 	}
 }
 
-// return an ordered list of parameters
+// GetPhysicalParametersList return an ordered list of parameters
 func (nc *Nc) GetPhysicalParametersList() []string {
 	r := append([]string{"PROFILE", "TIME", "LATITUDE", "LONGITUDE", "BATH", "TYPECAST"}, hdr...)
 	return r

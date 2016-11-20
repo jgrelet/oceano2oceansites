@@ -1,4 +1,4 @@
-// roscop.go
+// Roscop.go
 package main
 
 import (
@@ -12,20 +12,21 @@ import (
 
 type m map[string]map[string]string
 
-// roscop represents the attributes associated with each netCDF variable
-type roscop struct {
+// Roscop represents the attributes associated with each netCDF variable
+type Roscop struct {
 	m
 	physicalParametersOrderedList []string
 	attributesOrderedList         map[string][]string
 	attributesType                map[string]string
 }
 
-// documentation for csv is at http://golang.org/pkg/encoding/csv/
-func NewRoscop(filename string) roscop {
+// NewRoscop read Roscop definition from fileName and return Roscop object
+// read documentation for csv is at http://golang.org/pkg/encoding/csv/
+func NewRoscop(filename string) Roscop {
 
 	// use a map of map to store for each physical parameter a map where keys are
 	// attributes
-	var r = roscop{
+	var r = Roscop{
 		m: make(m),
 		physicalParametersOrderedList: []string{},
 		attributesOrderedList:         make(map[string][]string),
@@ -65,7 +66,7 @@ func NewRoscop(filename string) roscop {
 	}
 	//fmt.Println(r.attributesType)
 
-	// read next lines and fill roscop object
+	// read next lines and fill Roscop object
 	for {
 
 		// initialize a new empty map to store attributes variable
@@ -94,7 +95,7 @@ func NewRoscop(filename string) roscop {
 			}
 		}
 
-		// put the new map to roscop map with the rigth physical parameter
+		// put the new map to Roscop map with the rigth physical parameter
 		r.m[key] = mfields
 
 		// the iteration order is not specified and is not guaranteed to be
@@ -106,24 +107,24 @@ func NewRoscop(filename string) roscop {
 	return r
 }
 
-// returm an ordered list of all physical parameters
-func (r roscop) GetPhysicalParameters() []string {
+// GetPhysicalParameters returm an ordered list of all physical parameters
+func (r Roscop) GetPhysicalParameters() []string {
 	return r.physicalParametersOrderedList
 }
 
-// returm an ordered list of attributes for an physical parameter
-func (r roscop) GetAttributes(physicalParameter string) []string {
+// GetAttributes returm an ordered list of attributes for an physical parameter
+func (r Roscop) GetAttributes(physicalParameter string) []string {
 	// remove first key "types"
 	return r.attributesOrderedList[physicalParameter][1:]
 }
 
-// returm the attribute value as a string for a physical parameter
-func (r roscop) GetAttributesStringValue(physicalParameter string, attributeName string) string {
+// GetAttributesStringValue returm the attribute value as a string for a physical parameter
+func (r Roscop) GetAttributesStringValue(physicalParameter string, attributeName string) string {
 	return r.m[physicalParameter][attributeName]
 }
 
-// returm the attribute value with the right type for a physical parameter
-func (r roscop) GetAttributesValue(physicalParameter string, attributeName string) interface{} {
+// GetAttributesValue returm the attribute value with the right type for a physical parameter
+func (r Roscop) GetAttributesValue(physicalParameter string, attributeName string) interface{} {
 	switch r.attributesType[attributeName] {
 	case "string":
 		return r.m[physicalParameter][attributeName]
@@ -142,11 +143,11 @@ func (r roscop) GetAttributesValue(physicalParameter string, attributeName strin
 			value, _ := strconv.ParseFloat(r.m[physicalParameter][attributeName], 64)
 			return value
 		default:
-			log.Fatal("Error: check the column types  of your roscop file," +
+			log.Fatal("Error: check the column types  of your Roscop file," +
 				" valid values are: char, byte, int, int32, float, float32, double and float64")
 		}
 	default:
-		log.Fatal("Error: check the second line of your roscop file," +
+		log.Fatal("Error: check the second line of your Roscop file," +
 			" values sould be string or numeric")
 	}
 
@@ -155,15 +156,15 @@ func (r roscop) GetAttributesValue(physicalParameter string, attributeName strin
 
 //func main() {
 
-//	// initialize new roscop object from file
-//	roscop := NewRoscop("code_roscop.csv")
+//	// initialize new Roscop object from file
+//	Roscop := NewRoscop("code_Roscop.csv")
 
 //	// loop over each physicalParameter and display attribute values
-//	for _, physicalParameter := range roscop.GetPhysicalParameters() {
+//	for _, physicalParameter := range Roscop.GetPhysicalParameters() {
 //		fmt.Printf("%s => ", physicalParameter)
 
-//		for _, attributeName := range roscop.GetAttributes(physicalParameter) {
-//			value := roscop.GetAttributesValue(physicalParameter, attributeName)
+//		for _, attributeName := range Roscop.GetAttributes(physicalParameter) {
+//			value := Roscop.GetAttributesValue(physicalParameter, attributeName)
 //			fmt.Printf("%s: %v (%T), ", attributeName, value, value)
 //		}
 //		fmt.Println()

@@ -9,11 +9,11 @@ import (
 	"regexp"
 )
 
-// define constante for instrument type
-type InstrumentType int
+type instrumentType int
 
+// define an integer constant for instrument type
 const (
-	CTD InstrumentType = 3
+	CTD instrumentType = 3
 	BTL                = 5
 )
 
@@ -24,11 +24,11 @@ const (
 //	SADCP
 //)
 
-var typeInstrument InstrumentType
+var typeInstrument instrumentType
 
-// define bitmask
+// define bitmask for instrument
 const (
-	isSBE InstrumentType = 1 << iota
+	isSBE instrumentType = 1 << iota
 	isCTD
 	isBTL
 )
@@ -38,11 +38,11 @@ var regIsSeabird = regexp.MustCompile(`^\*\s+(Sea-Bird)`)
 var regIsCnv = regexp.MustCompile(`(\*END\*)`)
 var regIsBtottle = regexp.MustCompile(`^\s+(Bottle)`)
 
-// read all cnv files and return dimensions
-func AnalyseFirstFile(files []string) InstrumentType {
+// AnalyseFirstFile read all cnv files and return dimensions
+func analyseFirstFile(files []string) instrumentType {
 
 	// initialize bitmask
-	var result InstrumentType = 0
+	var result instrumentType
 
 	// open first file
 	fid, err := os.Open(files[0])

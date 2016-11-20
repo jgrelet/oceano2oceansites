@@ -20,11 +20,12 @@ var regIsHeaderBtl = regexp.MustCompile(`^[*#]|^\s+\w+`)
 // read .btl files and return dimensions
 func (nc *Btl) firstPass(files []string) (int, int) {
 
-	var line int = 0
-	var maxLine int = 0
-	var bottle float64 = 0
-	var maxBottle float64 = 0
-	var maxBottleAll float64 = 0
+// all locale variale are initialize to 0 by default
+	var line int
+	var maxLine int 
+	var bottle float64 
+	var maxBottle float64 
+	var maxBottleAll float64 
 
 	fmt.Fprintf(echo, "First pass: ")
 	// loop over each files passed throw command line
@@ -43,9 +44,9 @@ func (nc *Btl) firstPass(files []string) (int, int) {
 			if !match {
 				p(str)
 				values := strings.Fields(str)
-				p("BOTL", map_var["BOTL"])
-				p(values[map_var["BOTL"]])
-				if bottle, err = strconv.ParseFloat(values[map_var["BOTL"]], 64); err != nil {
+				p("BOTL", mapVar["BOTL"])
+				p(values[mapVar["BOTL"]])
+				if bottle, err = strconv.ParseFloat(values[mapVar["BOTL"]], 64); err != nil {
 					log.Fatal(err)
 				}
 				fmt.Fprintln(debug, values)
@@ -65,7 +66,7 @@ func (nc *Btl) firstPass(files []string) (int, int) {
 			maxLine = line
 		}
 		// store the maximum pressure value
-		nc.Extras_f[fmt.Sprintf("BOTL:%d", int(profile))] = maxBottle
+		nc.ExtraFloat[fmt.Sprintf("BOTL:%d", int(profile))] = maxBottle
 		if maxBottle > maxBottleAll {
 			maxBottleAll = maxBottle
 		}
@@ -89,11 +90,11 @@ func (nc *Btl) secondPass(files []string) {
 	fmt.Fprintf(echo, "Second pass ...\n")
 
 	// initialize profile and pressure max
-	var nbProfile int = 0
+	var nbProfile int
 
 	// loop over each files passed throw command line
 	for _, file := range files {
-		var line int = 0
+		var line int
 
 		fid, err := os.Open(file)
 		if err != nil {
@@ -140,7 +141,7 @@ func (nc *Btl) secondPass(files []string) {
 			log.Fatal(err)
 		}
 		// increment sclice index
-		nbProfile += 1
+		nbProfile ++
 	}
 }
 

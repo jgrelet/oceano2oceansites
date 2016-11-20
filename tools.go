@@ -28,9 +28,10 @@ const (
 	internalToOceanSites int64 = -oceanSitesToInternal
 )
 
-// define constante for profile
+// ProfileType is integer
 type ProfileType int
 
+// ProfileType define constante for profile
 const (
 	UNKNOW ProfileType = iota // UNKNOW == 0
 	PHY                       // PHY = 1
@@ -39,97 +40,60 @@ const (
 
 )
 
+// Time represent an object time.Time with the number of seconds 
+// elapsed since January 1, 1970 UTC
 type Time struct {
 	time.Time
-	nsec int64 // the number of seconds elapsed since January 1, 1970 UTC
+	nsec int64 
 }
 
-/*
-// matrix used to store profils
-type Data_2D struct {
-	data [][]float64
-}
-
-// map used a matrix for each parameters
-type AllData_2D map[string]Data_2D
-
-// initialize a slice with 2 dimensions to store data
-// It should be notice that this table has two dimensions allows to write
-// data straightforward, it will then be flatten to write netcdf file
-func (mp AllData_2D) NewData_2D(name string, fillValue interface{}, width, height int) *AllData_2D {
-	var fv float64
-	mt := new(Data_2D)
-	mt.data = make([][]float64, width)
-
-	// convert fillValue interface to float64
-	switch fillValue.(type) {
-	case int32:
-		fv = float64(fillValue.(int32))
-	case float32:
-		fv = float64(fillValue.(float32))
-	case float64:
-		fv = float64(fillValue.(float64))
-	default:
-		log.Fatal(fmt.Sprintf("netcdf: create 2D slice error filled %s with fillValue: %v\n", name, fillValue))
-	}
-
-	for i := range mt.data {
-		mt.data[i] = make([]float64, height)
-		for j := range mt.data[i] {
-			mt.data[i][j] = fv
-		}
-	}
-	mp[name] = *mt
-	return &mp
-}
-*/
-// construct time object from a string date
+// NewTimeFromString construct time object from a string date
 func NewTimeFromString(format, value string) *Time {
 	t, _ := time.Parse(format, value)
 	return &Time{t, t.Unix()}
 }
 
-// construct time object from number of second since 01/01/1970
+// NewTimeFromSec construct time object from number of second since 01/01/1970
 func NewTimeFromSec(nsec int64) *Time {
 	t := time.Unix(nsec, 0).UTC()
 	return &Time{t, t.Unix()}
 }
 
-// construct time object from decimal julian day since 01/01/1950
+// NewTimeFromJulian construct time object from decimal julian day since 01/01/1950
 func NewTimeFromJulian(julian float64) *Time {
 	t := time.Unix(int64(julian*86400.0)+oceanSitesToInternal+internalToUnix, 0).UTC()
 	return &Time{t, t.Unix()}
 }
 
-// construct time object from decimal julian day from current year
+// NewTimeFromJulianDay construct time object from decimal julian day from current year
 func NewTimeFromJulianDay(julian float64, c *Time) *Time {
 	nsec := time.Date(c.Year(), time.January, 0, 0, 0, 0, 0, time.UTC)
 	t := time.Unix(int64(julian*86400.0)+nsec.Unix(), 0).UTC()
 	return &Time{t, t.Unix()}
 }
 
-// compute from time object a decimal julian day from 1950
+// Time2JulianDec compute from time object a decimal julian day from 1950
 func (t *Time) Time2JulianDec() float64 {
-	const DIFF_ORIGIN = 2433283.0 // diff between UNIX DATE and 1950/1/1 00:00:00
+	const diffOrigin = 2433283.0 // diff between UNIX DATE and 1950/1/1 00:00:00
 	a := int(14-t.Month()) / 12
 	y := t.Year() + 4800 - a
 	m := int(t.Month()) + 12*a - 3
 	julianDay := int(t.Day()) + (153*m+2)/5 + 365*y + y/4
-	julianDay = julianDay - y/100 + y/400 - 32045.0 - DIFF_ORIGIN
+	julianDay = julianDay - y/100 + y/400 - 32045.0 - diffOrigin
 	d := float64(julianDay) + float64(t.Hour())/24 +
 		float64(t.Minute())/1440 + float64(t.Second())/86400
 	fmt.Fprintf(debug, "Julian day: %v ", d)
 	return d
 }
 
-// compute from time object a decimal julian day from the current year
+// JulianDayOfYear compute from time object a decimal julian day from the current year
 func (t *Time) JulianDayOfYear() float64 {
 	julianDay := t.YearDay()
 	return float64(julianDay) + float64(t.Hour())/24 +
 		float64(t.Minute())/1440 + float64(t.Second())/86400
 }
 
-// convert position "DD MM.SS S" to decimal position
+// Position2Decimal convert position "DD MM.SS S" to decimal position
 func Position2Decimal(pos string) (float64, error) {
 
 	var multiplier float64 = 1
@@ -155,9 +119,11 @@ func Position2Decimal(pos string) (float64, error) {
 	return value, nil
 }
 
-// convert  decimal position to string, hemi = 0 for latitude, 1 for longitude
+// DecimalPosition2String convert  decimal position to string, 
+// hemi = 0 for latitude, 1 for longitude
 func DecimalPosition2String(position float64, hemi int) string {
 	var neg, pos, geo rune
+	var str string
 
 	if hemi == 1 {
 		neg = 'W'
@@ -177,10 +143,11 @@ func DecimalPosition2String(position float64, hemi int) string {
 	min := tmp
 
 	if hemi == 1 {
-		return fmt.Sprintf("%03d%s%06.3f %c", deg, "\u00B0", min, geo)
+		str =  fmt.Sprintf("%03d%s%06.3f %c", deg, "\u00B0", min, geo)
 	} else {
-		return fmt.Sprintf("%02d%s%06.3f %c", deg, "\u00B0", min, geo)
+		str = fmt.Sprintf("%02d%s%06.3f %c", deg, "\u00B0", min, geo)
 	}
+	return str
 }
 
 func isArray(a interface{}) bool {
@@ -201,7 +168,7 @@ func zeros(size int) []float64 {
 }
 func ones(size int) []float64 {
 	m := make([]float64, size)
-	for i, _ := range m {
+	for i := range m {
 		m[i] = 1
 	}
 	return m

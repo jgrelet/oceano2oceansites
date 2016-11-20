@@ -1,14 +1,15 @@
-// writeAsciiBtl
 package main
 
 import (
 	"fmt"
 )
 
-func (nc *Btl) WriteAscii(map_format map[string]string, hdr []string) {
+// WriteAscii not yet implemeted
+func (nc *Btl) WriteAscii(mapFormat map[string]string, hdr []string) {
 	fmt.Println("Hello from WriteAscii for bottle !")
 }
 
-func (nc *Btl) WriteHeader(map_format map[string]string, hdr []string) {
+// WriteHeader not yet implemeted
+func (nc *Btl) WriteHeader(mapFormat map[string]string, hdr []string) {
 	fmt.Println("Hello from WriteHeader for bootle !")
 }

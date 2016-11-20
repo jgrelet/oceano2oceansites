@@ -10,9 +10,9 @@ import (
 	"os"
 )
 
-const PROG_NAME string = "oceano2oceansites"
-const PROG_VERSION string = "0.2.3"
-const PROG_DATE string = "11/20/2016"
+const progName string = "oceano2oceansites"
+const progVersion string = "0.2.3"
+const progDate string = "11/20/2016"
 
 // use for echo mode
 // Discard is an io.Writer on which all Write calls succeed
@@ -28,10 +28,10 @@ var p = fmt.Println
 var f = fmt.Printf
 
 // default configuration file
-var cfgname string = "oceano2oceansites.toml"
+var cfgname = "oceano2oceansites.toml"
 
 // default physical parameters file definition is embeded in code_roscop.go
-var code_roscop string = "roscop/code_roscop.csv"
+var codeRoscop = "roscop/code_roscop.csv"
 
 // file prefix for --all option: "-all" for all parameters, "" empty by default
 var prefixAll = ""
@@ -40,14 +40,14 @@ var prefixAll = ""
 var outputDir = "out"
 
 // Create an empty map.
-var map_var = map[string]int{}
-var map_format = map[string]string{}
+var mapVar = map[string]int{}
+var mapFormat = map[string]string{}
 var data = make(map[string]interface{})
 
 var hdr []string
 var cfg Config
 
-// the representation in memory of a data set is similar to
+// Nc is the representation in memory of a data set is similar to
 // that of a netcdf file
 type Nc struct {
 	// store dimensions
@@ -62,34 +62,39 @@ type Nc struct {
 	Attributes map[string]string
 
 	// used to store max of profiles value
-	Extras_f map[string]float64
+	ExtraFloat map[string]float64
 	// used to store max of profiles type
-	Extras_s map[string]string
+	ExtraString map[string]string
 	// give access to physical parameters
-	Roscop roscop
+	Roscop Roscop
 
 	// store header
 	//hdr []string
 }
 
-// interface common for all data sets (profile, trajectory and time-series
-// and instruments
+// Process is an interface common for all data sets like profiles,
+// trajectories and time-series
 type Process interface {
 	Read([]string)
 	GetConfig(string)
 	//	WriteHeader(map[string]string, []string)
 	WriteAscii(map[string]string, []string)
-	WriteNetcdf(InstrumentType)
+	WriteNetcdf(instrumentType)
 }
 
 // nc implement interface Process
 var nc Process
 
-// define new receiver type based on netcdf equivalent structure
+// Ctd define new receiver type based on netcdf equivalent structure
 type Ctd struct{ Nc }
+
+// Btl define new receiver type based on netcdf equivalent structure
 type Btl struct{ Nc }
 
+// NewCtd return an interface type based on Netcdf representation
 func NewCtd() *Ctd { return &Ctd{} }
+
+// NewBtl return an interface type based on Netcdf representation
 func NewBtl() *Btl { return &Btl{} }
 
 // main body
@@ -105,7 +110,7 @@ func main() {
 		cfgname = os.Getenv("OCEANO2OCEANSITES_CFG")
 	}
 	if os.Getenv("ROSCOP_CSV") != "" {
-		code_roscop = os.Getenv("ROSCOP_CSV")
+		codeRoscop = os.Getenv("ROSCOP_CSV")
 	}
 
 	// get options parse args list and return all given files to read
@@ -116,7 +121,7 @@ func main() {
 	mkOutputDir()
 
 	// read the first file and try to find the instrument type, return a bit mask
-	typeInstrument = AnalyseFirstFile(files)
+	typeInstrument = analyseFirstFile(files)
 
 	// following the instrument type, allocate the rigth receiver based on
 	// Process interface
@@ -136,13 +141,13 @@ func main() {
 	// read configuration file, by default, optCfgfile = cfgname
 	nc.GetConfig(optCfgfile)
 	// debug
-	fmt.Fprintln(debug, map_format)
+	fmt.Fprintln(debug, mapFormat)
 
 	// read and process all data files
 	nc.Read(files)
 
 	// write ASCII file
-	nc.WriteAscii(map_format, hdr)
+	nc.WriteAscii(mapFormat, hdr)
 
 	// write netcdf file
 	nc.WriteNetcdf(typeInstrument)

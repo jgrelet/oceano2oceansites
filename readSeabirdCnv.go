@@ -30,10 +30,9 @@ var regSystemTime = regexp.MustCompile(`System UpLoad Time =\s+(.*)`)
 var regNmeaLatitude = regexp.MustCompile(`NMEA Latitude\s*=\s*(\d+\s+\d+.\d+\s+\w)`)
 var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s+\w)`)
 
-// parse header line from .cnv and extract correct information
-// use regular expression
-// to parse time with non standard format, see:
-// http://golang.org/src/time/format.go
+// DecodeHeader parse header line from .cnv and extract correct information
+// use regular expression to parse time with non standard format, 
+// see: http://golang.org/src/time/format.go
 func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 
 	// decode Systeme Upload Time
@@ -136,12 +135,12 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 		if *optDebug {
 			fmt.Println(value)
 		}
-		nc.Extras_s[fmt.Sprintf("TYPE:%d", int(profile))] = value
+		nc.ExtraString[fmt.Sprintf("TYPE:%d", int(profile))] = value
 	}
 }
 
-// return the profile number from filename. Use CruisePrefix and
-// StationPrefixLength defined in configuration file
+// GetProfileNumber return the profile number from filename. 
+// Use CruisePrefix and StationPrefixLength defined in configuration file
 // TODOS:  the prefix could be extract from filename
 func (nc *Nc) GetProfileNumber(str string) float64 {
 	var value float64
@@ -156,7 +155,7 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 		fmt.Fprintf(debug, "Get profile number: %s -> %s\n", str, t[1])
 		if value, err = strconv.ParseFloat(t[1], 64); err == nil {
 			// get profile name, eg: csp00101
-			nc.Extras_s[fmt.Sprintf("PRFL_NAME:%d", int(value))] = t[1]
+			nc.ExtraString[fmt.Sprintf("PRFL_NAME:%d", int(value))] = t[1]
 		} else {
 			log.Fatal(fmt.Sprintf("Error func GetProfileNumber: %s, var: %v", err, t[1]))
 		}
@@ -168,22 +167,22 @@ func (nc *Nc) GetProfileNumber(str string) float64 {
 
 }
 
-// extract data from the line read in str with order gave by hash map_var
+// DecodeData extract data from the line read in str with order gave by hash mapVar
 // values:  1318 81.583900 3.000 2.983 29.5431 29.5464 5 ...
-// map_var: PRES:2 DEPTH:3 PSAL:21 DOX2:18 ...
+// mapVar: PRES:2 DEPTH:3 PSAL:21 DOX2:18 ...
 func (nc *Ctd) DecodeData(str string, profile float64, file string, line int) {
 
 	// split the string str using whitespace characters
 	values := strings.Fields(str)
-	nb_value := len(values)
+	nbValue := len(values)
 
 	// for each physical parameter, extract its data from the rigth column
 	// and save it in map data
-	for key, column := range map_var {
-		if column > nb_value {
+	for key, column := range mapVar {
+		if column > nbValue {
 			log.Fatal(fmt.Sprintf("Error in func DecodeData() "+
 				"configuration mismatch\nFound %d values, and we try to use column %d",
-				nb_value, column))
+				nbValue, column))
 		}
 		if v, err := strconv.ParseFloat(values[column], 64); err == nil {
 			data[key] = v
@@ -198,13 +197,13 @@ func (nc *Ctd) DecodeData(str string, profile float64, file string, line int) {
 // read .cnv files and return dimensions
 func (nc *Ctd) firstPass(files []string) (int, int) {
 
-	var line int = 0
-	var maxLine int = 0
-	var pres float64 = 0
-	var depth float64 = 0
-	var maxDepth float64 = 0
-	var maxPres float64 = 0
-	var maxPresAll float64 = 0
+	var line int
+	var maxLine int 
+	var pres float64 
+	var depth float64 
+	var maxDepth float64 
+	var maxPres float64 
+	var maxPresAll float64 
 
 	fmt.Fprintf(echo, "First pass: ")
 	// loop over each files passed throw command line
@@ -223,11 +222,11 @@ func (nc *Ctd) firstPass(files []string) (int, int) {
 			if !match {
 				values := strings.Fields(str)
 				// read the pressure
-				if pres, err = strconv.ParseFloat(values[map_var["PRES"]], 64); err != nil {
+				if pres, err = strconv.ParseFloat(values[mapVar["PRES"]], 64); err != nil {
 					log.Fatal(err)
 				}
 				// read the depth
-				if depth, err = strconv.ParseFloat(values[map_var["DEPTH"]], 64); err != nil {
+				if depth, err = strconv.ParseFloat(values[mapVar["DEPTH"]], 64); err != nil {
 					log.Fatal(err)
 				} else {
 					//p(math.Floor(depth))
@@ -248,8 +247,8 @@ func (nc *Ctd) firstPass(files []string) (int, int) {
 			maxLine = line
 		}
 		// store the maximum pressure and maximum depth value per cast
-		nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] = maxPres
-		nc.Extras_f[fmt.Sprintf("DEPTH:%d", int(profile))] = math.Floor(maxDepth)
+		nc.ExtraFloat[fmt.Sprintf("PRES:%d", int(profile))] = maxPres
+		nc.ExtraFloat[fmt.Sprintf("DEPTH:%d", int(profile))] = math.Floor(maxDepth)
 		if maxPres > maxPresAll {
 			maxPresAll = maxPres
 		}
@@ -272,11 +271,11 @@ func (nc *Ctd) secondPass(files []string) {
 	fmt.Fprintf(echo, "Second pass ...\n")
 
 	// initialize profile and pressure max
-	var nbProfile int = 0
+	var nbProfile int 
 
 	// loop over each files passed throw command line
 	for _, file := range files {
-		var line int = 0
+		var line int 
 
 		fid, err := os.Open(file)
 		if err != nil {
@@ -307,12 +306,12 @@ func (nc *Ctd) secondPass(files []string) {
 						}
 					}
 					// exit loop if reach maximum pressure for the profile
-					if data["PRES"] == nc.Extras_f[fmt.Sprintf("PRES:%d", int(profile))] {
+					if data["PRES"] == nc.ExtraFloat[fmt.Sprintf("PRES:%d", int(profile))] {
 						downcast = false
 					}
 				} else {
 					// store last julian day for end profile
-					nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
+					nc.ExtraFloat[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
 					//fmt.Println(presMax)
 				}
 				line++
@@ -323,10 +322,10 @@ func (nc *Ctd) secondPass(files []string) {
 		}
 
 		// increment sclice index
-		nbProfile += 1
+		nbProfile ++
 
 		// store last julian day for end profile
-		nc.Extras_f[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
+		nc.ExtraFloat[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
 		//fmt.Println(presMax)
 	}
 	fmt.Fprintln(debug, nc.Variables.get("PROFILE"))

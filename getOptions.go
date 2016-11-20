@@ -14,6 +14,7 @@ var optDebug *bool
 var optEcho *bool
 var optAll *bool
 
+// GetOptions parse arguments on command line and return files list to process
 func GetOptions() ([]string, string) {
 
 	var files []string
@@ -28,7 +29,7 @@ func GetOptions() ([]string, string) {
 	optCfgfile := getopt.StringLong("config", 'c', cfgname, "use specific configuration .toml file", "oceano2oceansites.toml")
 	//	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
 	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv", "files")
-	optRoscop := getopt.StringLong("roscop", 'r', code_roscop, "use a specific .csv file for physical parameter ", "code_roscop.csv")
+	optRoscop := getopt.StringLong("roscop", 'r', codeRoscop, "use a specific .csv file for physical parameter ", "code_roscop.csv")
 
 	// parse options line argument
 	getopt.Parse()
@@ -63,11 +64,11 @@ func GetOptions() ([]string, string) {
 		cfgname = *optCfgfile
 	}
 	if *optRoscop != "" {
-		code_roscop = *optRoscop
+		codeRoscop = *optRoscop
 	}
 	// show version and env
 	if *optVersion {
-		fmt.Println(PROG_NAME + ": v" + PROG_VERSION + ", build date: " + PROG_DATE)
+		fmt.Println(progName + ": v" + progVersion + ", build date: " + progDate)
 		fmt.Printf("Environnement variables:\n")
 		v := os.Getenv("OCEANO2OCEANSITES_CFG")
 		if v == "" {
@@ -80,7 +81,7 @@ func GetOptions() ([]string, string) {
 		}
 		fmt.Printf(" - ROSCOP_CSV: %s\n", r)
 		fmt.Printf("Configuration file: %s\n", cfgname)
-		fmt.Printf("Code ROSCOP file: %s\n", code_roscop)
+		fmt.Printf("Code ROSCOP file: %s\n", codeRoscop)
 		fmt.Printf("GOPATH: %s\n", os.Getenv("GOPATH"))
 		fmt.Printf("GOBIN: %s\n", os.Getenv("GOBIN"))
 		os.Exit(0)

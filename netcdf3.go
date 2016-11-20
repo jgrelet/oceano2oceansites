@@ -10,9 +10,8 @@ import (
 	"github.com/fhs/go-netcdf/netcdf"
 )
 
-// creates the NetCDF file following nc structure.
-//func WriteNetcdf(any interface{}) error {
-func (nc *Nc) WriteNetcdf(inst InstrumentType) {
+// WriteNetcdf creates the NetCDF file following nc structure.
+func (nc *Nc) WriteNetcdf(inst instrumentType) {
 
 	var ncType string
 
@@ -41,8 +40,8 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	fmt.Fprintf(debug, "writing file: %s\n", filename)
 
 	// get variables_1D size
-	len_1D := nc.Dimensions["TIME"]
-	len_2D := nc.Dimensions["DEPTH"]
+	len1D := nc.Dimensions["TIME"]
+	len2D := nc.Dimensions["DEPTH"]
 
 	// Create a new NetCDF 3 file. The dataset is returned.
 	ds, err := netcdf.CreateFile(filename, netcdf.CLOBBER)
@@ -52,23 +51,23 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 	defer ds.Close()
 
 	// Add the dimensions for our data to the dataset
-	dim_1D := make([]netcdf.Dim, 1)
-	dim_2D := make([]netcdf.Dim, 2)
+	dim1D := make([]netcdf.Dim, 1)
+	dim2D := make([]netcdf.Dim, 2)
 
 	// dimensions for ROSCOP paremeters as DEPTH, PRES, TEMP, PSAL, etc
-	dim_2D[0], err = ds.AddDim("TIME", uint64(len_1D))
+	dim2D[0], err = ds.AddDim("TIME", uint64(len1D))
 	if err != nil {
 		log.Fatal(err)
 	}
-	dim_2D[1], err = ds.AddDim("DEPTH", uint64(len_2D))
+	dim2D[1], err = ds.AddDim("DEPTH", uint64(len2D))
 	if err != nil {
 		log.Fatal(err)
 	}
 	// dimension for PROFILE, LATITUDE, LONGITUDE and BATH
-	dim_1D[0] = dim_2D[0]
+	dim1D[0] = dim2D[0]
 
 	// Add the variable to the dataset that will store our data
-	map_1D := make(map[string]netcdf.Var)
+	map1D := make(map[string]netcdf.Var)
 
 	// create netcdf variables with attributes
 	// for key, _ := range nc.Variables {
@@ -94,16 +93,16 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		// add variables
 		dims := make([]netcdf.Dim, 1)
 		if nc.Variables.isMatrix(key) {
-			dims = dim_2D
+			dims = dim2D
 		} else {
-			dims = dim_1D
+			dims = dim1D
 		}
 		v, err := ds.AddVar(key, netcdfType, dims)
 		if err != nil {
 			log.Fatal(fmt.Sprintf("%s, %v: %v (%T)", err, key, v, v))
 		}
 		fmt.Fprintf(debug, "AddVar: %s\n", key)
-		map_1D[key] = v
+		map1D[key] = v
 
 		// define variable attributes with the right type
 		// for an physical parameter, get a slice of attributes name
@@ -167,16 +166,16 @@ func (nc *Nc) WriteNetcdf(inst InstrumentType) {
 		switch roscop.GetAttributesStringValue(key, "types") {
 		case "int32":
 			r := Matrix2int32(v)
-			if err := map_1D[key].WriteInt32s(r); err != nil {
+			if err := map1D[key].WriteInt32s(r); err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: (%T) %v", err, key, value, value))
 			}
 		case "float32":
 			r := Matrix2float32(v)
-			if err := map_1D[key].WriteFloat32s(r); err != nil {
+			if err := map1D[key].WriteFloat32s(r); err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: (%T) %v", err, key, value, value))
 			}
 		case "float64":
-			if err := map_1D[key].WriteFloat64s(v); err != nil {
+			if err := map1D[key].WriteFloat64s(v); err != nil {
 				log.Fatal(fmt.Sprintf("%s, %v: (%T) %v", err, key, v, v))
 			}
 		default:
