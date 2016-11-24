@@ -6,6 +6,9 @@ Binary programs under Windows, Linux and Mac OSX are available from the depot un
 
 https://github.com/jgrelet/oceano2oceansites/releases
 
+Code is tested and deploy for Linux and OsX with Travis-CI:
+https://travis-ci.org/jgrelet/oceano2oceansites
+
 You can get the latest version by compiling it from the sources for the following OS:
 
 * [Windows](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md)
@@ -46,11 +49,11 @@ Test binary:
 $ oceano2oceansites -e --files=data/csp/csp*.cnv
 ```
 
-The program use by default the configuration files oceano2oceansites.ini
+The program use by default the configuration files oceano2oceansites.toml
 and the code_roscop.csv in the current directory.
 
 You can set a different location or file name by setting environment variables 
-OCEANO2OCEANSITES_INI and ROSCOP_CSV.
+OCEANO2OCEANSITES_CFG and ROSCOP_CSV.
 
 Edit toml config file:
 ```
