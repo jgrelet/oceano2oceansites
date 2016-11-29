@@ -21,6 +21,9 @@ before_install:
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew update; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew install netcdf; fi
 
+before_script:
+  - go vet ./...
+
 script:
   - go install -ldflags "-s" -v ./...
   - go test -v ./...
