@@ -29,7 +29,8 @@ func (nc *Nc) WriteNetcdf(inst instrumentType) {
 	}
 
 	// build filename
-	filename := fmt.Sprintf("netcdf/OS_%s%s_%s.nc",
+	filename := fmt.Sprintf("%s/netcdf/OS_%s%s_%s.nc",
+		outputDir,
 		strings.ToUpper(nc.Attributes["cycle_mesure"]),
 		strings.ToUpper(prefixAll),
 		ncType)

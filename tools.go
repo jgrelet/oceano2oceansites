@@ -40,11 +40,11 @@ const (
 
 )
 
-// Time represent an object time.Time with the number of seconds 
+// Time represent an object time.Time with the number of seconds
 // elapsed since January 1, 1970 UTC
 type Time struct {
 	time.Time
-	nsec int64 
+	nsec int64
 }
 
 // NewTimeFromString construct time object from a string date
@@ -119,7 +119,7 @@ func Position2Decimal(pos string) (float64, error) {
 	return value, nil
 }
 
-// DecimalPosition2String convert  decimal position to string, 
+// DecimalPosition2String convert  decimal position to string,
 // hemi = 0 for latitude, 1 for longitude
 func DecimalPosition2String(position float64, hemi int) string {
 	var neg, pos, geo rune
@@ -143,7 +143,7 @@ func DecimalPosition2String(position float64, hemi int) string {
 	min := tmp
 
 	if hemi == 1 {
-		str =  fmt.Sprintf("%03d%s%06.3f %c", deg, "\u00B0", min, geo)
+		str = fmt.Sprintf("%03d%s%06.3f %c", deg, "\u00B0", min, geo)
 	} else {
 		str = fmt.Sprintf("%02d%s%06.3f %c", deg, "\u00B0", min, geo)
 	}
@@ -215,12 +215,12 @@ func toFixed(num float64, precision int) float64 {
 
 func mkOutputDir() {
 	if _, err := os.Stat("ascii"); os.IsNotExist(err) {
-		os.Mkdir("."+string(filepath.Separator)+"ascii", 0777)
+		os.Mkdir(outputDir+string(filepath.Separator)+"ascii", 0777)
 	}
 	if _, err := os.Stat("netcdf"); os.IsNotExist(err) {
-		os.Mkdir("."+string(filepath.Separator)+"netcdf", 0777)
+		os.Mkdir(outputDir+string(filepath.Separator)+"netcdf", 0777)
 	}
 	if _, err := os.Stat("odv"); os.IsNotExist(err) {
-		os.Mkdir("."+string(filepath.Separator)+"odv", 0777)
+		os.Mkdir(outputDir+string(filepath.Separator)+"odv", 0777)
 	}
 }

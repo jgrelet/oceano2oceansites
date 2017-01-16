@@ -25,8 +25,8 @@ func (nc *Ctd) WriteAscii(mapFormat map[string]string, hdr []string) {
 	// build filenames
 	str := nc.Attributes["cycle_mesure"]
 	str = strings.Replace(str, "\r", "", -1)
-	headerFilename := fmt.Sprintf("ascii/%s.ctd", strings.ToLower(str))
-	filename = fmt.Sprintf("ascii/%s%s_ctd", strings.ToLower(str), prefixAll)
+	headerFilename := fmt.Sprintf("%s/ascii/%s.ctd", outputDir, strings.ToLower(str))
+	filename = fmt.Sprintf("%s/ascii/%s%s_ctd", outputDir, strings.ToLower(str), prefixAll)
 	//fmt.Println(headerFilename)
 	//fmt.Println(filename)
 

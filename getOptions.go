@@ -30,6 +30,7 @@ func GetOptions() ([]string, string) {
 	//	optCycleMesure := getopt.StringLong("cycle_mesure", 'm', "", "Name of cycle_mesure")
 	optFiles := getopt.StringLong("files", 'f', "", "files to process ex: data/fr25*.cnv", "files")
 	optRoscop := getopt.StringLong("roscop", 'r', codeRoscop, "use a specific .csv file for physical parameter ", "code_roscop.csv")
+	optOutput := getopt.StringLong("output", 'o', outputDir, "write files into", "output directory")
 
 	// parse options line argument
 	getopt.Parse()
@@ -65,6 +66,9 @@ func GetOptions() ([]string, string) {
 	}
 	if *optRoscop != "" {
 		codeRoscop = *optRoscop
+	}
+	if *optOutput != "" {
+		outputDir = *optOutput
 	}
 	// show version and env
 	if *optVersion {

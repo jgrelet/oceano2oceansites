@@ -36,8 +36,8 @@ var codeRoscop = "roscop/code_roscop.csv"
 // file prefix for --all option: "-all" for all parameters, "" empty by default
 var prefixAll = ""
 
-// default output directory
-var outputDir = "out"
+// default output directory (current)
+var outputDir = "."
 
 // Create an empty map.
 var mapVar = map[string]int{}
