@@ -11,7 +11,7 @@ import (
 func TestConfig(t *testing.T) {
 	assert := assert.New(t)
 
-	err := gcfg.ReadFileInto(&cfg, "cassiopee.toml")
+	err := gcfg.ReadFileInto(&cfg, "oceano2oceansites.toml")
 
 	// test if file exist
 	assert.Nil(err)
