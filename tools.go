@@ -121,11 +121,11 @@ func Position2Decimal(pos string) (float64, error) {
 
 // DecimalPosition2String convert  decimal position to string,
 // hemi = 0 for latitude, 1 for longitude
-func DecimalPosition2String(position float64, hemi int) string {
+func DecimalPosition2String(position float64, hemi string) string {
 	var neg, pos, geo rune
 	var str string
 
-	if hemi == 1 {
+	if strings.Contains(hemi, "EW") {
 		neg = 'W'
 		pos = 'E'
 	} else {
@@ -142,7 +142,7 @@ func DecimalPosition2String(position float64, hemi int) string {
 	tmp = (tmp - float64(deg)) * 60
 	min := tmp
 
-	if hemi == 1 {
+	if strings.Contains(hemi, "EW") {
 		str = fmt.Sprintf("%03d%s%06.3f %c", deg, "\u00B0", min, geo)
 	} else {
 		str = fmt.Sprintf("%02d%s%06.3f %c", deg, "\u00B0", min, geo)
