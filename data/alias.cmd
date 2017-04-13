@@ -8,4 +8,5 @@ PIRATA-FR25:
 PIRATA-FR24:
 -e --config=config/fr24.toml --files=data/CTD/fr24/fr24*.cnv
 CASSIOPEE:
--e --config=config/oceano2oceansites.toml --files=data/CTD/csp/csp*.cnv
+-e --config=config/cassiopee.toml --files=data/CTD/csp/csp*.cnv
+-e --files=data/CTD/csp/csp*.cnv
