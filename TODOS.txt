@@ -26,5 +26,6 @@ TODOS:
 - add default code_roscop.go file
 - add test matrix
 - add map_var, map_format and hdr to a composit struct 
+- check needed variable in toml file, program display a panic
 
 
