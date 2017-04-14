@@ -13,8 +13,8 @@ const (
 	codeForProfile = -1
 )
 
-// WriteAscii write ascii file
-func (nc *Ctd) WriteAscii(mapFormat map[string]string, hdr []string) {
+// WriteASCII write ascii file
+func (nc *Ctd) WriteASCII(mapFormat map[string]string, hdr []string) {
 	// define 2 files, profiles header and data
 	var filename string
 

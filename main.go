@@ -13,7 +13,9 @@ import (
 const progName string = "oceano2oceansites"
 const progVersion string = "0.2.4"
 
-var Build string = "2017-04-14T00:21:00Z"
+// Build date, should be get value at compile time
+// see: http://stackoverflow.com/questions/11354518/golang-application-auto-build-versioning
+var Build = "2017-04-14T00:21:00Z"
 
 // use for echo mode
 // Discard is an io.Writer on which all Write calls succeed
@@ -79,7 +81,7 @@ type Process interface {
 	Read([]string)
 	GetConfig(string)
 	//	WriteHeader(map[string]string, []string)
-	WriteAscii(map[string]string, []string)
+	WriteASCII(map[string]string, []string)
 	WriteNetcdf(instrumentType)
 }
 
@@ -148,7 +150,7 @@ func main() {
 	nc.Read(files)
 
 	// write ASCII file
-	nc.WriteAscii(mapFormat, hdr)
+	nc.WriteASCII(mapFormat, hdr)
 
 	// write netcdf file
 	nc.WriteNetcdf(typeInstrument)

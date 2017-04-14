@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-// WriteAscii not yet implemeted
-func (nc *Btl) WriteAscii(mapFormat map[string]string, hdr []string) {
+// WriteASCII not yet implemeted
+func (nc *Btl) WriteASCII(mapFormat map[string]string, hdr []string) {
 	fmt.Println("Hello from WriteAscii for bottle !")
 }
 
