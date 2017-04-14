@@ -11,8 +11,9 @@ import (
 )
 
 const progName string = "oceano2oceansites"
-const progVersion string = "0.2.3"
-const progDate string = "11/20/2016"
+const progVersion string = "0.2.4"
+
+var Build string = "2017-04-14T00:21:00Z"
 
 // use for echo mode
 // Discard is an io.Writer on which all Write calls succeed

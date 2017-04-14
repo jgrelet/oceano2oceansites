@@ -72,7 +72,7 @@ func GetOptions() ([]string, string) {
 	}
 	// show version and env
 	if *optVersion {
-		fmt.Println(progName + ": v" + progVersion + ", build date: " + progDate)
+		fmt.Println(progName + ": v" + progVersion + ", build date: " + Build)
 		fmt.Printf("Environnement variables:\n")
 		v := os.Getenv("OCEANO2OCEANSITES_CFG")
 		if v == "" {
