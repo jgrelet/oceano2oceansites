@@ -114,7 +114,7 @@ func (nc *Nc) GetConfig(configFile string) {
 	} else {
 		fields = strings.Split(split, ",")
 	}
-	fmt.Fprintln(debug, "getConfig: ", fields)
+	fmt.Fprintln(debug, "getConfig (fields): ", fields)
 
 	// construct header slice from split
 	for i := 0; i < len(fields); i += 2 {
@@ -123,7 +123,7 @@ func (nc *Nc) GetConfig(configFile string) {
 			hdr = append(hdr, fields[i])
 		}
 	}
-	fmt.Fprintln(debug, "getConfig: ", hdr)
+	fmt.Fprintln(debug, "getConfig (hdr): ", hdr)
 
 	// fill map_format from code_roscop
 	for _, key := range hdr {
