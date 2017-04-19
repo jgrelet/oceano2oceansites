@@ -27,11 +27,11 @@ On a Raspbery PIx, you  must install and compile the go compiler and NetCDF libr
 
      go get github.com/jgrelet/oceano2oceansites
 
-This will install automatically these following packages
+This will install automatically these following packages:
 
-* [go-netcdf](https://github.com/fhs/go-netcdf)
-* [getopt](https://github.com/pborman/getopt)
-* [gcfg](https://gopkg.in/gcfg.v1)
+* [https://github.com/fhs/go-netcdf](https://github.com/fhs/go-netcdf)
+* [https://github.com/pborman/getopt](https://github.com/pborman/getopt)
+* [https://gopkg.in/gcfg.v](https://gopkg.in/gcfg.v1)
 
 The package go-netcdf wrap the netcdf C library with go and need the installation
 of pkgconfig utility and libnetcdf-dev.
