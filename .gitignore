@@ -1,1 +1,16 @@
 /.vscode
+*.exe
+*.o
+*.a
+*.swp
+*~
+*.cnv
+*.hdr
+*.btl
+*.ladcp
+*.xbt
+*.ctd
+*_ctd
+*.btl
+*_btl
+*.nc
