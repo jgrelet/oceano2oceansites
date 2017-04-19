@@ -47,14 +47,16 @@ _example:_
 
 * Update your path env with setx
 
-    $ setx path "%path%;C:\go\bin;C:\opt\netCDF-4.3.3.1\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
+    setx path "%path%;C:\go\bin;C:\opt\netCDF-4.3.3.1\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
 
 * Run MSYS command tool from C:\MinGW\msys\1.0\msys.bat and check your go and gcc version:
 
     $ go version
+
     go version go1.5.1 windows/amd64
 
     $ gcc --version
+
     gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
 
 ## Install packages
