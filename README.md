@@ -20,19 +20,19 @@ for example data/csp/*.cnv
 
 Run and test:
 
-    > go run *.go --files=data/csp/csp*.cnv -e
+    go run *.go --files=data/csp/csp*.cnv -e
 
 Compile it:
 
-    > go build
+    go build
 
 Install binary under go/bin:
 
-    > go install
+    go install
 
 Usage:
 
-    > oceano2oceansites -h
+    $ oceano2oceansites -h
       Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameters ...]
         -c, --config=value
                      Name of the configuration file to use.
@@ -46,13 +46,13 @@ Usage:
 
 Test binary:
 
-    > oceano2oceansites -e --files=data/csp/csp*.cnv
+    oceano2oceansites -e --files=data/csp/csp*.cnv
 
 The program use by default the configuration files oceano2oceansites.toml
 and the code_roscop.csv in the current directory.
 
-You can set a different location or file name by setting environment variables 
-OCEANO2OCEANSITES_CFG and ROSCOP_CSV.
+You can set a different location or file name by setting environment variables
+`OCEANO2OCEANSITES_CFG` and `ROSCOP_CSV`.
 
 Edit toml config file:
 
@@ -79,11 +79,11 @@ Edit toml config file:
     split          = "PRES,3,DEPTH,4,ETDD,2,TEMP,5,PSAL,22,DENS,24,SVEL,26,DOX2,19,FLU2,14,TUR3,13,LGH3,15,NUMP,18,NAVG,21"
     splitAll       = "PRES,3,DEPTH,4,ETDD,2,TE01,5,TE02,6,PSA1,22,PSA2,23,DO12,19,DO22,20,DEN1,24,DEN2,25,SVEL,26,CND1,7,CND2,8,DOV1,9,DVT1,10,DOV2,11,DVT2,12,TUR3,13,FLU2,14,LGH3,15,LGHT,16,LGH4,17,NUMP,18,NAVG,21"
 
-split describe the column order of each physical parameter to extract data from 
-seabird cnv files. 
-The order is used also for ASCII file output. 
+split describe the column order of each physical parameter to extract data from
+seabird cnv files.
+The order is used also for ASCII file output.
 
-All the physical parameters definition are decribed inside `code_roscop.csv`. 
+All the physical parameters definition are decribed inside `code_roscop.csv`.
 You can update this file with your own definition.
 Example:
 
@@ -97,7 +97,7 @@ Example:
 
 Check data with ncdump:
 
-    > ncdump -v TIME  test_ctd.nc
+    $ ncdump -v TIME  test_ctd.nc
      netcdf test_ctd {
      dimensions:
              TIME = 4 ;
@@ -182,4 +182,3 @@ Check data with ncdump:
 
       TIME = 23820.5651041667, 23821.5832638889, 23823.3512615741, 23826.5581481481 ;
      }
-
