@@ -97,7 +97,8 @@ Example:
 
 Check data with ncdump:
 
-    $ ncdump -v TIME  test_ctd.nc
+```cdl
+$ ncdump -v TIME  test_ctd.nc
      netcdf test_ctd {
      dimensions:
              TIME = 4 ;
@@ -182,3 +183,4 @@ Check data with ncdump:
 
       TIME = 23820.5651041667, 23821.5832638889, 23823.3512615741, 23826.5581481481 ;
      }
+```
