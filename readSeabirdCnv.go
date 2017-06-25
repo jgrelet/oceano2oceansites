@@ -31,7 +31,7 @@ var regNmeaLatitude = regexp.MustCompile(`NMEA Latitude\s*=\s*(\d+\s+\d+.\d+\s+\
 var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s+\w)`)
 
 // DecodeHeader parse header line from .cnv and extract correct information
-// use regular expression to parse time with non standard format, 
+// use regular expression to parse time with non standard format,
 // see: http://golang.org/src/time/format.go
 func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 
@@ -139,19 +139,19 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 	}
 }
 
-// GetProfileNumber return the profile number from filename. 
+// GetProfileNumber return the profile number from filename.
 // Use CruisePrefix and StationPrefixLength defined in configuration file
 // TODOS:  the prefix could be extract from filename
 func (nc *Nc) GetProfileNumber(str string) float64 {
 	var value float64
 	var err error
 
-	fmt.Fprintln(debug, "GetProfileNumber():\n--------------")
+	fmt.Fprintln(debug, "GetProfileNumber():\n------------------")
 	reg := fmt.Sprintf("%s(\\d{%d})", cfg.Ctd.CruisePrefix, cfg.Ctd.StationPrefixLength)
 	res := regexp.MustCompile(reg)
 	match := res.MatchString(str)
 	if match {
-		t := res.FindStringSubmatch(strings.ToLower(str))
+		t := res.FindStringSubmatch(str)
 		fmt.Fprintf(debug, "Get profile number: %s -> %s\n", str, t[1])
 		if value, err = strconv.ParseFloat(t[1], 64); err == nil {
 			// get profile name, eg: csp00101
@@ -198,12 +198,12 @@ func (nc *Ctd) DecodeData(str string, profile float64, file string, line int) {
 func (nc *Ctd) firstPass(files []string) (int, int) {
 
 	var line int
-	var maxLine int 
-	var pres float64 
-	var depth float64 
-	var maxDepth float64 
-	var maxPres float64 
-	var maxPresAll float64 
+	var maxLine int
+	var pres float64
+	var depth float64
+	var maxDepth float64
+	var maxPres float64
+	var maxPresAll float64
 
 	fmt.Fprintf(echo, "First pass: ")
 	// loop over each files passed throw command line
@@ -271,11 +271,11 @@ func (nc *Ctd) secondPass(files []string) {
 	fmt.Fprintf(echo, "Second pass ...\n")
 
 	// initialize profile and pressure max
-	var nbProfile int 
+	var nbProfile int
 
 	// loop over each files passed throw command line
 	for _, file := range files {
-		var line int 
+		var line int
 
 		fid, err := os.Open(file)
 		if err != nil {
@@ -322,7 +322,7 @@ func (nc *Ctd) secondPass(files []string) {
 		}
 
 		// increment sclice index
-		nbProfile ++
+		nbProfile++
 
 		// store last julian day for end profile
 		nc.ExtraFloat[fmt.Sprintf("ETDD:%d", int(profile))] = data["ETDD"].(float64)
