@@ -15,19 +15,28 @@ var regIsHour = regexp.MustCompile(`^\s+(\d+:\d+:\d+)`)
 
 //var regIsDate = regexp.MustCompile(`^\s+\d+\s+(\w{3}\s+\d{2}\s+\d{4})`)
 var regIsMontDayYear = regexp.MustCompile(`^\s+\d+\s+(\w{3})\s+(\d{2})\s+(\d{4})`)
-var regIsHeaderBtl = regexp.MustCompile(`^[*#]|^\s+\w+`)
+
+var regIsHeaderBtl = regexp.MustCompile(`^\s*Bottle|^\s+Position|^[*#]`)
+
+// DecodeHeader parse header line from .btl and extract correct information
+// use regular expression to parse time with non standard format,
+// see: http://golang.org/src/time/format.go
+func (nc *Btl) DecodeHeader(str string, profile float64, nbProfile int) {
+	//fmt.Println("DecodeHeader for bottle not implemented!")
+}
 
 // read .btl files and return dimensions
 func (nc *Btl) firstPass(files []string) (int, int) {
 
-// all locale variale are initialize to 0 by default
+	// all locale variale are initialize to 0 by default
 	var line int
-	var maxLine int 
-	var bottle float64 
-	var maxBottle float64 
-	var maxBottleAll float64 
+	var maxLine int
+	var bottle float64
+	var maxBottle float64
+	var maxBottleAll float64
 
 	fmt.Fprintf(echo, "First pass: ")
+	fmt.Fprintf(debug, "First pass:\n")
 	// loop over each files passed throw command line
 	for _, file := range files {
 		fid, err := os.Open(file)
@@ -39,9 +48,10 @@ func (nc *Btl) firstPass(files []string) (int, int) {
 		profile := nc.GetProfileNumber(file)
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
-			str := scanner.Text()
+			str := scanner.Text() // read the first line for each bottle sample
 			match := regIsHeaderBtl.MatchString(str)
 			if !match {
+				fmt.Fprintf(debug, "First pass: match\n")
 				p(str)
 				values := strings.Fields(str)
 				p("BOTL", mapVar["BOTL"])
@@ -50,6 +60,9 @@ func (nc *Btl) firstPass(files []string) (int, int) {
 					log.Fatal(err)
 				}
 				fmt.Fprintln(debug, values)
+				// read the second line for each bottle sample
+				scanner.Scan()
+				str = scanner.Text()
 
 			}
 			if bottle > maxBottle {
@@ -107,7 +120,7 @@ func (nc *Btl) secondPass(files []string) {
 		scanner := bufio.NewScanner(fid)
 		for scanner.Scan() {
 			str := scanner.Text()
-			match := regIsHeader.MatchString(str)
+			match := regIsHeaderBtl.MatchString(str)
 			if match {
 				nc.DecodeHeader(str, profile, nbProfile)
 			} else {
@@ -141,7 +154,7 @@ func (nc *Btl) secondPass(files []string) {
 			log.Fatal(err)
 		}
 		// increment sclice index
-		nbProfile ++
+		nbProfile++
 	}
 }
 
