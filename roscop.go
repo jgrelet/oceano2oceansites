@@ -143,8 +143,10 @@ func (r Roscop) GetAttributesValue(physicalParameter string, attributeName strin
 			value, _ := strconv.ParseFloat(r.m[physicalParameter][attributeName], 64)
 			return value
 		default:
-			log.Fatal("Error: check the column types  of your Roscop file," +
-				" valid values are: char, byte, int, int32, float, float32, double and float64")
+			log.Fatalf("Error: check the column types  of your Roscop file,"+
+				" valid values are: char, byte, int, int32, float, float32, double and float64\n"+
+				"find \"%s\" for %s, %s = %s", r.m[physicalParameter]["types"], physicalParameter,
+				attributeName, r.m[physicalParameter][attributeName])
 		}
 	default:
 		log.Fatal("Error: check the second line of your Roscop file," +
