@@ -35,6 +35,7 @@ var regNmeaLongitude = regexp.MustCompile(`NMEA Longitude\s*=\s*(\d+\s+\d+.\d+\s
 // see: http://golang.org/src/time/format.go
 func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 
+	nc.Variables.set("PROFILE", profile, nbProfile)
 	// decode Systeme Upload Time
 	match := regSystemTime.MatchString(str)
 	if match {
@@ -81,16 +82,7 @@ func (nc *Nc) DecodeHeader(str string, profile float64, nbProfile int) {
 		value := res[1]
 		if v, err := strconv.ParseFloat(value, 64); err == nil {
 			fmt.Fprintln(debug, v)
-			// ch
-			//			format := "%0" + cfg.Ctd.StationPrefixLength + ".0f"
-			//			p := fmt.Sprintf(format, profile)
-			//			//s := fmt.Sprintf(format, v)
-			//			fmt.Println(p, v)
-			//			if p != v {
-			//				fmt.Printf("Warning: profile for header differ from file name: %s <=> %s\n", p, v)
-			//			}
-			//nc.Variables_1D["PROFILE"].([]float64)[nbProfile] = profile
-			nc.Variables.set("PROFILE", profile, nbProfile)
+			nc.Variables.set("PROFILE", v, nbProfile)
 
 		}
 	}
