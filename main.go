@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,10 +20,10 @@ var Build = "2017-04-14T00:21:00Z"
 // Discard is an io.Writer on which all Write calls succeed
 // without doing anything. Discard = devNull(0) = int(0)
 // when echo is define in program argument list, echo = os.Stdout
-var echo io.Writer = ioutil.Discard
+var echo = ioutil.Discard
 
 // use for debug mode
-var debug io.Writer = ioutil.Discard
+var debug = ioutil.Discard
 
 // usefull shortcut macros
 var p = fmt.Println
