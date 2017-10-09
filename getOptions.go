@@ -76,12 +76,12 @@ func GetOptions() ([]string, string) {
 		fmt.Printf("Environnement variables:\n")
 		v := os.Getenv("OCEANO2OCEANSITES_CFG")
 		if v == "" {
-			v = "not define"
+			v = "not defined"
 		}
 		fmt.Printf(" - OCEANO2OCEANSITES_CFG: %s\n", v)
 		r := os.Getenv("ROSCOP_CSV")
 		if r == "" {
-			r = "not define"
+			r = "not defined"
 		}
 		fmt.Printf(" - ROSCOP_CSV: %s\n", r)
 		fmt.Printf("Configuration file: %s\n", cfgname)
