@@ -31,7 +31,7 @@ This will install automatically these following packages:
 
 * [https://github.com/fhs/go-netcdf](https://github.com/fhs/go-netcdf)
 * [https://github.com/pborman/getopt](https://github.com/pborman/getopt)
-* [https://gopkg.in/gcfg.v](https://gopkg.in/gcfg.v1)
+* [https://github.com/BurntSushi/toml](https://github.com/BurntSushi/toml)
 
 The package go-netcdf wrap the netcdf C library with go and need the installation
 of pkgconfig utility and libnetcdf-dev.
