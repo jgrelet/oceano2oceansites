@@ -76,9 +76,9 @@ Replace the line :
 
  with the path where NetCDF is installed, c:/opt in this case:
 
-   // #cgo windows CFLAGS: -I C:/opt/netCDF-4.5.0/include
+    // #cgo windows CFLAGS: -I C:/opt/netCDF-4.5.0/include
 
-   // #cgo windows LDFLAGS: -lnetcdf -L C:/opt/netCDF-4.5.0/lib
+    // #cgo windows LDFLAGS: -lnetcdf -L C:/opt/netCDF-4.5.0/lib
 
 Restart package installation:
 
