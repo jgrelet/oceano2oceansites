@@ -74,7 +74,7 @@ Replace the line :
 
     // #cgo pkg-config: nectcdf
 
- with the path where NetCDF is installed, c:/opt in this case:
+ with the path where NetCDF is installed, c:/opt in this case for pseudo #cgo directives CFLAGS and LDFLAGS:
 
     // #cgo windows CFLAGS: -I C:/opt/netCDF-4.5.0/include
 
