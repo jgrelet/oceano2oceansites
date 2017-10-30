@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	//	"strconv"
 	"strings"
 
 	"github.com/fhs/go-netcdf/netcdf"
