@@ -9,12 +9,15 @@ import (
 	"os"
 )
 
-const progName string = "oceano2oceansites"
-const progVersion string = "0.2.4"
-
-// Build date, should be get value at compile time
-// see: http://stackoverflow.com/questions/11354518/golang-application-auto-build-versioning
-var Build = "2017-04-14T00:21:00Z"
+var (
+	// Version set in Makefile
+	// see: http://stackoverflow.com/questions/11354518/golang-application-auto-build-versioning
+	Version = "undefined"
+	// Binary set in Makefile
+	Binary = "oceano2oceansites"
+	// BuildTime set in Makefile
+	BuildTime = "undefined"
+)
 
 // use for echo mode
 // Discard is an io.Writer on which all Write calls succeed
