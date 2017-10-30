@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fhs/go-netcdf/netcdf"
 	"github.com/pborman/getopt"
 )
 
@@ -74,7 +73,7 @@ func GetOptions() ([]string, string) {
 	// show version and env
 	if *optVersion {
 		fmt.Println(Binary + ": v" + Version + ", build date: " + BuildTime)
-		fmt.Printf("Netcdf version: %s\n", netcdf.Version())
+		fmt.Printf("Netcdf version: %s\n", NetcdfVersion())
 		fmt.Printf("Environnement variables:\n")
 		v := os.Getenv("OCEANO2OCEANSITES_CFG")
 		if v == "" {
