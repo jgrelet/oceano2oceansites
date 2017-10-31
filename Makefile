@@ -1,0 +1,52 @@
+# Borrowed from: 
+# https://github.com/silven/go-example/blob/master/Makefile
+# https://vic.demuzere.be/articles/golang-makefile-crosscompile/
+
+BINARY = oceano2oceansites
+VET_REPORT = vet.report
+TEST_REPORT = tests.xml
+GOARCH = amd64
+
+VERSION = 0.2.5
+COMMIT = $(shell git rev-parse HEAD)
+BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
+
+# Symlink into GOPATH
+GITHUB_USERNAME=jgrelet
+CURRENT_DIR=$(shell pwd)
+
+# demo
+DRIVE = data/CTD/test
+CRUISE = TEST
+CONFIG = oceano2oceansites.toml
+ROSCOP = roscop/code_roscop.csv
+PREFIX = csp
+
+# Setup the -ldflags option for go build here, interpolate the variable values
+LDFLAGS = -ldflags "-X main.Binary=${BINARY} -X main.Version=${VERSION}  \
+-X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
+
+# Build the project
+all: clean test vet build demo
+
+build: 
+	go build ${LDFLAGS} -o ${BINARY} 
+
+install:
+	go install ${LDFLAGS} 
+
+test:
+	go test -v ./...  
+
+demo:
+	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv 
+
+fmt:
+	go fmt $$(go list ./... | grep -v /vendor/) 
+
+clean:
+	-rm -f ${TEST_REPORT}
+	-rm -f ${VET_REPORT}
+	-rm -f ${BINARY}-*
+
+.PHONY: build install test vet fmt clean
