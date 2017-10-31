@@ -20,7 +20,7 @@ func TestConfig(t *testing.T) {
 	assert.Equal(cfg.Global.Debug, false)
 	assert.Equal(cfg.Global.Echo, true)
 	// test Cruise section
-	assert.Equal(cfg.Cruise.CycleMesure, "CASSIOPEE")
+	assert.Equal(cfg.Cruise.CycleMesure, "TEST")
 	assert.Equal(cfg.Cruise.Plateforme, "ATALANTE")
 	assert.Equal(cfg.Cruise.Callsign, "FNCM")
 	assert.Equal(cfg.Cruise.Institute, "IRD")

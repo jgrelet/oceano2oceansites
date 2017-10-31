@@ -27,20 +27,21 @@ LDFLAGS = -ldflags "-X main.Binary=${BINARY} -X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
 
 # Build the project
-all: clean test vet build demo
+all: clean build test vet demo
 
 build: 
-	go build ${LDFLAGS} -o ${BINARY} 
+	go get .
+	go build ${LDFLAGS} -o ${BINARY} .
 
 install:
-	go install ${LDFLAGS} 
+	go install ${LDFLAGS} .
 
 test:
 	go test -v ./...  
 
 demo:
 	${BINARY} -v
-	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv -o OS_${CRUISE}_CTD.nc
+	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv 
 	ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
 
 fmt:
