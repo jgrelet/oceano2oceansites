@@ -16,5 +16,5 @@
 *.nc
 debug
 oceano2oceansites
-*.stack.*
+*.stackdump
 
