@@ -39,7 +39,9 @@ test:
 	go test -v ./...  
 
 demo:
-	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv 
+	${BINARY} -v
+	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv -o OS_${CRUISE}_CTD.nc
+	ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
 
 fmt:
 	go fmt $$(go list ./... | grep -v /vendor/) 

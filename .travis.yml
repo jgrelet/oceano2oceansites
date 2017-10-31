@@ -24,14 +24,6 @@ before_install:
 before_script:
   - go vet ./...
 
-script:
-  - go install -ldflags "-s" -v ./...
-  - go test -v ./...
-  - oceano2oceansites -v
-  - oceano2oceansites -e --files=data/CTD/csp/csp*.cnv
-  - ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_CASSIOPEE_CTD.nc
-  - oceano2oceansites -d --config=config/fr25.toml --files=data/CTD/fr25/fr2599?.cnv
-  - ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_PIRATA-FR25_CTD.nc
 
 after_success:    
   - ls -la
