@@ -74,6 +74,19 @@ You have to define PKG_CONFIG_PATH which is a environment variable that specifie
 
 Edit the C:\opt\netCDF\lib\pkgconfig\netcdf.pc file with the correct path.
 
+    prefix=C:/opt/netCDF
+    exec_prefix=C:/opt/netCDF
+    libdir=C:/opt/netCDF/lib
+    includedir=C:/opt/netCDF/include
+    ccompiler=C:/MinGW/msys/1.0/bin/gcc.exe
+
+    Name: netCDF
+    Description: NetCDF Client Library for C
+    URL: http://www.unidata.ucar.edu/netcdf
+    Version: 4.5.0
+    Libs: -L${libdir} -lnetcdf -lhdf5 -hdf5_hl -lzlib
+    Cflags: -I${includedir}
+
 Check it:
 
     > pkg-config --cflags netcdf
