@@ -49,21 +49,21 @@ _example:_
 
 * Update your path env with setx
 
-    setx path "%path%;C:\go\bin;C:\opt\netCDF\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
+    > setx path "%path%;C:\go\bin;C:\opt\netCDF\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
 
 * Run MSYS command tool from C:\MinGW\msys\1.0\msys.bat and check your go and gcc version:
 
     > go version
-    go version go1.9.2 windows/amd64
+go version go1.9.2 windows/amd64
 
     > gcc --version
-    gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
+gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
 
 ## Install packages
 
 * package [go-netcdf](https://github.com/jgrelet/go-netcdf)
 
-    go get github.com/jgrelet/go-netcdf/netcdf
+    > go get github.com/jgrelet/go-netcdf/netcdf
 
 _Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See <http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html#pkg-config>_
 
