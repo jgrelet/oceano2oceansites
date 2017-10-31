@@ -30,26 +30,26 @@ LDFLAGS = -ldflags "-X main.Binary=${BINARY} -X main.Version=${VERSION}  \
 all: clean build test vet demo
 
 build: 
-	go get .
-	go build ${LDFLAGS} -o ${BINARY} .
+    go get .
+    go build ${LDFLAGS} -o ${BINARY} .
 
 install:
-	go install ${LDFLAGS} .
+    go install ${LDFLAGS} .
 
 test:
-	go test -v ./...  
+    go test -v ./...  
 
 demo:
-	${BINARY} -v
-	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv 
-	ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
+    ${BINARY} -v
+    ${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv 
+    ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
 
 fmt:
-	go fmt $$(go list ./... | grep -v /vendor/) 
+    go fmt $$(go list ./... | grep -v /vendor/) 
 
 clean:
-	-rm -f ${TEST_REPORT}
-	-rm -f ${VET_REPORT}
-	-rm -f ${BINARY}-*
+    -rm -f ${TEST_REPORT}
+    -rm -f ${VET_REPORT}
+    -rm -f ${BINARY}-*
 
 .PHONY: build install test vet fmt clean
