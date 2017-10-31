@@ -54,10 +54,10 @@ _example:_
 * Run MSYS command tool from C:\MinGW\msys\1.0\msys.bat and check your go and gcc version:
 
     > go version
-go version go1.9.2 windows/amd64
+    go version go1.9.2 windows/amd64
 
     > gcc --version
-gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
+    gcc.exe (x86_64-win32-seh-rev1, Built by MinGW-W64 project) 4.9.3
 
 ## Install packages
 
@@ -69,7 +69,7 @@ _Installation should be failed during compilation, the pkg-config method current
 
 Define PKG_CONFIG_PATH which is a environment variable that specifies additional paths in which pkg-config will search for its .pc files.
 
-    > echo $PKG_CONFIG_PATH 
+    > echo $PKG_CONFIG_PATH
     C:\opt\netCDF\lib\pkgconfig
 
 Edit the C:\opt\netCDF\lib\pkgconfig\netcdf.pc file with the correct path.
