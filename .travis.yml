@@ -23,7 +23,7 @@ before_install:
 
 before_script:
   - go vet ./...
-
+  - go get github.com/stretchr/testify/assert
 
 after_success:    
   - ls -la
