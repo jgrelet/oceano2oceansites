@@ -1,17 +1,17 @@
 # Windows installation
 
-You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compilers and Netcdf library). The gcc compiler is need to link Netcdf library with the go-netcdf package. The installation of gcc under Windows 64 bit is a little tricky due to exception propagation
+You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compilers and Netcdf library). The gcc compiler is needed to link Netcdf library with the go-netcdf package. The installation of gcc under Windows 64 bit is a little tricky due to exceptions propagation.
 
 ## 32 bit
 
 * Download golang from [https://golang.org/dl](https://golang.org/dl) and follow the installation instructions
   * from binary: [https://golang.org/doc/install](https://golang.org/doc/install)
   * from source : [https://golang.org/doc/install/source](https://golang.org/doc/install/source)
-* Download the mingw on line installer from [sourceforge](http://sourceforge.net/projects/mingw/files/latest/download?source=files)
-* Run it and select only msys-base, mingw-developper-tools and mingw32-base
+* Download the mingw online installer from [sourceforge](http://sourceforge.net/projects/mingw/files/latest/download?source=files)
+* Run it and select only msys-base, mingw-developper-tools,mingw32-base and pkg-config
 * Install [Git for Windows](https://git-scm.com/download/win)
 * Install [Mercurial](https://mercurial.selenic.com/) (hg)
-* Install [Netcdf 4.5.0 NC4-32](http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html)
+* Install [Netcdf 4.5.0 NC4-32] under c:\opt\netCDF for exemple(http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html)
 
 ## 64 bit
 
@@ -31,7 +31,7 @@ You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compil
 
 * Install [Git for Windows](https://git-scm.com/download/win)
 * Install [Mercurial](https://mercurial.selenic.com/)
-* Install [Netcdf 4.5.0 NC4-64](http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html)
+* Install [Netcdf 4.5.0 NC4-64] under c:\opt\netCDF for exemple(http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html)
 
 ## Setting environment
 
@@ -47,13 +47,13 @@ _example:_
 
 * Update your path env with setx
 
-    setx path "%path%;C:\go\bin;C:\opt\netCDF-4.5.0\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
+    setx path "%path%;C:\go\bin;C:\opt\netCDF\bin;C:\Program Files (x86)\Git\bin;C:\Program Files\Mercurial\"
 
 * Run MSYS command tool from C:\MinGW\msys\1.0\msys.bat and check your go and gcc version:
 
     $ go version
 
-    go version go1.9.1 windows/amd64
+    go version go1.9.2 windows/amd64
 
     $ gcc --version
 
@@ -61,13 +61,27 @@ _example:_
 
 ## Install packages
 
-* package [go-netcdf](https://github.com/fhs/go-netcdf)
+* package [go-netcdf](https://github.com/jgrelet/go-netcdf)
 
-    go get github.com/fhs/go-netcdf/netcdf
+    go get github.com/jgrelet/go-netcdf/netcdf
 
 _Installation should be failed during compilation, the pkg-config method currently used to detect C library is not installed under Windows. See <http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw_how_to.html#pkg-config>_
 
-A faster implementation is to change these cgo directives in `dataset.go` and `attribute.go` files before compilation.
+You have to define PKG_CONFIG_PATH which is a environment variable that specifies additional paths in which pkg-config will search for its .pc files.
+
+    $ echo $PKG_CONFIG_PATH 
+    C:\opt\netCDF\lib\pkgconfig
+
+Edit the C:\opt\netCDF\lib\pkgconfig\netcdf.pc file with the correct path.
+
+Check it:
+
+    > pkg-config --cflags netcdf
+    -IC:/opt/netCDF/include
+    > pkg-config --libs netcdf
+    -LC:/opt/netCDF/lib -lnetcdf -lhdf5 -lhdf5_hl -lzlib
+
+A faster implementation but not standard and portable is to change directly these cgo directives in `dataset.go` and `attribute.go` files before compilation.
 cgo allows Go programs to interoperate with C libraries.
 
 Replace the line :
@@ -76,15 +90,16 @@ Replace the line :
 
  with the path where NetCDF is installed, c:/opt in this case for pseudo #cgo directives CFLAGS and LDFLAGS:
 
-    // #cgo windows CFLAGS: -I C:/opt/netCDF-4.5.0/include
+    // #cgo windows CFLAGS: -I C:/opt/netCDF/include
 
-    // #cgo windows LDFLAGS: -lnetcdf -L C:/opt/netCDF-4.5.0/lib
+    // #cgo windows LDFLAGS: -lnetcdf -L C:/opt/netCDF/lib
 
-Restart package installation:
+Build manually the package go-netcdf:
 
-    go install github.com/fhs/go-netcdf/netcdf
+    $ cd github.com/fhs/go-netcdf/netcdf
+    $ go build -a -v
 
-The netcdf.a library sould be installed under       `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
+The netcdf.a library sould be installed under       `$GOPATH\pkg\windows_amd64\github.com\jgrelet\go-netcdf`
 
 * package [oceano2oceansites](https://github.com/jgrelet/oceano2oceansites)
 

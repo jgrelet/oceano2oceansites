@@ -29,7 +29,7 @@ On a Raspbery PIx, you  must install and compile the go compiler and NetCDF libr
 
 This will install automatically these following packages:
 
-* [https://github.com/fhs/go-netcdf](https://github.com/fhs/go-netcdf)
+* [https://github.com/jgrelet/go-netcdf](https://github.com/fhs/go-netcdf)
 * [https://github.com/pborman/getopt](https://github.com/pborman/getopt)
 * [https://github.com/BurntSushi/toml](https://github.com/BurntSushi/toml)
 
