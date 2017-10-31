@@ -15,24 +15,27 @@ You can get the latest version by compiling it from the sources for the followin
 * [Windows](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_WINDOWS.md)
 * [Linux](https://github.com/jgrelet/oceano2oceansites/blob/master/INSTALL_LINUX.md)
 
-Add some Seabird cnv files under data directory,
-for example data/csp/*.cnv
+Add some Seabird cnv files under data directory, for example data/csp/*.cnv
 
-Run and test:
+Run and test, you can use make or go:
 
-    go run *.go --files=data/csp/csp*.cnv -e
+    > make
+
+or
+
+    > go run *.go --files=data/csp/csp*.cnv -e
 
 Compile it:
 
-    go build
+    > go build
 
 Install binary under go/bin:
 
-    go install
+    > go install
 
 Usage:
 
-    $ oceano2oceansites -h
+    > oceano2oceansites -h
       Usage: oceano2oceansites.exe [-dehv] [-c value] [-f value] [-m value] [parameters ...]
         -c, --config=value
                      Name of the configuration file to use.
@@ -46,7 +49,7 @@ Usage:
 
 Test binary:
 
-    oceano2oceansites -e --files=data/csp/csp*.cnv
+    > oceano2oceansites -e --files=data/csp/csp*.cnv
 
 The program use by default the configuration files oceano2oceansites.toml
 and the code_roscop.csv in the current directory.
