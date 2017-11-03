@@ -33,6 +33,10 @@ build:
 	go get .
 	go build ${LDFLAGS} -o ${BINARY} .
 
+buildall: 
+	go get .
+	go build ${LDFLAGS} -o ${BINARY} -a -v .
+
 install:
 	go install ${LDFLAGS} .
 
