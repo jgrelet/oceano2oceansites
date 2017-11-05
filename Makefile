@@ -4,7 +4,7 @@
 
 BINARY = oceano2oceansites
 VET_REPORT = vet.report
-TEST_REPORT = tests.xml
+TEST_REPORT = tests.x
 GOARCH = amd64
 
 VERSION = 0.2.5
@@ -23,7 +23,7 @@ ROSCOP = roscop/code_roscop.csv
 PREFIX = csp
 
 # Setup the -ldflags option for go build here, interpolate the variable values
-LDFLAGS = -ldflags "-X main.Binary=${BINARY} -X main.Version=${VERSION}  \
+LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
 
 # Build the project
@@ -31,14 +31,14 @@ all: clean build test vet demo
 
 build: 
 	go get .
-	go build ${LDFLAGS} -o ${BINARY} .
+	go build ${LDFLAGS}  .
 
 buildall: 
 	go get .
-	go build ${LDFLAGS} -o ${BINARY} -a -v .
+	go build ${LDFLAGS} -a -v .
 
 install:
-	go install ${LDFLAGS} .
+	go install 
 
 test:
 	go test -v ./...  
