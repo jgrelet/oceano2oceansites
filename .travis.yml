@@ -25,6 +25,7 @@ before_script:
   - go vet ./...
   - go get github.com/stretchr/testify/assert
   - go get gopkg.in/gcfg.v1
+  - go get github.com/BurntSushi/toml
 
 after_success:    
   - ls -la
