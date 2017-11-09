@@ -31,21 +31,25 @@ LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
 
 # Build the project
-all: clean build install test vet demo
+all: clean dep build install test vet demo
+
+dep:
+	@go get -v -d ./...
 
 build: 
-	go get ./...
-	go build ${LDFLAGS}  .
+	@go build ${LDFLAGS}  .
 
 buildall: 
-	go get ./...
-	go build ${LDFLAGS} -a -v .
+	@go build ${LDFLAGS} -a -v .
 
 install:
-	go install 
+	@go install 
 
 test:
-	go test -v ./...  
+	@go test -v ./...  
+
+fmt:
+	@go fmt $$(go list ./... | grep -v /vendor/) 
 
 demo:
 	${BINARY} -e -c ${CONFIG} -r ${ROSCOP} --files=${DRIVE}/${PREFIX}*.cnv 
@@ -55,12 +59,9 @@ demo:
 ncdump:
 	ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
 
-fmt:
-	go fmt $$(go list ./... | grep -v /vendor/) 
-
 clean:
 	-rm -f ${TEST_REPORT}
 	-rm -f ${VET_REPORT}
 	-rm -f ${BINARY}-*
 
-.PHONY: build buildall install test demo ncdump vet fmt clean
+.PHONY: dep build buildall install test demo ncdump vet fmt clean
