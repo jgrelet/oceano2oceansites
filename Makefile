@@ -22,6 +22,10 @@ CONFIG = oceano2oceansites.toml
 ROSCOP = roscop/code_roscop.csv
 PREFIX = csp
 
+# set env
+export OCEANO2OCEANSITES_CFG = ${CONFIG}
+export ROSCOP_CSV = ${ROSCOP}
+
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
@@ -30,11 +34,11 @@ LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
 all: clean build test vet demo
 
 build: 
-	go get .
+	go get ./...
 	go build ${LDFLAGS}  .
 
 buildall: 
-	go get .
+	go get ./...
 	go build ${LDFLAGS} -a -v .
 
 install:
@@ -44,8 +48,11 @@ test:
 	go test -v ./...  
 
 demo:
+	${BINARY} -e -c ${CONFIG} -r ${ROSCOP} --files=${DRIVE}/${PREFIX}*.cnv 
 	${BINARY} -v
-	${BINARY} -c ${CONFIG} -r ${ROSCOP} -e --files=${DRIVE}/${PREFIX}*.cnv 
+	${BINARY} --files=${DRIVE}/${PREFIX}*.cnv 
+
+ncdump:
 	ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
 
 fmt:
@@ -56,4 +63,4 @@ clean:
 	-rm -f ${VET_REPORT}
 	-rm -f ${BINARY}-*
 
-.PHONY: build install test vet fmt clean
+.PHONY: build buildall install test demo ncdump vet fmt clean
