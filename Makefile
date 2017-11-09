@@ -31,7 +31,7 @@ LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
 
 # Build the project
-all: clean build test vet demo
+all: clean build install test vet demo
 
 build: 
 	go get ./...
