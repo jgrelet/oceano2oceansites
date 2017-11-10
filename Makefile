@@ -3,8 +3,6 @@
 # https://vic.demuzere.be/articles/golang-makefile-crosscompile/
 
 BINARY = oceano2oceansites
-VET_REPORT = vet.report
-TEST_REPORT = tests.x
 GOARCH = amd64
 
 VERSION = 0.2.5
@@ -31,7 +29,7 @@ LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
 
 # Build the project
-all: clean dep build install test vet demo
+all: dep build install test demo
 
 dep:
 	@go get -v -d ./...
@@ -60,8 +58,6 @@ ncdump:
 	ncdump -v PROFILE,LATITUDE,LONGITUDE,BATH netcdf/OS_${CRUISE}_CTD.nc
 
 clean:
-	-rm -f ${TEST_REPORT}
-	-rm -f ${VET_REPORT}
 	-rm -f ${BINARY}-*
 
-.PHONY: dep build buildall install test demo ncdump vet fmt clean
+.PHONY: build buildall install test demo ncdump fmt clean
