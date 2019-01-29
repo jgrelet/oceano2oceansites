@@ -1,10 +1,10 @@
 language: go
 
 go:
-        #  - 1.8.7
-  - 1.9.7
+  - 1.8.7
+    #  - 1.9.7
     #  - 1.10.8
-    #  - 1.11.5
+  - 1.11.5
 
 os:
   - linux
@@ -25,10 +25,10 @@ before_install:
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew install netcdf; fi
 
 before_script:
-  - go vet ./...
   - go get github.com/stretchr/testify/assert
   - go get gopkg.in/gcfg.v1
   - go get github.com/BurntSushi/toml
+  - go vet ./...
 
 after_success:    
   - ls -la
