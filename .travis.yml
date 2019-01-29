@@ -29,6 +29,7 @@ before_script:
   - go get gopkg.in/gcfg.v1
   - go get github.com/BurntSushi/toml
   - go get github.com/pborman/getopt
+  - go get github.com/jgrelet/go-netcdf/netcdf
   - go vet ./...
 
 after_success:    
