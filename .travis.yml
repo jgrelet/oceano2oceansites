@@ -1,10 +1,10 @@
 language: go
 
 go:
-  - 1.8.7
+        #  - 1.8.7
   - 1.9.7
-  - 1.10.8
-  - 1.11.5
+    #  - 1.10.8
+    #  - 1.11.5
 
 os:
   - linux
@@ -21,7 +21,7 @@ before_install:
   - if [ ${TRAVIS_OS_NAME} == "linux" ]; then sudo apt-get update -q -y; fi
   - if [ ${TRAVIS_OS_NAME} == "linux" ]; then sudo apt-get install libnetcdf-dev netcdf-bin -y; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew update; fi
-  - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew tap homebrew/science; fi
+  - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew tap brewsci/science; fi
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew install netcdf; fi
 
 before_script:
