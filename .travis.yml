@@ -38,6 +38,7 @@ before_script:
 after_success:    
 
   - ls -la
+  - echo $DIST
   - curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs $DIST
   - curl -T "{oceano2oceansites.toml,cassiopee.toml,fr25.toml}" $DIST
   - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T /usr/lib/libnetcdf.so $DIST; f
