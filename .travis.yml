@@ -41,6 +41,7 @@ after_success:
   - ls -la
   - echo $DIST
   - echo $TRAVIS_GO_VERSION
+  - echo $DIST{$TRAVIS_GO_VERSION}
   - curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs $DIST{$TRAVIS_GO_VERSION} --ftp-method singlecwd
   - curl -T "{oceano2oceansites.toml,cassiopee.toml,fr25.toml}" $DIST{$TRAVIS_GO_VERSION}/
   - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T /usr/lib/libnetcdf.so $DIST{$TRAVIS_GO_VERSION}/; f
