@@ -28,12 +28,13 @@ before_install:
   - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew install netcdf; fi
 
 before_script:
-  - go get github.com/stretchr/testify/assert
-  - go get gopkg.in/gcfg.v1
-  - go get github.com/BurntSushi/toml
-  - go get github.com/pborman/getopt
-  - go get github.com/jgrelet/go-netcdf/netcdf
-  - go vet -t -v ./...
+#  - go get github.com/stretchr/testify/assert
+#  - go get gopkg.in/gcfg.v1
+#  - go get github.com/BurntSushi/toml
+#  - go get github.com/pborman/getopt
+#  - go get github.com/jgrelet/go-netcdf/netcdf
+  - go get -t -v ./...
+  - go vet ./...
 
 after_success:    
 
