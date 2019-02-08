@@ -26,7 +26,9 @@ after_success:
 - ls -la
 - echo $DIST
 - echo $TRAVIS_GO_VERSION
-- curl -T $GOPATH/bin/oceano2oceansites --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}
+- - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T $GOPATH/bin/${TARGET} --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}; fi
+- - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T $GOPATH/bin/${TARGET} --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}; fi
+- - if [ ${TRAVIS_OS_NAME} == "windows" ]; then curl -T $GOPATH/bin/${TARGET}.exe --ftp-create-dirs ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}; fi
 - curl -T "{oceano2oceansites.toml,cassiopee.toml,fr25.toml}" ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}
 - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T /usr/lib/libnetcdf.so ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST};
   fi
