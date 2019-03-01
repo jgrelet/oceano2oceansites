@@ -25,7 +25,7 @@ export OCEANO2OCEANSITES_CFG = ${CONFIG}
 export ROSCOP_CSV = ${ROSCOP}
 
 # Setup the -ldflags option for go build here, interpolate the variable values
-LDFLAGS = -ldflags "-X main.Version=${VERSION}  \
+LDFLAGS = -buildmode=exe -ldflags  "-X main.Version=${VERSION}  \
 -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'`"
 
 # Build the project
