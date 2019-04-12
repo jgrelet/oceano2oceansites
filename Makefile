@@ -32,7 +32,8 @@ LDFLAGS = -buildmode=exe -ldflags  "-X main.Version=${VERSION}  \
 all: dep build install test demo
 
 dep:
-	@go get -v -d ./...
+	@go get -v -t ./...
+	@go vet  ./...
 
 build: 
 	@go build ${LDFLAGS}  .

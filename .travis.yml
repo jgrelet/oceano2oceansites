@@ -13,7 +13,7 @@ env:
   - secure: TUVHQgjlBH+MmdepI0kLT12GKTd361mfExZ3t4N1xeue7AdsvCF5fgPRCc1g5CJE2DdaoYRqiArEC+a6EZ/UDsrElXJ2JZ+c3/JYW5EznTAPzH7hGKvGMDAEkHWd8OgUccSZZMPKMIpnV0KVM5xIHlOK461V5kw0f9ChXzO27k7EF8z8d/9+KhmNVVMSTvhOzM6KoxCGiugHMsP8YBmUPz12pUK2+F3UPN/XD5qnRKq9k9GtYhBAqfhkGM/aktbCYd3+lnQJE0tw55sRZCNgqMQq/2nl4l8Xlr/7c90dufpcc07IU5Xo8Ov41q2ZawsbEtxAptMjrNTdYhLjEYYY03nUknidgxuS/E4V1aPLKOmgdaiAI3BoeOOnbGyZ+aGl1xqh2TD06twxfOm8ryyhIxX1aBwVSzuMVmbQ/SoPR7XDoVH0wcBxi6/XC2ab6Ld7wP7Up7Up6feW46nJczPQLvuxd9IDFd7VN9Bc5LduCdyb/8WgorM3URC44RO9opoUZHmhnOW/Prl7UgUUGEX4s23d90Qn6CykryqdpxjFhsVuIrzH2SRcRaIkZepxSSZvyMSzBWNGSpYFqgHEkfmwFbFumsiMC3dfV7+oNx1+XBgjwVOWJwZ5qGJ3u6rI0vY0+N5Qvucnof6UMUtmdrnnBm2EDHeYCHD8P2ZrVBdSNT8=
 before_install:
 - if [ ${TRAVIS_OS_NAME} == "linux" ]; then sudo apt-get update -q -y; fi
-- if [ ${TRAVIS_OS_NAME} == "linux" ]; then sudo apt-get install libnetcdf-dev netcdf-bin
+- if [ ${TRAVIS_OS_NAME} == "linux" ]; then sudo apt-get install gcc binutil libnetcdf-dev netcdf-bin
   -y; fi
 - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew update; fi
 - if [ ${TRAVIS_OS_NAME} == "osx" ]; then brew tap brewsci/science; fi
