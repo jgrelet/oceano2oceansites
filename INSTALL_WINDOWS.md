@@ -10,8 +10,7 @@ You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compil
 * Download the mingw online installer from [sourceforge](http://sourceforge.net/projects/mingw/files/latest/download?source=files)
 * Run it and select only msys-base, mingw-developper-tools,mingw32-base and pkg-config
 * Install [Git for Windows](https://git-scm.com/download/win)
-* Install [Mercurial](https://mercurial.selenic.com/) (hg)
-* Install [Netcdf 4.5.0 NC4-32](http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example
+* Install NetCDF library and tools (http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example
 
 ## 64 bit
 
@@ -20,12 +19,14 @@ You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compil
   * from source : [https://golang.org/doc/install/source](https://golang.org/doc/install/source)
 * Download the mingw-64 on line installer from [sourceforge](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/)
 * Test gcc installation with :
-  
-    $ g++ -v
-    Using built-in specs.
-    ...
-    Target: x86_64-w64-mingw32
-    ...
+
+```bash
+$ g++ -v
+  Using built-in specs.
+  ...
+  Target: x86_64-w64-mingw32
+  ...
+```
 
 * Install [Git for Windows](https://git-scm.com/download/win)
 * Install Netcdf librarie and tools (http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example (don't install it in directory with space)
@@ -36,11 +37,14 @@ You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compil
 
 * Define PKG_CONFIG_PATH which as an environment variableDefine that specifies additional paths in which pkg-config will search for its .pc files.
 
-    $ echo $PKG_CONFIG_PATH
-    C:\opt\netCDF\lib\pkgconfig
+```bash
+$ echo $PKG_CONFIG_PATH
+  C:\opt\netCDF\lib\pkgconfig
+```
 
 Edit the C:\opt\netCDF\lib\pkgconfig\netcdf.pc file with the correct path.
 
+```bash
 prefix=C:/opt/netCDF
 exec_prefix=C:/opt/netCDF
 libdir=C:/opt/netCDF/lib
@@ -53,29 +57,38 @@ URL: http://www.unidata.ucar.edu/netcdf
 Version: 4.x.x
 Libs: -L${libdir} -lnetcdf -lhdf5 -hdf5_hl -lzlib
 Cflags: -I${includedir}
+```
 
 Check it:
 
-    $ pkg-config --cflags netcdf -IC:/opt/netCDF/include
-    $ pkg-config --libs netcdf
+```bash
+$ pkg-config --cflags netcdf -IC:/opt/netCDF/include
+$ pkg-config --libs netcdf
 -LC:/opt/netCDF/lib -lnetcdf -lhdf5 -lhdf5_hl -lzlib
+```
   
 * ## Install packages
 
 * package [go-netcdf](https://github.com/jgrelet/go-netcdf)
 
-    $ go get github.com/fhs/go-netcdf
+```bash
+$ go get github.com/fhs/go-netcdf
+```
 
 Build manually the package go-netcdf (optional):
 
-    $ cd github.com/fhs/go-netcdf/netcdf
-    $ go build -a -v
+```bash
+$ cd github.com/fhs/go-netcdf/netcdf
+$ go build -a -v
+```
 
 The netcdf.a library sould be installed under       `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
 
 * package [oceano2oceansites](https://github.com/jgrelet/oceano2oceansites)
 
-    $ go get github.com/jgrelet/oceano2oceansites
+```bash
+$ go get github.com/jgrelet/oceano2oceansites
+```
 
 This will install automatically these following packages:
 
