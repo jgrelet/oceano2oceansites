@@ -3,9 +3,9 @@ go:
 - 1.14.x
 os:
 - linux
-- osx
+  #- osx
   #- windows
-dist: trusty
+dist: bionic
 env:
   global:
   - DIST=US191/$TARGET/$TRAVIS_OS_NAME/
