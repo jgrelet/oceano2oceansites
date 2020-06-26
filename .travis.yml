@@ -31,6 +31,7 @@ after_success:
 - curl -T "{oceano2oceansites.toml,cassiopee.toml,fr25.toml}" ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}
 - if [ ${TRAVIS_OS_NAME} == "linux" ]; then curl -T /usr/lib/libnetcdf.so ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST};
   fi
+- if [ ${TRAVIS_OS_NAME} == "osx" ]; then ls -la /usr/local/opt/netcdf/lib
 - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/netcdf/lib/libnetcdf.dylib
   ftp://$FTP_USER:$FTP_PASSWORD@ftp.ifremer.fr/${DIST}; fi
 - if [ ${TRAVIS_OS_NAME} == "osx" ]; then curl -T /usr/local/opt/szip/lib/libsz.dylib
