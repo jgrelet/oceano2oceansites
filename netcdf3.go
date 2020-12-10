@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jgrelet/go-netcdf/netcdf"
+	"github.com/fhs/go-netcdf/netcdf"
 )
 
 // WriteNetcdf creates the NetCDF file following nc structure.

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jgrelet/go-netcdf/netcdf"
+	"github.com/fhs/go-netcdf/netcdf"
 	"github.com/pborman/getopt"
 )
 
