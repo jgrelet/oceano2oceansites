@@ -55,21 +55,22 @@ Name: netCDF
 Description: NetCDF Client Library for C
 URL: http://www.unidata.ucar.edu/netcdf
 Version: 4.x.x
-Libs: -L${libdir} -lnetcdf -lhdf5 -hdf5_hl -lzlib
+Libs: -L${libdir} -lnetcdf -lhdf5 -lzlib
 Cflags: -I${includedir}
 ```
 
 Check it:
 
 ```bash
-$ pkg-config --cflags netcdf -IC:/opt/netCDF/include
+$ pkg-config --cflags netcdf 
+-IC:/opt/netCDF/include
 $ pkg-config --libs netcdf
--LC:/opt/netCDF/lib -lnetcdf -lhdf5 -lhdf5_hl -lzlib
+-LC:/opt/netCDF/lib -lnetcdf -lhdf5 -lzlib
 ```
   
 * ## Install packages
 
-* package [go-netcdf](https://github.com/jgrelet/go-netcdf)
+* package [go-netcdf](https://github.com/fhs/go-netcdf)
 
 ```bash
 $ go get github.com/fhs/go-netcdf
