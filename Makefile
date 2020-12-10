@@ -5,7 +5,7 @@
 BINARY = oceano2oceansites
 GOARCH = amd64
 
-VERSION = 0.2.5
+VERSION = 0.2.6
 COMMIT = $(shell git rev-parse HEAD)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 
