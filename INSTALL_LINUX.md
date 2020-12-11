@@ -14,6 +14,13 @@ If not, install them with apt-get:
 
     > sudo apt-get install netcdf-bin libnetcdf-dev gcc
 
+**Notes:**
+If you have previously installed the NetCDF library for Python with anaconda, you should not install it with apt-get.
+But you have to define the following variables in your Linux session so that the gcc compiler can access the libraries and then perform linking.
+
+    > export PKG_CONFIG_PATH=/home/<user>/miniconda3/lib/pkgconfig
+    > export LD_LIBRARY_PATH=/home/<user>/miniconda3/lib
+
 ## ARM processors
 
 On a Raspbery PIx, you  must install and compile the go compiler and NetCDF library from source, see:

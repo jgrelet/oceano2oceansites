@@ -1,4 +1,4 @@
-module ocean2oceansites/main.go
+module github.com/jgrelet/oceano2oceansites
 
 go 1.15
 

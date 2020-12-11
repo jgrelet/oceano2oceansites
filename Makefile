@@ -1,6 +1,9 @@
 # Borrowed from: 
 # https://github.com/silven/go-example/blob/master/Makefile
 # https://vic.demuzere.be/articles/golang-makefile-crosscompile/
+# use go module since version 1.15
+# go mod init github.com/jgrelet/oceano2oceansites
+# go test
 
 BINARY = oceano2oceansites
 GOARCH = amd64
