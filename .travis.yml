@@ -3,7 +3,7 @@ go:
 - 1.15.x
 os:
 - linux
-- osx
+  #- osx
   #- windows
 dist: bionic
 env:
