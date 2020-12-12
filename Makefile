@@ -47,6 +47,10 @@ buildall:
 install:
 	@go install 
 
+mod:
+	@go mod tidy  
+	$(MAKE) test 
+
 test:
 	@go test -v ./...  
 
@@ -64,4 +68,4 @@ ncdump:
 clean:
 	-rm -f ${BINARY}-*
 
-.PHONY: build buildall install test demo ncdump fmt clean
+.PHONY: build buildall install test demo ncdump fmt  mod clean
