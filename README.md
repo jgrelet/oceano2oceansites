@@ -1,4 +1,4 @@
-# oceano2oceansites [![Build Status](https://travis-ci.org/jgrelet/oceano2oceansites.svg?branch=master)](https://travis-ci.org/jgrelet/oceano2oceansites)
+# oceano2oceansites [![Build Status](https://travis-ci.com/jgrelet/oceano2oceansites.svg?branch=master)](https://travis-ci.com/jgrelet/oceano2oceansites)
 
 _This application read Seabird CTD cnv files, extract data from header files and write result into one ASCII file and NetCDF OceanSITES file._
 
