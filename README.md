@@ -49,7 +49,7 @@ Usage:
 
 Test binary:
 
-    > oceano2oceansites -e --files=data/csp/csp*.cnv
+    > oceano2oceansites -e --files=data/CTD/csp/csp*.cnv
 
 The program use by default the configuration files oceano2oceansites.toml
 and the code_roscop.csv in the current directory.
