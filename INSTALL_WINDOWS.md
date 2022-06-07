@@ -38,8 +38,8 @@ $ g++ -v
 * Define PKG_CONFIG_PATH which as an environment variableDefine that specifies additional paths in which pkg-config will search for its .pc files.
 
 ```bash
-$ echo $PKG_CONFIG_PATH
-  C:\opt\netCDF\lib\pkgconfig
+echo $PKG_CONFIG_PATH
+  C:/opt/netCDF/lib/pkgconfig
 ```
 
 Edit the C:\opt\netCDF\lib\pkgconfig\netcdf.pc file with the correct path.
@@ -73,14 +73,14 @@ $ pkg-config --libs netcdf
 * package [go-netcdf](https://github.com/fhs/go-netcdf)
 
 ```bash
-$ go get github.com/fhs/go-netcdf
+go get github.com/fhs/go-netcdf
 ```
 
 Build manually the package go-netcdf (optional):
 
 ```bash
-$ cd github.com/fhs/go-netcdf/netcdf
-$ go build -a -v
+cd github.com/fhs/go-netcdf/netcdf
+go build -a -v
 ```
 
 The netcdf.a library sould be installed under       `$GOPATH\pkg\windows_amd64\github.com\fhs\go-netcdf`
