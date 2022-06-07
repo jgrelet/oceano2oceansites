@@ -29,6 +29,11 @@ Compile it:
 
     > go build
 
+Update go packages:
+
+    > go get -u ./...
+    > go mod tidy
+
 Install binary under go/bin:
 
     > go install
