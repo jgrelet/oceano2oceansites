@@ -10,7 +10,7 @@ You have the choice to install the 32-bit or 64-bit toolchain (go and gcc compil
 * Download the mingw online installer from [sourceforge](http://sourceforge.net/projects/mingw/files/latest/download?source=files)
 * Run it and select only msys-base, mingw-developper-tools,mingw32-base and pkg-config
 * Install [Git for Windows](https://git-scm.com/download/win)
-* Install NetCDF library and tools (http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example
+* Install [NetCDF library and tools](http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example
 
 ## 64 bit
 
@@ -29,11 +29,11 @@ $ g++ -v
 ```
 
 * Install [Git for Windows](https://git-scm.com/download/win)
-* Install Netcdf librarie and tools (http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example (don't install it in directory with space)
+* Install [Netcdf library and tools](http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html) under c:\opt\netCDF directory for example (don't install it in directory with space)
 
 ## Install pkg-config
 
-* Install [pkg-config-lite](https://sourceforge.net/projects/pkgconfiglite/) inside gcc binary durectory. 
+* Install [pkg-config-lite](https://sourceforge.net/projects/pkgconfiglite/) inside gcc binary durectory.
 
 * Define PKG_CONFIG_PATH which as an environment variableDefine that specifies additional paths in which pkg-config will search for its .pc files.
 
@@ -88,7 +88,7 @@ The netcdf.a library sould be installed under       `$GOPATH\pkg\windows_amd64\g
 * package [oceano2oceansites](https://github.com/jgrelet/oceano2oceansites)
 
 ```bash
-$ go get github.com/jgrelet/oceano2oceansites
+go get github.com/jgrelet/oceano2oceansites
 ```
 
 This will install automatically these following packages:
