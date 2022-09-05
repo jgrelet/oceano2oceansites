@@ -17,4 +17,6 @@
 debug
 oceano2oceansites
 *.stackdump
+/vendor
+
 
