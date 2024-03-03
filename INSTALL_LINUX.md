@@ -14,6 +14,10 @@ If not, install them with apt-get:
 
     > sudo apt-get install netcdf-bin libnetcdf-dev gcc
 
+Add go env $GOBIN to your PATH:
+
+    > export PATH=$PATH:$GOBIN
+
 **Notes:**
 If you have previously installed the NetCDF library for Python with anaconda, you should not install it with apt-get.
 But you have to define the following variables in your Linux session so that the gcc compiler can access the libraries and then perform linking.
