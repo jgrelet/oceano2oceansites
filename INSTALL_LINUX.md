@@ -45,3 +45,9 @@ This will install automatically these following packages:
 * [https://github.com/BurntSushi/toml](https://github.com/BurntSushi/toml)
 
 The package go-netcdf wrap the netcdf C library with go and need the installation of pkgconfig utility and libnetcdf-dev.
+
+## Upgrade Golang Dependencies
+
+* See: [https://golang.cafe/blog/how-to-upgrade-golang-dependencies.html]
+  
+    > go get -t -u ./...
